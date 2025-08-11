@@ -7,31 +7,36 @@
   <title>My_Stuff</title>
 
   <style>
-                 /* --- Google Fonts for an elegant look --- */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap');
+                body {
+  /* PASTE THE IMAGE URL YOU COPIED HERE */
+  background-image: url('https://images.unsplash.com/photo-1509316976878-54c4e0339c6d'); /* Example URL */
 
-body {
-  background-color: #FDF6E3; /* A soft, creamy background like parchment */
+  /* This makes the image cover the entire screen */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* This keeps the image fixed in place for a cool parallax effect when you scroll */
+  background-attachment: fixed;
+
+  /* Basic reset */
   margin: 0;
-  padding: 2rem;
-  font-family: 'Roboto', sans-serif; /* A clean, readable font for paragraphs */
-  color: #583922; /* A rich, dark brown for text */
-  line-height: 1.6;
+  font-family: sans-serif;
 }
 
+/* This is the semi-transparent layer for your text */
+.content-wrapper {
+  background-color: rgba(20, 30, 40, 0.65); /* A dark, moody blue with 65% opacity */
+  color: #FFFFFF; /* White text for contrast */
+  min-height: 100vh; /* Ensures the overlay covers the full height of the screen */
+  padding: 3rem;
+  box-sizing: border-box; /* Important for padding calculations */
+}
+
+/* Optional: Style headings to stand out more */
 h1, h2, h3 {
-  font-family: 'Playfair Display', serif; /* A beautiful, classic font for headings */
-  color: #C06014; /* A deep, burnt orange for headings */
-}
-
-a {
-  color: #AF4425; /* A strong rust color for links */
-  text-decoration: none;
-  font-weight: bold;
-}
-
-a:hover {
-  text-decoration: underline; /* Underline links on hover */
+  color: #AEC6CF; /* A soft, misty blue for headings */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
     </style>
 
