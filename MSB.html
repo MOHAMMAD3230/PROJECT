@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Online Music Search Bot</title>
+  <style>
+    body {
+      background: linear-gradient(120deg, #232526, #485563);
+      font-family: Arial, sans-serif;
+      color: #fff;
+      margin: 0; padding: 0;
+      text-align: center;
+    }
+    .container { max-width: 700px; margin: 40px auto; background: #181818; padding: 30px; border-radius: 14px; box-shadow: 0 4px 16px #222; }
+    h1 { margin-bottom: 1em; }
+    #search-input { padding: 12px; width: 60%; border-radius: 6px; border: none; font-size: 1.1em; }
+    #search-button { padding: 12px 26px; border-radius: 6px; border: none; background: #069; color: #fff; font-weight: bold; cursor: pointer; margin-left: 8px;}
+    #results { margin-top: 2em; }
+    .song-card { background: #222; color: #fff; border-radius: 10px; margin: 1em 0; padding: 1em; box-shadow: 0 3px 8px #333; display: flex; align-items: center; gap: 20px;}
+    .song-card img { border-radius: 8px; width: 80px; height: 80px; }
+    .song-details { text-align: left; flex: 1;}
+    audio { width: 160px; }
+    @media (max-width:750px) {
+      #search-input { width: 90%; }
+      .container { padding: 8px; }
+      .song-card { flex-direction: column; text-align: center; gap: 8px;}
+      .song-details { text-align: center;}
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Online Music Search Bot</h1>
+  <input type="text" id="search-input" placeholder="Search for songs, artists, or albums">
+  <button id="search-button">Search</button>
+  <div id="results"></div>
+</div>
+<script>
+  const searchBtn = document.getElementById('search-button');
+  const searchInput = document.getElementById('search-input');
+  const resultsDiv = document.getElementById('results');
+
+  async function fetchMusic(query) {
+    const API_URL = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=12`;
+    resultsDiv.innerHTML = "<p>Searching...</p>";
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      displayResults(data.results);
+    } catch (error) {
+      resultsDiv.innerHTML = "<p>Error fetching results. Please try again.</p>";
+    }
+  }
+
+  function displayResults(songs) {
+    resultsDiv.innerHTML = '';
+    if (!songs.length) {
+      resultsDiv.innerHTML = '<p>No results found.</p>';
+      return;
+    }
+    songs.forEach(song => {
+      const card = document.createElement('div');
+      card.className = 'song-card';
+      card.innerHTML = `
+        <img src="${song.artworkUrl100}" alt="${song.trackName}">
+        <div class="song-details">
+          <strong>${song.trackName}</strong><br/>
+          <span>${song.artistName}</span><br/>
+          <span>${song.collectionName || ""}</span>
+        </div>
+        <audio controls>
+          <source src="${song.previewUrl}" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      `;
+      resultsDiv.appendChild(card);
+    });
+  }
+
+  searchBtn.addEventListener('click', () => {
+    const query = searchInput.value.trim();
+    if (query) fetchMusic(query);
+    else resultsDiv.innerHTML = '<p>Please enter a search term.</p>';
+  });
+
+  searchInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') searchBtn.click();
+  });
+</script>
+</body>
+</html>
