@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Tunes - Online Music Player</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a sleeker look */
+        .playlist-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .playlist-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .playlist-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        .playlist-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        /* Custom styles for the progress bar */
+        .progress-bar-container {
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #1DB954; /* Spotify-like green */
+            transition: width 0.1s linear;
+        }
+        .active-song {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left: 3px solid #1DB954;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main Music Player Container -->
+    <div class="w-full max-w-sm md:max-w-md lg:max-w-lg bg-gray-800 bg-opacity-50 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+        
+        <div class="p-6">
+            <!-- Now Playing Section -->
+            <div class="text-center mb-6">
+                <h2 class="text-sm font-semibold text-gray-400 tracking-widest uppercase">Now Playing</h2>
+            </div>
+            
+            <!-- Album Art -->
+            <div class="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-6">
+                <img id="album-art" src="https://placehold.co/300x300/1a1a1a/ffffff?text=Music" 
+                     onerror="this.onerror=null;this.src='https://placehold.co/300x300/1a1a1a/ffffff?text=Error';"
+                     class="rounded-xl shadow-lg w-full h-full object-cover" alt="Album Art">
+            </div>
+
+            <!-- Song Info -->
+            <div class="text-center mb-6">
+                <h1 id="song-title" class="text-2xl font-bold truncate">Select a song</h1>
+                <p id="song-artist" class="text-md text-gray-400 truncate">Artist</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-4">
+                <div id="progress-container" class="progress-bar-container rounded-full">
+                    <div id="progress-bar" class="progress-bar rounded-full"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                    <span id="current-time">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+
+            <!-- Player Controls -->
+            <div class="flex items-center justify-center space-x-8 mb-6">
+                <button id="prev-btn" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fas fa-backward-step fa-2x"></i>
+                </button>
+                <button id="play-pause-btn" class="bg-green-500 hover:bg-green-400 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg transition duration-300">
+                    <i id="play-pause-icon" class="fas fa-play fa-2x"></i>
+                </button>
+                <button id="next-btn" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fas fa-forward-step fa-2x"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Playlist Section -->
+        <div class="bg-black bg-opacity-20 p-4">
+             <h3 class="text-lg font-semibold mb-3 px-2">Up Next</h3>
+            <div id="playlist" class="playlist-scrollbar h-48 overflow-y-auto">
+                <!-- Playlist items will be injected here by JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="audio-player" class="hidden"></audio>
+
+    <script>
+        // --- DOM Elements ---
+        const albumArt = document.getElementById('album-art');
+        const songTitle = document.getElementById('song-title');
+        const songArtist = document.getElementById('song-artist');
+        const progressBar = document.getElementById('progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+        const currentTimeEl = document.getElementById('current-time');
+        const durationEl = document.getElementById('duration');
+        const prevBtn = document.getElementById('prev-btn');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const playPauseIcon = document.getElementById('play-pause-icon');
+        const nextBtn = document.getElementById('next-btn');
+        const playlistEl = document.getElementById('playlist');
+        const audioPlayer = document.getElementById('audio-player');
+
+        // Helper function to convert ArrayBuffer to Base64 to avoid stack overflow
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        // --- Helper function to create silent audio ---
+        // This is a workaround to avoid needing actual audio files.
+        // It generates a short, silent WAV file as a Base64 data URL.
+        const createSilentAudio = (durationSeconds) => {
+            const sampleRate = 44100;
+            const numChannels = 1;
+            const bytesPerSample = 2;
+            const blockAlign = numChannels * bytesPerSample;
+            const byteRate = sampleRate * blockAlign;
+            const dataSize = Math.round(durationSeconds * byteRate);
+
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+
+            // RIFF header
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataSize, true);
+            writeString(view, 8, 'WAVE');
+            // fmt chunk
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); // Audio format 1 (PCM)
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bytesPerSample * 8, true);
+            // data chunk
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataSize, true);
+
+            // Use the safe converter
+            return 'data:audio/wav;base64,' + arrayBufferToBase64(buffer);
+        };
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        // --- Playlist Data ---
+        const songs = [
+            {
+                title: "Cosmic Dream",
+                artist: "Starlight Echoes",
+                albumArtUrl: "https://placehold.co/300x300/8e44ad/ffffff?text=Cosmic",
+                audioSrc: createSilentAudio(185) // 3:05
+            },
+            {
+                title: "Ocean Whispers",
+                artist: "Tidal Flow",
+                albumArtUrl: "https://placehold.co/300x300/3498db/ffffff?text=Ocean",
+                audioSrc: createSilentAudio(212) // 3:32
+            },
+            {
+                title: "City Lights",
+                artist: "Urban Groove",
+                albumArtUrl: "https://placehold.co/300x300/f1c40f/000000?text=City",
+                audioSrc: createSilentAudio(198) // 3:18
+            },
+            {
+                title: "Forest Lullaby",
+                artist: "Earthen Tune",
+                albumArtUrl: "https://placehold.co/300x300/2ecc71/ffffff?text=Forest",
+                audioSrc: createSilentAudio(241) // 4:01
+            },
+            {
+                title: "Retro Sunset",
+                artist: "80s Vibe",
+                albumArtUrl: "https://placehold.co/300x300/e74c3c/ffffff?text=Retro",
+                audioSrc: createSilentAudio(205) // 3:25
+            }
+        ];
+
+        let currentSongIndex = 0;
+        let isPlaying = false;
+
+        // --- Functions ---
+
+        // Load a song into the player
+        function loadSong(song) {
+            songTitle.textContent = song.title;
+            songArtist.textContent = song.artist;
+            albumArt.src = song.albumArtUrl;
+            audioPlayer.src = song.audioSrc;
+            updateActivePlaylistItem();
+        }
+        
+        // Play the current song
+        function playSong() {
+            isPlaying = true;
+            audioPlayer.play();
+            playPauseIcon.classList.replace('fa-play', 'fa-pause');
+            playPauseBtn.classList.remove('bg-green-500');
+            playPauseBtn.classList.add('bg-pink-500');
+        }
+
+        // Pause the current song
+        function pauseSong() {
+            isPlaying = false;
+            audioPlayer.pause();
+            playPauseIcon.classList.replace('fa-pause', 'fa-play');
+            playPauseBtn.classList.add('bg-green-500');
+            playPauseBtn.classList.remove('bg-pink-500');
+        }
+        
+        // Go to the previous song
+        function prevSong() {
+            currentSongIndex--;
+            if (currentSongIndex < 0) {
+                currentSongIndex = songs.length - 1;
+            }
+            loadSong(songs[currentSongIndex]);
+            playSong();
+        }
+
+        // Go to the next song
+        function nextSong() {
+            currentSongIndex++;
+            if (currentSongIndex > songs.length - 1) {
+                currentSongIndex = 0;
+            }
+            loadSong(songs[currentSongIndex]);
+            playSong();
+        }
+
+        // Update progress bar and time
+        function updateProgress(e) {
+            const { duration, currentTime } = e.srcElement;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Update time display
+            durationEl.textContent = formatTime(duration);
+            currentTimeEl.textContent = formatTime(currentTime);
+        }
+        
+        // Set progress bar on click
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audioPlayer.duration;
+            
+            if(duration) {
+               audioPlayer.currentTime = (clickX / width) * duration;
+            }
+        }
+
+        // Format time from seconds to M:SS
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Populate the playlist in the UI
+        function populatePlaylist() {
+            playlistEl.innerHTML = '';
+            songs.forEach((song, index) => {
+                const { title, artist } = song;
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="flex justify-between items-center p-3 rounded-lg cursor-pointer hover:bg-white hover:bg-opacity-10 transition duration-200">
+                        <div>
+                            <p class="font-semibold">${title}</p>
+                            <p class="text-sm text-gray-400">${artist}</p>
+                        </div>
+                    </div>
+                `;
+                li.addEventListener('click', () => {
+                    currentSongIndex = index;
+                    loadSong(songs[currentSongIndex]);
+                    playSong();
+                });
+                playlistEl.appendChild(li);
+            });
+        }
+        
+        // Highlight the currently playing song in the playlist
+        function updateActivePlaylistItem() {
+             const playlistItems = playlistEl.querySelectorAll('li > div');
+             playlistItems.forEach((item, index) => {
+                 if(index === currentSongIndex) {
+                     item.classList.add('active-song');
+                 } else {
+                     item.classList.remove('active-song');
+                 }
+             });
+        }
+
+        // --- Event Listeners ---
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        });
+
+        prevBtn.addEventListener('click', prevSong);
+        nextBtn.addEventListener('click', nextSong);
+
+        audioPlayer.addEventListener('timeupdate', updateProgress);
+        audioPlayer.addEventListener('ended', nextSong);
+        
+        progressContainer.addEventListener('click', setProgress);
+
+        // --- Initial Load ---
+        window.onload = () => {
+            populatePlaylist();
+            loadSong(songs[currentSongIndex]);
+        };
+    </script>
+</body>
+</html>
