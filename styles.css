@@ -1,0 +1,131 @@
+/* ===== Theme Variables (Light Mode) ===== */
+:root {
+    --bg-color: #f7f7f7;
+    --text-color: #000;
+    --table-bg: #fff;
+    --header-bg: #273c75;
+    --header-text: #fff;
+}
+
+/* ===== Theme Variables (Dark Mode) ===== */
+body.dark-mode {
+    --bg-color: #121212;
+    --text-color: #f5f5f5;
+    --table-bg: #1e1e1e;
+    --header-bg: #1f3b5c;
+    --header-text: #fff;
+}
+
+/* ===== Global Base Styles ===== */
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    transition: background-color 0.4s, color 0.4s;
+}
+
+header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 1rem;
+    text-align: center;
+    transition: background-color 0.4s, color 0.4s;
+}
+
+header nav button {
+    margin: 0.3rem;
+    background: #888;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+header nav button:hover {
+    background: #666;
+}
+
+main {
+    max-width: 900px;
+    margin: 1rem auto;
+    background: var(--table-bg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    padding: 1rem;
+    border-radius: 8px;
+    transition: background-color 0.4s;
+}
+
+/* ===== Watchlist Manager & Autocomplete ===== */
+#watchlistManager {
+    margin: 1rem auto;
+    max-width: 600px;
+    position: relative;
+}
+
+.autocomplete-list {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    width: calc(100% - 22px);
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.autocomplete-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* ===== Stocks Table ===== */
+#stocksTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+#stocksTable th, 
+#stocksTable td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.4s, color 0.4s;
+}
+
+#stocksTable td:first-child {
+    white-space: nowrap;
+}
+
+#stocksTable tr {
+    transition: background-color 0.4s ease;
+}
+
+/* ===== Alert Animations ===== */
+@keyframes pulseAlert {
+    0% { background-color: #ffcccc; }
+    50% { background-color: #ff9999; }
+    100% { background-color: #ffcccc; }
+}
+
+.alert-active {
+    animation: pulseAlert 1s ease-in-out infinite;
+}
+
+/* ===== Buttons ===== */
+button {
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+}
+
+input[type="number"], input[type="text"] {
+    padding: 0.3rem;
+}
