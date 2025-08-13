@@ -1,10 +1,33 @@
 // ===== CONFIG =====
 const API_KEY = "3b6fb1fec2mshe51c9b329d9f3cdp1b06bejsn420c66fa4e22"; // Replace with your RapidAPI key 
 
-GET /api/v1/markets/insider-trades HTTP/1.1
-X-Rapidapi-Key: 30cbe4bc30msh5fdcf92c4fd37b1p1c022fjsncc0f1842bb0a
-X-Rapidapi-Host: yahoo-finance15.p.rapidapi.com
-Host: yahoo-finance15.p.rapidapi.com
+
+async function fetchStockPrice(symbol) {
+    const region = getRegion(symbol);
+    const url = `https://yh-finance.p.rapidapi.com/stock/v2/get-summary?symbol=${symbol}&region=${region}`;
+
+    console.log(`🔍 [Frontend] Fetching price for ${symbol} | Region: ${region}`);
+    console.log("API URL:", url);
+
+    try {
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-RapidAPI-Key': API_KEY, // Your key is already at top of file
+                'X-RapidAPI-Host': 'yh-finance.p.rapidapi.com'
+            }
+        });
+        console.log(`[Frontend] HTTP Status: ${res.status}`);
+
+        const data = await res.json();
+        console.log(`[Frontend] API Response for ${symbol}:`, data);
+
+        return data.price?.regularMarketPrice?.raw ?? null;
+    } catch (err) {
+        console.error(`[Frontend] Error fetching ${symbol}:`, err);
+        return null;
+    }
+}
 
 
 // Default from localStorage
