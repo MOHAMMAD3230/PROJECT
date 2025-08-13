@@ -1,6 +1,12 @@
 // ===== CONFIG =====
 const API_KEY = "3b6fb1fec2mshe51c9b329d9f3cdp1b06bejsn420c66fa4e22"; // Replace with your RapidAPI key 
 
+GET /api/v1/markets/insider-trades HTTP/1.1
+X-Rapidapi-Key: 30cbe4bc30msh5fdcf92c4fd37b1p1c022fjsncc0f1842bb0a
+X-Rapidapi-Host: yahoo-finance15.p.rapidapi.com
+Host: yahoo-finance15.p.rapidapi.com
+
+
 // Default from localStorage
 let watchlist = JSON.parse(localStorage.getItem("watchlist")) || ["RELIANCE.NS", "TCS.NS", "AAPL"];
 let alerts = JSON.parse(localStorage.getItem("stockAlerts")) || {};
