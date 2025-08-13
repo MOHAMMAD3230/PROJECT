@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const API_KEY = "YOUR_RAPIDAPI_KEY"; // Replace with your RapidAPI key
+const API_KEY = "3b6fb1fec2mshe51c9b329d9f3cdp1b06bejsn420c66fa4e22"; // Replace with your RapidAPI key
 
 // Default from localStorage
 let watchlist = JSON.parse(localStorage.getItem("watchlist")) || ["RELIANCE.NS", "TCS.NS", "AAPL"];
