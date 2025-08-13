@@ -63,7 +63,7 @@ async function fetchStockPrice(symbol) {
 
     return data.price?.regularMarketPrice?.raw ?? "N/A";
   } catch (err) {
-    console.error(`[Backend] Error fetching ${symbol}:`, err);
+    console.error("[Backend] Error fetching %s:", symbol, err);
     return "Error";
   }
 }
