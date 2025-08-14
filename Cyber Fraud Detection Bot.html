@@ -407,6 +407,21 @@
         });
 
         // --- IOC Management Logic ---
+
+        // Helper function to escape HTML special characters
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function (m) {
+                switch (m) {
+                    case '&': return '&amp;';
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '"': return '&quot;';
+                    case "'": return '&#39;';
+                    default: return m;
+                }
+            });
+        }
+
         document.getElementById('showAssociationsBtn').addEventListener('click', () => {
             const primaryInput = document.getElementById('iocInput').value.trim();
             const iocCardsContainer = document.getElementById('iocCardsContainer');
@@ -529,7 +544,7 @@
 
                 if (domainAssociationsList && domainAssociationsPlaceholder) {
                     if (mockAssociations.length > 0) {
-                        domainAssociationsList.innerHTML = mockAssociations.map(assoc => `<li>${assoc}</li>`).join('');
+                        domainAssociationsList.innerHTML = mockAssociations.map(assoc => `<li>${escapeHTML(assoc)}</li>`).join('');
                         domainAssociationsList.classList.remove('hidden'); // Show the list
                         domainAssociationsPlaceholder.classList.add('hidden'); // Hide the placeholder
                     } else {
