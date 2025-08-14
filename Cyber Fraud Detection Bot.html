@@ -536,7 +536,7 @@
                     } else {
                         iocCardsContainer.innerHTML = `
                             <div class="col-span-full text-center text-gray-400" id="iocPlaceholder">
-                                No IOCs found for "${primaryInput}".
+                                No IOCs found for "${escapeHTML(primaryInput)}".
                             </div>
                         `;
                     }
