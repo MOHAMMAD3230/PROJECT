@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dietician Bot - Offline Single File</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f4f8fb; color: #333; }
+.container { max-width: 500px; margin: 50px auto; background: white; padding: 20px;
+  border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+h1 { text-align: center; }
+form { display: flex; flex-direction: column; }
+label { margin-top: 10px; }
+input, select, button { padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
+button { background-color: #28a745; color: white; cursor: pointer; margin-top: 15px; }
+button:hover { background-color: #218838; }
+#printBtn { display:none; background:#007bff; }
+#printBtn:hover { background:#0056b3; }
+#nutritionOutput { margin-top: 20px; padding: 15px; background: #f1f1f1; border-radius: 10px; }
+#suggestions { position: relative; }
+.suggestion-list { position: absolute; top: 100%; left: 0; right: 0; background: white;
+  border: 1px solid #ccc; border-top: none; max-height: 250px; overflow-y: auto; z-index: 1000; }
+.category-header { font-weight: bold; background: #f4f4f4; padding: 6px 10px; font-size: 0.9em;
+  cursor: pointer; border-bottom: 1px solid #ddd; }
+.category-header:hover { background: #e2e2e2; }
+.category-items { display: block; }
+.suggestion-item { padding: 8px 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.suggestion-item small { color: #666; font-size: 0.85em; }
+.suggestion-item:hover, .suggestion-item.active { background-color: #28a745; color: white; }
+.suggestion-item:hover small, .suggestion-item.active small { color: white; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Dietician Bot - Offline</h1>
+  <form id="foodInputForm" autocomplete="off">
+    <label for="categories">Category:</label>
+    <select id="categories">
+      <option>Fruits</option>
+      <option>Vegetables</option>
+      <option>Grains</option>
+      <option>Dairy</option>
+      <option>Meat</option>
+      <option>Snacks</option>
+    </select>
+    <label for="foodName">Food Name:</label>
+    <input type="text" id="foodName" placeholder="Type to search..." required/>
+    <div id="suggestions"></div>
+    <label for="allergy">Allergens (comma separated):</label>
+    <input type="text" id="allergy" placeholder="e.g. nuts, dairy"/>
+    <button type="submit">Get Nutrition Info</button>
+  </form>
+  <div id="nutritionOutput"></div>
+  <button id="printBtn" onclick="downloadReport()">Download Nutrition Report</button>
+</div>
+<script>
+// Embedded food database
+const foodDatabase = {
+  "apple": { "category": "Fruits", "calories": 52, "protein": 0.3, "fiber": 2.4, "allergens": [] },
+  "banana": { "category": "Fruits", "calories": 89, "protein": 1.1, "fiber": 2.6, "allergens": [] },
+  "cashew": { "category": "Snacks", "calories": 553, "protein": 18.2, "fiber": 3.3, "allergens": ["nuts"] },
+  "milk": { "category": "Dairy", "calories": 42, "protein": 3.4, "fiber": 0, "allergens": ["dairy"] },
+  "bread": { "category": "Grains", "calories": 265, "protein": 9, "fiber": 2.4, "allergens": ["gluten"] },
+  "egg": { "category": "Meat", "calories": 155, "protein": 13, "fiber": 0, "allergens": ["egg"] }
+};
+// Base64 logo (small placeholder)
+const base64Logo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAyCAYAAAB5nVbLAAAAAXNSR0IArs4c6QAAAlZJREFUeF7tmM1xwkAMhe/1FswYUzpA9nXQWwRbQi97lfI5m7TSN1AJqaSGIxVOadFdxXKwAA5K0MSHdgEQBAEBAAgBAYAL1V75olkM3Cm1vdOP1PvdUsr7Zv4Fz75oxCSaBYNUSCFkhRKkkgSt9Jqu4FhQQlSHghmSLxwPN2FYKTFAt3WKAKShVGJMOo+pVXyiA3N2xy5PA2NVLYsER3uVm2bOMAASYEMiGHYDKw4SkUkAWUg0GZ7RQ9XhZpCWeEw0BQtYADN6V9ZnZdQ2K33nKJ2CEp7GoGVQ5YY52jJtMKwpwC9JCDJkipM4OE3YkVQVDJNN1F5jOY/14NzGipHMR7GLUCphcQAFZqXnioEvwhxGDb1VNCjOIA2YZmx3SmptblWt7idYYHq39PpWbJ6bmSnXo6nEEHTnGuXv3Bx0+3cqSC6R5DshY+pw+MKyMUNuPv0rQsWZ+SXU44f2ZoZU4c7j9f1ML5sCmTyJ+2eu3M8zRK6xyFeaS847vLjN0rST69lQ+4zVxgA6zWE2Cj5gKGq/CaMLI+Myg6PUtQ4hPno24GSP5+MZfVIkitMFHDjoai5V5QqYLXiBJ/O++KoWq+rUmRonphU1AgDL9q5UU1zRGMef4MIwzRHNYdyQNIhuoUTotCesMwBEg/HQ6b5apKhAzIn/XdSYNuf3DIMBSv6AGUiZuKl+yR9sOAAAAAElFTkSuQmCC";
+let allFoodNames = Object.keys(foodDatabase);
+let currentFocus = -1;
+let categoryState = {};
+const foodInput = document.getElementById("foodName");
+const suggestionsBox = document.getElementById("suggestions");
+foodInput.addEventListener("input", function () {
+  const query = this.value.toLowerCase();
+  suggestionsBox.innerHTML = "";
+  currentFocus = -1;
+  if (!query) return;
+  const groupedMatches = {};
+  allFoodNames.forEach(name => {
+    if (name.startsWith(query)) {
+      const category = foodDatabase[name].category || "Other";
+      if (!groupedMatches[category]) groupedMatches[category] = [];
+      groupedMatches[category].push(name);
+    }
+  });
+  if (Object.keys(groupedMatches).length > 0) {
+    const list = document.createElement("div");
+    list.className = "suggestion-list";
+    for (let category in groupedMatches) {
+      if (categoryState[category] === undefined) categoryState[category] = true;
+      const header = document.createElement("div");
+      header.className = "category-header";
+      header.textContent = category + (categoryState[category] ? " ▼" : " ▶");
+      const itemContainer = document.createElement("div");
+      itemContainer.className = "category-items";
+      itemContainer.style.display = categoryState[category] ? "block" : "none";
+      groupedMatches[category].forEach(name => {
+        const item = document.createElement("div");
+        item.className = "suggestion-item";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = capitalize(name);
+        const calSpan = document.createElement("small");
+        calSpan.textContent = ${foodDatabase[name].calories} kcal;
+        item.appendChild(nameSpan);
+        item.appendChild(calSpan);
+        item.addEventListener("click", function () {
+          foodInput.value = name;
+          suggestionsBox.innerHTML = "";
+        });
+        itemContainer.appendChild(item);
+      });
+      header.addEventListener("click", function () {
+        categoryState[category] = !categoryState[category];
+        itemContainer.style.display = categoryState[category] ? "block" : "none";
+        header.textContent = category + (categoryState[category] ? " ▼" : " ▶");
+      });
+      list.appendChild(header);
+      list.appendChild(itemContainer);
+    }
+    suggestionsBox.appendChild(list);
+  }
+});
+foodInput.addEventListener("keydown", function (e) {
+  const items = suggestionsBox.querySelectorAll(".suggestion-item");
+  if (!items.length) return;
+  if (e.key === "ArrowDown") { currentFocus++; highlight(items); }
+  else if (e.key === "ArrowUp") { currentFocus--; highlight(items); }
+  else if (e.key === "Enter") { e.preventDefault(); if (currentFocus > -1) items[currentFocus].click(); }
+});
+function highlight(items) { removeActive(items); if (currentFocus >= items.length) currentFocus = 0;
+  if (currentFocus < 0) currentFocus = items.length - 1; items[currentFocus].classList.add("active"); }
+function removeActive(items) { items.forEach(i => i.classList.remove("active")); }
+document.addEventListener("click", e => { if (e.target !== foodInput) suggestionsBox.innerHTML = ""; });
+document.getElementById("foodInputForm").onsubmit = function (e) {
+  e.preventDefault();
+  const foodName = foodInput.value.trim().toLowerCase();
+  const allergiesInput = document.getElementById("allergy").value
+    .split(",").map(a => a.trim().toLowerCase()).filter(a => a);
+  if (!foodName) { alert("Please enter a food name."); return; }
+  if (foodDatabase[foodName]) {
+    const food = foodDatabase[foodName];
+    let output = <h2>${capitalize(foodName)} (${food.category})</h2>;
+    output += <p>Calories: ${food.calories}</p>;
+    output += <p>Proteins: ${food.protein} g</p>;
+    output += <p>Fibers: ${food.fiber} g</p>;
+    const matches = allergiesInput.filter(a => food.allergens.includes(a));
+    if (matches.length > 0) {
+      output += <p style="color:red;"><b>⚠ Allergy Warning:</b> Contains ${matches.join(", ")}</p>;
+    } else {
+      output += <p style="color:green;">No allergens detected based on your input.</p>;
+    }
+    document.getElementById("nutritionOutput").innerHTML = output;
+    document.getElementById("printBtn").style.display = "block";
+  } else {
+    document.getElementById("nutritionOutput").innerHTML =
+      <p style="color:red;">Food not found in the local database.</p>;
+    document.getElementById("printBtn").style.display = "none";
+  }
+};
+function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+function downloadReport() {
+  const today = new Date().toLocaleDateString();
+  const reportContent = `
+    <div style="text-align:center; margin-bottom:20px;">
+      <img src="${base64Logo}" alt="Logo" style="max-height:50px;"><br>
+      <h2>Dietician Bot - Nutrition Report</h2>
+      <p><em>Date: ${today}</em></p>
+    </div>
+    ${document.getElementById("nutritionOutput").innerHTML}
+  `;
+  const newWindow = window.open("", "_blank");
+  newWindow.document.write(<html><head><title>Nutrition Report</title></head><body>${reportContent}</body></html>);
+  newWindow.document.close();
+  newWindow.print();
+}
+</script>
+</body>
+</html>
