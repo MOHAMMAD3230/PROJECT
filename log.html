@@ -1,1 +1,458 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1" /> <title>MY_STUFF</title> <style> body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; transition: background 0.3s, color 0.3s; } body.night { background-color: #181924; color: #e5eaf1; } .title-bar { position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); flex-wrap: wrap; transition: background 0.3s; } body.night .title-bar { background: linear-gradient(90deg, #232938 0%, #43436d 100%); color: #e5eaf1; } .title-left { display: flex; align-items: center; } .logo { font-size: 2rem; margin-right: 12px; } .title-bar h1 { font-size: 1.6rem; margin: 0; font-weight: bold; } .search-container { display: flex; align-items: center; background-color: white; padding: 6px 10px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-right: 12px; transition: background-color 0.3s; } body.night .search-container { background-color: #232938; box-shadow: 0 2px 4px rgba(30,29,41,0.3); } .search-container input { border: none; outline: none; font-size: 1rem; background: none; width: 150px; color: inherit; } .search-container button { border: none; background: none; color: #2575fc; font-size: 1.2rem; cursor: pointer; } #resultCount { margin-left: 10px; font-size: 0.9rem; color: #fff; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 12px; white-space: nowrap; transition: background 0.3s, color 0.3s; } body.night #resultCount { background: rgba(255,255,255,0.1); color: #fcf07a; } .toolbar { display: flex; justify-content: center; align-items: center; padding: 10px; background-color: #eaeaea; flex-wrap: wrap; gap: 20px; transition: background 0.3s; } body.night .toolbar { background-color: #232938; } .category-bar button, .view-toggle button, .sort-options select { background: #fff; border: 1px solid #ccc; margin: 4px; padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: all 0.2s ease; color: #333; } .category-bar button:hover, .view-toggle button:hover { background: #2575fc; color: white; } .category-bar button.active, .view-toggle button.active { background: #2575fc; color: white; } body.night .category-bar button, body.night .view-toggle button, body.night .sort-options select { background: #22253a; border-color: #333756; color: #e5eaf1; } body.night .category-bar button.active, body.night .category-bar button:hover, body.night .view-toggle button.active, body.night .view-toggle button:hover { background: #6a11cb; color: #fff; } main { padding: 20px; max-width: 1100px; margin: auto; transition: color 0.3s; } .card-container.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; } .card-container.list { display: block; } .card { background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: background 0.3s, color 0.3s, transform 0.2s; color: inherit; } body.night .card { background: #232938; color: #e5eaf1; } .card:hover { transform: scale(1.02); } .card.list-item { display: flex; align-items: flex-start; gap: 15px; } .tags { margin-top: 8px; } .tags span { background: #ddd; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; margin-right: 4px; transition: background 0.3s; } body.night .tags span { background: #393b5b; color: #e5eaf1; } mark { background-color: yellow; padding: 0; } body.night mark { background-color: #fcf07a; color: #000; } #noResults { opacity: 0; transition: opacity 0.4s ease; text-align: center; font-size: 1.2rem; color: #888; margin-top: 20px; display: none; } #noResults.show { display: block; opacity: 1; } .daynight-toggle { position: relative; width: 50px; height: 26px; background: #444; border-radius: 13px; cursor: pointer; transition: background-color 0.3s; display: flex; align-items: center; padding: 2px; box-sizing: border-box; border: none; outline: none; color: #fff; font-size: 18px; } .toggle-thumb { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; left: 2px; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: left 0.3s; color: #333; user-select: none; } body.night .daynight-toggle { background: #f1c40f; color: #333; } body.night .daynight-toggle .toggle-thumb { left: 26px; } @media (max-width: 600px) { .title-bar { flex-direction: column; align-items: flex-start; } .search-container { margin-top: 8px; width: 100%; margin-right: 0; } .search-container input { width: 100%; color: inherit; } #resultCount { margin-top: 4px; display: inline-block; } } /* Modal background */ .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; } .modal-overlay.show { display: flex; } /* Modal content */ .modal { background: #fff; border-radius: 8px; max-width: 400px; width: 90%; padding: 20px; box-sizing: border-box; position: relative; color: #333; } body.night .modal { background: #232938; color: #e5eaf1; } .modal h2 { margin-top: 0; } .modal-close { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 1.2rem; font-weight: bold; color: #888; } body.night .modal-close { color: #ccc; } .modal input[type="email"], .modal input[type="password"] { width: 100%; padding: 8px 10px; margin: 8px 0 16px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; } body.night .modal input[type="email"], body.night .modal input[type="password"] { background: #393b5b; border-color: #555; color: #e5eaf1; } .modal button { background: #2575fc; color: #fff; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-size: 1rem; } .modal button:hover { background: #1a5edc; } .error-message { color: #d33; font-size: 0.9rem; margin-bottom: 10px; } body.night .error-message { color: #f99; } .success-message { color: green; font-size: 1rem; margin: 10px 0; } </style> </head> <body> <header class="title-bar"> <div class="title-left"> <div class="logo">📦</div> <h1>MY_STUFF</h1> </div> <div style="display:flex; align-items:center; gap: 10px;"> <div class="search-container"> <input type="text" placeholder="Search..." id="searchInput" onkeyup="filterItems()" /> <button onclick="filterItems()">🔍</button> <span id="resultCount">0 results</span> </div> <button class="daynight-toggle" id="daynightToggle" title="Toggle Day/Night mode" aria-label="Toggle day and night mode"> <div class="toggle-thumb" id="toggleThumb">🌙</div> </button> <button id="btnSignIn" style="background:none; color:#fff; border:none; cursor:pointer; font-size:1rem;">Sign In</button> <button id="btnSignUp" style="background:none; color:#fff; border:none; cursor:pointer; font-size:1rem;">Sign Up</button> </div> </header> <div class="toolbar"> <div class="category-bar"> <button class="active" data-category="all">All</button> <button data-category="electronics">Electronics</button> <button data-category="books">Books</button> <button data-category="clothing">Clothing</button> </div> <div class="view-toggle"> <button class="active" data-view="grid">Grid View</button> <button data-view="list">List View</button> </div> <div class="sort-options"> <select id="sortSelect" onchange="sortItems()"> <option value="original">Sort by: Recently Added</option> <option value="az">Sort by: Name (A–Z)</option> <option value="za">Sort by: Name (Z–A)</option> </select> </div> </div> <main> <div class="card-container grid" id="cardContainer"> <div class="card" data-category="electronics"> <h2>Laptop</h2> <p>High performance laptop for work and play.</p> <div class="tags"><span>Electronics</span></div> </div> <div class="card" data-category="books"> <h2>Science Fiction Novel</h2> <p>A thrilling journey through space.</p> <div class="tags"><span>Books</span></div> </div> <div class="card" data-category="electronics"> <h2>Smartphone</h2> <p>Latest model smartphone with premium features.</p> <div class="tags"><span>Electronics</span></div> </div> <div class="card" data-category="clothing"> <h2>T-Shirt</h2> <p>Comfortable cotton T-shirt in multiple sizes.</p> <div class="tags"><span>Clothing</span></div> </div> <div class="card" data-category="books"> <h2>History Book</h2> <p>Detailed insights into world history.</p> <div class="tags"><span>Books</span></div> </div> </div> <div id="noResults">No results found</div> </main> <!-- Sign In Modal --> <div id="signInModal" class="modal-overlay"> <div class="modal"> <div class="modal-close" id="closeSignIn">&times;</div> <h2>Sign In</h2> <div id="signInError" class="error-message"></div> <input type="email" id="signInEmail" placeholder="Email" required /> <input type="password" id="signInPassword" placeholder="Password" required /> <button id="signInSubmit">Sign In</button> <div id="signInSuccess" class="success-message"></div> </div> </div> <!-- Sign Up Modal --> <div id="signUpModal" class="modal-overlay"> <div class="modal"> <div class="modal-close" id="closeSignUp">&times;</div> <h2>Sign Up</h2> <div id="signUpError" class="error-message"></div> <input type="email" id="signUpEmail" placeholder="Email" required /> <input type="password" id="signUpPassword" placeholder="Password" required /> <input type="password" id="signUpPasswordConfirm" placeholder="Confirm Password" required /> <button id="signUpSubmit">Sign Up</button> <div id="signUpSuccess" class="success-message"></div> </div> </div> <script> let selectedCategories = ['all']; let currentView = 'grid'; let originalOrder = Array.from(document.querySelectorAll('#cardContainer .card')); const dnToggle = document.getElementById('daynightToggle'); const toggleThumb = document.getElementById('toggleThumb'); // CATEGORY SELECTION document.querySelectorAll('.category-bar button').forEach((button) => { button.addEventListener('click', () => { const category = button.getAttribute('data-category'); if (category === 'all') { selectedCategories = ['all']; document.querySelectorAll('.category-bar button').forEach((btn) => btn.classList.remove('active')); button.classList.add('active'); } else { if (selectedCategories.includes('all')) { selectedCategories = []; document.querySelector('.category-bar button[data-category="all"]').classList.remove('active'); } if (selectedCategories.includes(category)) { selectedCategories = selectedCategories.filter((c) => c !== category); button.classList.remove('active'); if (selectedCategories.length === 0) { selectedCategories = ['all']; document.querySelector('.category-bar button[data-category="all"]').classList.add('active'); } } else { selectedCategories.push(category); button.classList.add('active'); } } filterItems(); }); }); // VIEW TOGGLE document.querySelectorAll('.view-toggle button').forEach((button) => { button.addEventListener('click', () => { document.querySelectorAll('.view-toggle button').forEach((btn) => btn.classList.remove('active')); button.classList.add('active'); currentView = button.getAttribute('data-view'); const container = document.getElementById('cardContainer'); container.className = `card-container ${currentView}`; document.querySelectorAll('.card').forEach((card) => { card.classList.toggle('list-item', currentView === 'list'); }); }); }); // FILTER FUNCTION function filterItems() { let input = document.getElementById('searchInput').value.trim().toLowerCase(); let cards = document.querySelectorAll('.card'); let noResults = document.getElementById('noResults'); let resultCount = document.getElementById('resultCount'); let keywords = input.split(/\s+/).filter((word) => word.length > 0); let matchCount = 0; cards.forEach((card) => { let cleanHTML = card.innerHTML.replace(/<\/?mark>/g, ''); card.innerHTML = cleanHTML; let text = card.innerText.toLowerCase(); let category = card.getAttribute('data-category'); let categoryMatch = selectedCategories.includes('all') || selectedCategories.includes(category); let textMatch = keywords.length === 0 || keywords.some((word) => text.includes(word)); if (categoryMatch && textMatch) { card.style.display = ''; matchCount++; keywords.forEach((word) => highlightText(card, word)); } else { card.style.display = 'none'; } }); resultCount.textContent = `${matchCount} result${matchCount !== 1 ? 's' : ''}`; noResults.classList.toggle('show', matchCount === 0); } // SORT FUNCTION function sortItems() { const container = document.getElementById('cardContainer'); let sortType = document.getElementById('sortSelect').value; let cards = Array.from(container.querySelectorAll('.card')); if (sortType === 'az') { cards.sort((a, b) => a.querySelector('h2').innerText.localeCompare(b.querySelector('h2').innerText)); } else if (sortType === 'za') { cards.sort((a, b) => b.querySelector('h2').innerText.localeCompare(a.querySelector('h2').innerText)); } else { cards = [...originalOrder]; } container.innerHTML = ''; cards.forEach((card) => container.appendChild(card)); filterItems(); } // Highlight helper function highlightText(element, search) { if (!search) return; let regex = new RegExp(`(${escapeRegExp(search)})`, 'gi'); element.innerHTML = element.innerHTML.replace(regex, '<mark>$1</mark>'); } function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[$$\$$/g, '\\$&'); } dnToggle.addEventListener('click', () => { document.body.classList.toggle('night'); const isNight = document.body.classList.contains('night'); toggleThumb.textContent = isNight ? '🌞' : '🌙'; }); if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { document.body.classList.add('night'); toggleThumb.textContent = '🌞'; } document.addEventListener('DOMContentLoaded', () => { filterItems(); }); // Sign In/Up Modal Logic const signInModal = document.getElementById('signInModal'); const signUpModal = document.getElementById('signUpModal'); const btnSignIn = document.getElementById('btnSignIn'); const btnSignUp = document.getElementById('btnSignUp'); const closeSignIn = document.getElementById('closeSignIn'); const closeSignUp = document.getElementById('closeSignUp'); btnSignIn.onclick = () => { signInModal.classList.add('show'); clearSignInForm(); }; btnSignUp.onclick = () => { signUpModal.classList.add('show'); clearSignUpForm(); }; closeSignIn.onclick = () => signInModal.classList.remove('show'); closeSignUp.onclick = () => signUpModal.classList.remove('show'); window.onclick = e => { if (e.target === signInModal) signInModal.classList.remove('show'); if (e.target === signUpModal) signUpModal.classList.remove('show'); }; const signInSubmit = document.getElementById('signInSubmit'); signInSubmit.onclick = () => { const email = document.getElementById('signInEmail').value.trim(); const password = document.getElementById('signInPassword').value.trim(); const errorDiv = document.getElementById('signInError'); const successDiv = document.getElementById('signInSuccess'); errorDiv.textContent = ''; successDiv.textContent = ''; if (!validateEmail(email)) { errorDiv.textContent = 'Please enter a valid email address.'; return; } if (password.length < 6) { errorDiv.textContent = 'Password must be at least 6 characters.'; return; } successDiv.textContent = 'Sign in successful! (Demo only)'; setTimeout(() => { signInModal.classList.remove('show'); }, 1500); }; const signUpSubmit = document.getElementById('signUpSubmit'); signUpSubmit.onclick = () => { const email = document.getElementById('signUpEmail').value.trim(); const password = document.getElementById('signUpPassword').value.trim(); const passwordConfirm = document.getElementById('signUpPasswordConfirm').value.trim(); const errorDiv = document.getElementById('signUpError'); const successDiv = document.getElementById('signUpSuccess'); errorDiv.textContent = ''; successDiv.textContent = ''; if (!validateEmail(email)) { errorDiv.textContent = 'Please enter a valid email address.'; return; } if (password.length < 6) { errorDiv.textContent = 'Password must be at least 6 characters.'; return; } if (password !== passwordConfirm) { errorDiv.textContent = 'Passwords do not match.'; return; } successDiv.textContent = 'Sign up successful! (Demo only)'; setTimeout(() => { signUpModal.classList.remove('show'); }, 1500); }; function clearSignInForm() { document.getElementById('signInEmail').value = ''; document.getElementById('signInPassword').value = ''; document.getElementById('signInError').textContent = ''; document.getElementById('signInSuccess').textContent = ''; } function clearSignUpForm() { document.getElementById('signUpEmail').value = ''; document.getElementById('signUpPassword').value = ''; document.getElementById('signUpPasswordConfirm').value = ''; document.getElementById('signUpError').textContent = ''; document.getElementById('signUpSuccess').textContent = ''; } function validateEmail(email) { const re = /^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$/; return re.test(email); } </script> <!-- Sign In Modal --> <div id="signInModal" class="modal-overlay"> <div class="modal"> <div class="modal-close" id="closeSignIn">&times;</div> <h2>Sign In</h2> <div id="signInError" class="error-message"></div> <input type="email" id="signInEmail" placeholder="Email" required /> <input type="password" id="signInPassword" placeholder="Password" required /> <button id="signInSubmit">Sign In</button> <div id="signInSuccess" class="success-message"></div> </div> </div> <!-- Sign Up Modal --> <div id="signUpModal" class="modal-overlay"> <div class="modal"> <div class="modal-close" id="closeSignUp">&times;</div> <h2>Sign Up</h2> <div id="signUpError" class="error-message"></div> <input type="email" id="signUpEmail" placeholder="Email" required /> <input type="password" id="signUpPassword" placeholder="Password" required /> <input type="password" id="signUpPasswordConfirm" placeholder="Confirm Password" required /> <button id="signUpSubmit">Sign Up</button> <div id="signUpSuccess" class="success-message"></div> </div> </div> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MY_STUFF</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    transition: background 0.3s, color 0.3s;
+  }
+  body.night {
+    background-color: #181924;
+    color: #e5eaf1;
+  }
+  .title-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    flex-wrap: wrap;
+    transition: background 0.3s;
+  }
+  body.night .title-bar {
+    background: linear-gradient(90deg, #232938 0%, #43436d 100%);
+    color: #e5eaf1;
+  }
+  .title-left {
+    display: flex;
+    align-items: center;
+  }
+  .logo {
+    font-size: 2rem;
+    margin-right: 12px;
+  }
+  .title-bar h1 {
+    font-size: 1.6rem;
+    margin: 0;
+    font-weight: bold;
+  }
+  .search-container {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 6px 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-right: 12px;
+    transition: background-color 0.3s;
+  }
+  body.night .search-container {
+    background-color: #232938;
+    box-shadow: 0 2px 4px rgba(30,29,41,0.3);
+  }
+  .search-container input {
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    background: none;
+    width: 150px;
+    color: inherit;
+  }
+  .search-container button {
+    border: none;
+    background: none;
+    color: #2575fc;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  #resultCount {
+    margin-left: 10px;
+    font-size: 0.9rem;
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+    padding: 2px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+    transition: background 0.3s, color 0.3s;
+  }
+  body.night #resultCount {
+    background: rgba(255,255,255,0.1);
+    color: #fcf07a;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #eaeaea;
+    flex-wrap: wrap;
+    gap: 20px;
+    transition: background 0.3s;
+  }
+  body.night .toolbar {
+    background-color: #232938;
+  }
+  .category-bar button,
+  .view-toggle button,
+  .sort-options select {
+    background: #fff;
+    border: 1px solid #ccc;
+    margin: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;
+  }
+  .category-bar button:hover,
+  .view-toggle button:hover {
+    background: #2575fc;
+    color: white;
+  }
+  .category-bar button.active,
+  .view-toggle button.active {
+    background: #2575fc;
+    color: white;
+  }
+  body.night .category-bar button,
+  body.night .view-toggle button,
+  body.night .sort-options select {
+    background: #22253a;
+    border-color: #333756;
+    color: #e5eaf1;
+  }
+  body.night .category-bar button.active,
+  body.night .category-bar button:hover,
+  body.night .view-toggle button.active,
+  body.night .view-toggle button:hover {
+    background: #6a11cb;
+    color: #fff;
+  }
+  main {
+    padding: 20px;
+    max-width: 1100px;
+    margin: auto;
+    transition: color 0.3s;
+  }
+  .card-container.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  .card-container.list {
+    display: block;
+  }
+  .card {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+    color: inherit;
+  }
+  body.night .card {
+    background: #232938;
+    color: #e5eaf1;
+  }
+  .card:hover {
+    transform: scale(1.02);
+  }
+  .card.list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .tags {
+    margin-top: 8px;
+  }
+  .tags span {
+    background: #ddd;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-right: 4px;
+    transition: background 0.3s;
+  }
+  body.night .tags span {
+    background: #393b5b;
+    color: #e5eaf1;
+  }
+  mark {
+    background-color: yellow;
+    padding: 0;
+  }
+  body.night mark {
+    background-color: #fcf07a;
+    color: #000;
+  }
+  #noResults {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+    margin-top: 20px;
+    display: none;
+  }
+  #noResults.show {
+    display: block;
+    opacity: 1;
+  }
+  .daynight-toggle {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    background: #444;
+    border-radius: 13px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 18px;
+  }
+  .toggle-thumb {
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    left: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: left 0.3s;
+    color: #333;
+    user-select: none;
+  }
+  body.night .daynight-toggle {
+    background: #f1c40f;
+    color: #333;
+  }
+  body.night .daynight-toggle .toggle-thumb {
+    left: 26px;
+  }
+  @media (max-width: 600px) {
+    .title-bar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .search-container {
+      margin-top: 8px;
+      width: 100%;
+      margin-right: 0;
+    }
+    .search-container input {
+      width: 100%;
+      color: inherit;
+    }
+    #resultCount {
+      margin-top: 4px;
+      display: inline-block;
+    }
+  }
+</style>
+</head>
+<body>
+<header class="title-bar">
+  <div class="title-left">
+    <div class="logo">📦</div>
+    <h1>MY_STUFF</h1>
+  </div>
+  <div style="display:flex; align-items:center; gap: 10px;">
+    <div class="search-container">
+      <input type="text" placeholder="Search..." id="searchInput" onkeyup="filterItems()" />
+      <button onclick="filterItems()">🔍</button>
+      <span id="resultCount">0 results</span>
+    </div>
+    <button class="daynight-toggle" id="daynightToggle" title="Toggle Day/Night mode" aria-label="Toggle day and night mode">
+      <div class="toggle-thumb" id="toggleThumb">🌙</div>
+    </button>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="category-bar">
+    <button class="active" data-category="all">All</button>
+    <button data-category="electronics">Electronics</button>
+    <button data-category="books">Books</button>
+    <button data-category="clothing">Clothing</button>
+  </div>
+  <div class="view-toggle">
+    <button class="active" data-view="grid">Grid View</button>
+    <button data-view="list">List View</button>
+  </div>
+  <div class="sort-options">
+    <select id="sortSelect" onchange="sortItems()">
+      <option value="original">Sort by: Recently Added</option>
+      <option value="az">Sort by: Name (A–Z)</option>
+      <option value="za">Sort by: Name (Z–A)</option>
+    </select>
+  </div>
+</div>
+
+<main>
+  <div class="card-container grid" id="cardContainer">
+    <div class="card" data-category="electronics">
+      <h2>Laptop</h2>
+      <p>High performance laptop for work and play.</p>
+      <div class="tags"><span>Electronics</span></div>
+    </div>
+    <div class="card" data-category="books">
+      <h2>Science Fiction Novel</h2>
+      <p>A thrilling journey through space.</p>
+      <div class="tags"><span>Books</span></div>
+    </div>
+    <div class="card" data-category="electronics">
+      <h2>Smartphone</h2>
+      <p>Latest model smartphone with premium features.</p>
+      <div class="tags"><span>Electronics</span></div>
+    </div>
+    <div class="card" data-category="clothing">
+      <h2>T-Shirt</h2>
+      <p>Comfortable cotton T-shirt in multiple sizes.</p>
+      <div class="tags"><span>Clothing</span></div>
+    </div>
+    <div class="card" data-category="books">
+      <h2>History Book</h2>
+      <p>Detailed insights into world history.</p>
+      <div class="tags"><span>Books</span></div>
+    </div>
+  </div>
+  <div id="noResults">No results found</div>
+</main>
+
+<script>
+  const dnToggle = document.getElementById('daynightToggle');
+  const toggleThumb = document.getElementById('toggleThumb');
+
+  dnToggle.addEventListener('click', () => {
+    document.body.classList.toggle('night');
+    const isNight = document.body.classList.contains('night');
+    toggleThumb.textContent = isNight ? '🌞' : '🌙';
+  });
+
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.add('night');
+    toggleThumb.textContent = '🌞';
+  }
+
+  let selectedCategories = ['all'];
+  let currentView = 'grid';
+  let originalOrder = Array.from(document.querySelectorAll('#cardContainer .card'));
+
+  document.querySelectorAll('.category-bar button').forEach(button => {
+    button.addEventListener('click', () => {
+      const category = button.getAttribute('data-category');
+      if (category === 'all') {
+        selectedCategories = ['all'];
+        document.querySelectorAll('.category-bar button').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+      } else {
+        if (selectedCategories.includes('all')) {
+          selectedCategories = [];
+          document.querySelector('.category-bar button[data-category="all"]').classList.remove('active');
+        }
+        if (selectedCategories.includes(category)) {
+          selectedCategories = selectedCategories.filter(c => c !== category);
+          button.classList.remove('active');
+          if (selectedCategories.length === 0) {
+            selectedCategories = ['all'];
+            document.querySelector('.category-bar button[data-category="all"]').classList.add('active');
+          }
+        } else {
+          selectedCategories.push(category);
+          button.classList.add('active');
+        }
+      }
+      filterItems();
+    });
+  });
+
+  document.querySelectorAll('.view-toggle button').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.view-toggle button').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      currentView = button.getAttribute('data-view');
+      const container = document.getElementById('cardContainer');
+      container.className = `card-container ${currentView}`;
+      document.querySelectorAll('.card').forEach(card => {
+        card.classList.toggle('list-item', currentView === 'list');
+      });
+    });
+  });
+
+  function filterItems() {
+    let input = document.getElementById('searchInput').value.trim().toLowerCase();
+    let cards = document.querySelectorAll('.card');
+    let noResults = document.getElementById('noResults');
+    let resultCount = document.getElementById('resultCount');
+    let keywords = input.split(/\s+/).filter(word => word.length > 0);
+    let matchCount = 0;
+    cards.forEach(card => {
+      let cleanHTML = card.innerHTML.replace(/<\/?mark>/g, '');
+      card.innerHTML = cleanHTML;
+      let text = card.innerText.toLowerCase();
+      let category = card.getAttribute('data-category');
+      let categoryMatch = (selectedCategories.includes('all') || selectedCategories.includes(category));
+      let textMatch = keywords.length === 0 || keywords.some(word => text.includes(word));
+      if (categoryMatch && textMatch) {
+        card.style.display = "";
+        matchCount++;
+        keywords.forEach(word => highlightText(card, word));
+      } else {
+        card.style.display = "none";
+      }
+    });
+    resultCount.textContent = `${matchCount} result${matchCount !== 1 ? 's' : ''}`;
+    noResults.classList.toggle('show', matchCount === 0);
+  }
+
+  function sortItems() {
+    const container = document.getElementById('cardContainer');
+    let sortType = document.getElementById('sortSelect').value;
+    let cards = Array.from(container.querySelectorAll('.card'));
+    if (sortType === 'az') {
+      cards.sort((a, b) => a.querySelector('h2').innerText.localeCompare(b.querySelector('h2').innerText));
+    } else if (sortType === 'za') {
+      cards.sort((a, b) => b.querySelector('h2').innerText.localeCompare(a.querySelector('h2').innerText));
+    } else {
+      cards = [...originalOrder];
+    }
+    container.innerHTML = '';
+    cards.forEach(card => container.appendChild(card));
+    filterItems();
+  }
+
+  function highlightText(element, search) {
+    if (!search) return;
+    let regex = new RegExp(`(${escapeRegExp(search)})`, "gi");
+    element.innerHTML = element.innerHTML.replace(regex, "<mark>$1</mark>");
+  }
+
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    filterItems();
+  });
+</script>
+</body>
+</html>
