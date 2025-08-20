@@ -63,10 +63,11 @@ Host: virtual-number.p.rapidapi.com
 <a href="Cyber Fraud Detection Bot.html" target="_blank">Cyber Fraud Detection Bot</a>
 <br>
 
+<div id="scan-result"></div>
 
 
 <div style="text-align:left; margin: 30px; animation: slidein 1s ease forwards; overflow: hidden;">
-  <form action="https://mohammad3230.github.io/PROJECT/Cyber%20Fraud%20Detection%20Bot.html" method="GET" target="_blank" style="display:inline-block;">
+  <form action="Cyber Fraud Detection Bot.html" method="GET" target="_blank" style="display:inline-block;">
     <input type="text" name="domain" placeholder="Enter domain here..." 
       style="height: 56px; width: 300px; font-size: 18px; padding: 0 20px; border: 2px solid #28a745; border-radius: 8px 0 0 8px;" required />
     <button type="submit" style="height: 56px; width: 56px; background-color: #28a745; color: white; border:none; border-radius: 0 8px 8px 0; cursor:pointer; box-shadow: 0 0 10px #28a745; transition: box-shadow 0.3s;">
@@ -467,6 +468,23 @@ _iub.csConfiguration = {"siteId":3996614,"cookiePolicyId":24679055,"lang":"en","
 <script type="text/javascript" src="https://cs.iubenda.com/autoblocking/3996614.js"></script>
 <script type="text/javascript" src="//cdn.iubenda.com/cs/gpp/stub.js"></script>
 <script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
+
+
+<script>
+  // Get `domain` query parameter
+  function getDomainFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("domain");
+  }
+
+  // Display the domain (or trigger a scan here)
+  const scannedDomain = getDomainFromURL();
+  if (scannedDomain) {
+    document.getElementById("scan-result").textContent = 
+      "Scanning: " + scannedDomain;
+    // You can now call your API or run scan logic here
+  }
+</script>
 
   
 </html>
