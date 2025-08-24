@@ -1,0 +1,4 @@
+title: My Site
+theme: jekyll-theme-minimal
+baseurl: ""          # For user/organization sites leave empty
+url: "https://mohammad3230.github.io"
