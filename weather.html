@@ -2,57 +2,340 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Live Weather Lookup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Weather Dashboard</title>
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #232946; color: #fff; margin: 0; min-height: 100vh; }
-    .weather-card {
-      background: #fff; color: #232946; max-width: 350px; margin: 60px auto; border-radius: 14px; box-shadow: 0 2px 12px #15172833; padding: 32px 28px;
+    html, body {
+      height: 100%;
+      margin: 0; padding: 0;
+      background: #22294d;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* Align top for scroll */
+      overflow-y: auto;       /* Enable vertical scroll */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
     }
-    .weather-card h2 { margin-top: 0; }
-    .weather-card input[type="text"] { width: 80%; padding: 9px 11px; border-radius: 6px; border: 1px solid #bbb; margin-bottom: 14px; }
-    .weather-card button { background: #232946; color: #fff; border: none; border-radius: 6px; padding: 9px 14px; cursor: pointer; }
-    #result { margin-top: 18px; }
-    .label { font-weight: 500; color: #44318d; }
+    .weather-card {
+      background: #2f365f;
+      border-radius: 20px;
+      max-width: 580px;
+      width: 90vw;
+      padding: 30px 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      margin: 30px 0;
+    }
+    input[type="text"] {
+      border-radius: 10px;
+      border: none;
+      padding: 12px 16px;
+      font-size: 16px;
+      width: 70%;
+      outline: none;
+    }
+    button {
+      background-color: #4b6cb7;
+      border: none;
+      border-radius: 10px;
+      color: #eef1f5;
+      cursor: pointer;
+      font-size: 16px;
+      margin-left: 12px;
+      padding: 12px 20px;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #182848;
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-weight: 700;
+      text-align: center;
+    }
+    #result, #forecast {
+      margin-top: 26px;
+    }
+    h3 {
+      border-bottom: 2px solid #6c7a97;
+      padding-bottom: 8px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .panel {
+      border-radius: 15px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      color: #fff;
+    }
+    .panel-row {
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+    }
+    #forecast {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .forecast-day {
+      padding: 14px 18px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.26);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    .forecast-weather {
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 120px;
+      justify-content: flex-end;
+    }
+    canvas {
+      margin-top: 30px;
+      border-radius: 14px;
+      background-color: #f0f4ff;
+      box-shadow: 0 4px 24px rgba(34,57,131,0.3);
+      width: 100% !important;
+      height: 280px !important;
+    }
+    .error {
+      color: #f44336;
+      font-weight: 700;
+      font-size: 1.15rem;
+      margin: 28px 0;
+      text-align: center;
+    }
+    .input-group {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 480px) {
+      input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      button {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="weather-card">
-    <h2>Weather Search</h2>
-    <input type="text" id="cityInput" placeholder="Enter city (e.g. Mumbai)" />
-    <button onclick="getWeather()">Get Weather</button>
-    <div id="result">Enter a city and press the button.</div>
+    <h2>Responsive Weather Dashboard</h2>
+    <div class="input-group">
+      <input type="text" id="cityInput" placeholder="Enter city (e.g. Mumbai)" /> <br>
+      <button onclick="getWeather()">Get Weather</button>
+    </div>
+    <div id="result"></div>
+    <div id="forecast"></div>
+    <canvas id="forecastChart"></canvas>
   </div>
+
   <script>
+    const apiKey = '733ec5a871dceb31719ab4f3bebf65de'; // Replace with your actual API key
+    let chartInstance = null;
+
+    const weatherStyles = {
+      clear: { color: '#4a90e2', icon: '☀️' },
+      clouds: { color: '#6c769c', icon: '☁️' },
+      rain: { color: '#34699a', icon: '🌧️' },
+      drizzle: { color: '#4a7ca8', icon: '🌦️' },
+      thunderstorm: { color: '#2f3e66', icon: '⛈️' },
+      snow: { color: '#a9c9ff', icon: '❄️' },
+      mist: { color: '#7f8fa4', icon: '🌫️' },
+      haze: { color: '#aab7c4', icon: '🌁' },
+      fog: { color: '#aab7c4', icon: '🌁' },
+      smoke: { color: '#7f8fa4', icon: '💨' },
+      dust: { color: '#c9b18f', icon: '🌪️' },
+      sand: { color: '#c9b18f', icon: '🏜️' },
+      ash: { color: '#a29b98', icon: '🌋' },
+      squall: { color: '#2f3e66', icon: '🌬️' },
+      tornado: { color: '#2f3e66', icon: '🌪️' }
+    };
+
     function getWeather() {
-      const city = document.getElementById('cityInput').value || 'Hyderabad';
+      const city = document.getElementById('cityInput').value.trim();
       const resultDiv = document.getElementById('result');
-      resultDiv.textContent = 'Loading...';
+      const forecastDiv = document.getElementById('forecast');
 
-      const data = null;
-      const xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
+      if (!city) {
+        showError('Please enter a city name.');
+        return;
+      }
 
-      xhr.addEventListener('readystatechange', function () {
-        if (this.readyState === this.DONE) {
-          try {
-            const weather = JSON.parse(this.responseText);
-            resultDiv.innerHTML = `
-              <span class="label">City:</span> ${weather.name || city}<br>
-              <span class="label">Temperature:</span> ${weather.main && weather.main.temp ? weather.main.temp + '°C' : 'N/A'}<br>
-              <span class="label">Weather:</span> ${weather.weather && weather.weather[0] ? weather.weather[0].description : 'N/A'}<br>
-              <span class="label">Humidity:</span> ${weather.main && weather.main.humidity ? weather.main.humidity + '%' : 'N/A'}<br>
-              <span class="label">Wind Speed:</span> ${weather.wind && weather.wind.speed ? weather.wind.speed + ' m/s' : 'N/A'}<br>
-            `;
-          } catch (e) {
-            resultDiv.textContent = 'Could not parse response: ' + this.responseText;
+      clearError();
+      resultDiv.innerHTML = 'Loading...';
+      forecastDiv.innerHTML = '';
+      clearChart();
+
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&appid=${apiKey}`)
+        .then(res => {
+          if (!res.ok) {
+            if (res.status === 404) throw new Error('City not found. Check spelling.');
+            if (res.status === 401) throw new Error('Invalid API key.');
+            if (res.status === 429) throw new Error('API rate limit exceeded.');
+            throw new Error(`Server error: ${res.statusText} (${res.status})`);
           }
-        }
-      });
+          return res.json();
+        })
+        .then(data => {
+          displayCurrentWeather(data);
+          getForecast(data.coord.lat, data.coord.lon);
+        })
+        .catch(err => {
+          showError(err.message);
+        });
+    }
 
-      xhr.open('GET', `https://open-weather13.p.rapidapi.com/city?city=${encodeURIComponent(city)}&lang=EN`);
-      xhr.setRequestHeader('x-rapidapi-key', '30cbe4bc30msh5fdcf92c4fd37b1p1c022fjsncc0f1842bb0a');
-      xhr.setRequestHeader('x-rapidapi-host', 'open-weather13.p.rapidapi.com');
-      xhr.send(data);
+    function displayCurrentWeather(data) {
+      const sunrise = new Date(data.sys.sunrise * 1000).toLocaleTimeString();
+      const sunset = new Date(data.sys.sunset * 1000).toLocaleTimeString();
+      const mainWeather = data.weather[0].main.toLowerCase();
+
+      let { color, icon } = weatherStyles[mainWeather] || { color: '#556888', icon: '❔' };
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `
+        <div class="panel current-weather" style="background-color:${color}; color:#fff;">
+          <div class="panel-row"><span>City:</span><strong>${data.name} ${icon}</strong></div>
+          <div class="panel-row"><span>Temperature:</span><strong>${data.main.temp} °C</strong></div>
+          <div class="panel-row"><span>Feels Like:</span><strong>${data.main.feels_like} °C</strong></div>
+          <div class="panel-row"><span>Condition:</span><strong style="text-transform: capitalize;">${data.weather[0].description}</strong></div>
+          <div class="panel-row"><span>Humidity:</span><strong>${data.main.humidity} %</strong></div>
+          <div class="panel-row"><span>Pressure:</span><strong>${data.main.pressure} hPa</strong></div>
+          <div class="panel-row"><span>Visibility:</span><strong>${(data.visibility / 1000).toFixed(1)} km</strong></div>
+          <div class="panel-row"><span>Wind Speed:</span><strong>${data.wind.speed} m/s</strong></div>
+          <div class="panel-row"><span>Wind Direction:</span><strong>${data.wind.deg}°</strong></div>
+          <div class="panel-row"><span>Sunrise:</span><strong>${sunrise}</strong></div>
+          <div class="panel-row"><span>Sunset:</span><strong>${sunset}</strong></div>
+        </div>
+      `;
+    }
+
+    function getForecast(lat, lon) {
+      const forecastDiv = document.getElementById('forecast');
+
+      fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch forecast');
+          return res.json();
+        })
+        .then(data => {
+          const days = {};
+          data.list.forEach(item => {
+            const date = item.dt_txt.split(' ')[0];
+            if (!days[date]) days[date] = [];
+            days[date].push(item);
+          });
+
+          const dailySummaries = Object.keys(days).map(date => {
+            const temps = days[date].map(x => x.main.temp);
+            const minTemp = Math.min(...temps);
+            const maxTemp = Math.max(...temps);
+            const weather = days[date][0].weather[0];
+            return { date, minTemp, maxTemp, weather };
+          });
+
+          forecastDiv.innerHTML = '<h3>5-Day Forecast</h3>';
+          dailySummaries.forEach(day => {
+            let { color, icon } = weatherStyles[day.weather.main.toLowerCase()] || { color: '#556888', icon: '❔' };
+            forecastDiv.innerHTML += `
+              <div class="forecast-day" style="background-color:${color}; color:#fff;">
+                <div>${day.date}</div>
+                <div>${day.minTemp.toFixed(1)}°C - ${day.maxTemp.toFixed(1)}°C</div>
+                <div class="forecast-weather">${icon} <span style="margin-left:8px;">${day.weather.main}</span></div>
+              </div>
+            `;
+          });
+
+          renderChart(
+            dailySummaries.map(d => d.date),
+            dailySummaries.map(d => d.maxTemp),
+            dailySummaries.map(d => d.minTemp)
+          );
+        })
+        .catch(() => {
+          document.getElementById('forecast').innerHTML = '<div class="error">Error fetching forecast data</div>';
+        });
+    }
+
+    function clearChart() {
+      if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+      }
+    }
+
+    function renderChart(labels, maxTemps, minTemps) {
+      clearChart();
+      const ctx = document.getElementById('forecastChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Max Temp (°C)',
+              data: maxTemps,
+              borderColor: '#44318d',
+              backgroundColor: 'rgba(68,49,141,0.3)',
+              fill: true,
+              tension: 0.3,
+            },
+            {
+              label: 'Min Temp (°C)',
+              data: minTemps,
+              borderColor: '#2663a4',
+              backgroundColor: 'rgba(38,99,164,0.3)',
+              fill: true,
+              tension: 0.3,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          stacked: false,
+          plugins: {
+            legend: { position: 'top' },
+          },
+          scales: {
+            y: { beginAtZero: false },
+          },
+        },
+      });
+    }
+
+    function showError(msg) {
+      document.getElementById('result').innerHTML = `<div class="error">${msg}</div>`;
+      document.getElementById('forecast').innerHTML = '';
+      clearChart();
+    }
+
+    function clearError() {
+      document.getElementById('result').innerHTML = '';
     }
   </script>
 </body>
