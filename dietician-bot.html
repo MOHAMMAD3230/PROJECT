@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Advanced Dietician App with Detailed BMI & Advice</title>
+<title>Advanced Dietician App with Reset Button</title>
 <style>
   html, body {
     margin: 0; padding: 0;
@@ -20,7 +20,7 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background-image:
-      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 1px);
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
     pointer-events: none;
     z-index: -1;
@@ -124,6 +124,16 @@
     font-weight: 700;
     text-align: center;
   }
+
+  /* Button group styling */
+  #buttonsGroup {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  #buttonsGroup button {
+    flex: 1;
+  }
 </style>
 </head>
 <body>
@@ -151,31 +161,60 @@
         <input type="text" id="diet" placeholder="e.g. Vegan, Keto" />
       </div>
     </div>
-    <button id="calcBtn">Calculate BMI & Advice</button>
+
+    <div id="buttonsGroup">
+      <button id="calcBtn">Calculate BMI & Advice</button>
+      <button id="resetBtn" title="Reset all inputs and outputs">Reset All</button>
+    </div>
+
     <textarea id="bmiAdvice" readonly placeholder="Your detailed health advice will appear here."></textarea>
   </section>
 
   <section>
     <h2>Nutrition Lookup</h2>
     <input type="text" id="foodQuery" placeholder="Enter food name to search" />
-    <button id="searchBtn">Search Nutrition</button>
+    <div id="buttonsGroup">
+      <button id="searchBtn">Search Nutrition</button>
+    </div>
     <textarea id="nutritionResult" readonly placeholder="Nutrition data will appear here."></textarea>
   </section>
 </div>
 
 <div id="dosWidget" aria-live="polite">
-  <h2>Your Detailed Do's & Don'ts & Wellness Guide</h2>
+  <h2>Your Personalized Do's & Don'ts & Wellness Tips</h2>
   <select id="goalSelect" aria-label="Select your weight goal">
     <option value="" selected disabled>Choose your weight goal...</option>
     <option value="Lose">Weight Loss</option>
     <option value="Gain">Weight Gain</option>
     <option value="Maintain">Weight Maintenance</option>
   </select>
-  <button id="showDosBtn">Show Recommendations</button>
+  <div id="buttonsGroup" style="margin-top:10px;">
+    <button id="showDosBtn">Show Recommendations</button>
+  </div>
   <pre id="dosOutput"></pre>
 </div>
 
 <script>
+  // Function to clear all inputs and outputs for fresh interaction
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    // Clear profile inputs
+    document.getElementById('age').value = "";
+    document.getElementById('weight').value = "";
+    document.getElementById('height').value = "";
+    document.getElementById('diet').value = "";
+
+    // Clear weight goal select
+    document.getElementById('goalSelect').selectedIndex = 0;
+
+    // Clear nutrition query
+    document.getElementById('foodQuery').value = "";
+
+    // Clear all output textareas and pre
+    document.getElementById('bmiAdvice').value = "";
+    document.getElementById('nutritionResult').value = "";
+    document.getElementById('dosOutput').textContent = "";
+  });
+
   function calculateBMI(weight, height) {
     const heightM = height / 100;
     return +(weight / (heightM * heightM)).toFixed(1);
@@ -191,63 +230,52 @@
     return "Obesity Class III";
   }
 
-  // Provide detailed BMI calculation step-by-step and health advice
-  function generateDetailedAdvice(weight, height, bmi, bmiCategory, age, diet, goal) {
-    let advice = `=== ADVANCED BMI CALCULATION AND HEALTH ADVICE ===\n\n`;
+  function generateDetailedAdvice(weight, height, bmi, category, age, diet, goal) {
+    let advice = `=== BMI Calculation & Health Advice ===\n\n`;
     advice += `Step 1: Convert height from cm to meters:\n  ${height} cm = ${(height / 100).toFixed(2)} m\n\n`;
     advice += `Step 2: Square the height in meters:\n  ${(height / 100).toFixed(2)} × ${(height / 100).toFixed(2)} = ${(height / 100 * height / 100).toFixed(4)} m²\n\n`;
-    advice += `Step 3: Divide weight (kg) by squared height:\n  ${weight} ÷ ${(height / 100 * height / 100).toFixed(4)} = BMI ${bmi}\n\n`;
+    advice += `Step 3: Calculate BMI by weight divided by squared height:\n  ${weight} ÷ ${(height / 100 * height / 100).toFixed(4)} = ${bmi}\n\n`;
 
-    advice += `BMI Category: ${bmiCategory}\n\n`;
-    advice += `Important: BMI is a screening tool; factors like body composition\nand health conditions also matter.\n\n`;
+    advice += `BMI Classification: ${category}\n\n`;
 
-    // Health advice pin-pointed
-    switch (bmiCategory) {
+    switch (category) {
       case "Severely Underweight":
-        advice += "You are severely underweight. This may increase risk for infections, malnutrition, and osteoporosis.\n";
-        advice += "- Focus on nutrient and calorie dense diet.\n- Include healthy fats, lean proteins, whole grains.\n- Avoid skipping meals.\n";
+        advice += "- Severe underweight risks: malnutrition, fractures, immunity issues.\n- Increase calorie and nutrient intake with professional guidance.\n";
         break;
       case "Underweight":
-        advice += "You are underweight. Consider increasing calorie intake with balanced nutrition.\n";
-        advice += "- Eat frequent meals.\n- Include protein and healthy fats.\n- Monitor your health regularly.\n";
+        advice += "- Underweight risks: nutrient deficiencies, fatigue.\n- Eat high-calorie, nutrient-dense foods and frequent meals.\n";
         break;
       case "Normal weight":
-        advice += "Your weight is in the normal range. Maintain balanced nutrition and regular activity.\n";
-        advice += "- Eat a variety of foods.\n- Keep active.\n- Manage stress and sleep well.\n";
+        advice += "- Normal weight: maintain healthy lifestyle.\n- Balance diet and physical activity.\n";
         break;
       case "Overweight":
-        advice += "You are overweight. Reducing weight slightly improves health outcomes.\n";
-        advice += "- Reduce calorie intake moderately.\n- Adopt sustained physical activity.\n- Monitor portion sizes.\n";
+        advice += "- Overweight: risk of diabetes, hypertension.\n- Moderate reduction in calories and more activity recommended.\n";
         break;
       case "Obesity Class I":
       case "Obesity Class II":
       case "Obesity Class III":
-        advice += "High obesity class. Weight loss is important to lower risks of diabetes, cardiovascular disease, and others.\n";
-        advice += "- Seek medical advice for personalized care.\n- Implement structured, gradual lifestyle changes.\n";
-        advice += "- Avoid crash diets; focus on sustainability.\n";
+        advice += "- Obesity risks: cardiovascular disease, diabetes.\n- Seek health professional support for sustainable management.\n";
         break;
     }
 
-    advice += `\nGoal Based Recommendations (${goal}):\n`;
+    advice += `\nWeight Goal: ${goal}\n`;
     if (goal === "Lose") {
-      advice += "- Establish calorie deficit moderately.\n- Emphasize lean proteins, fiber, and water intake.\n- Include aerobic and strength exercises.\n";
+      advice += "- Maintain moderate calorie deficit.\n- Emphasize vegetables, lean protein, hydration.\n- Include cardio and strength training.\n";
     } else if (goal === "Gain") {
-      advice += "- Increase nutritious calorie intake with nuts, seeds, dairy.\n- Consume protein-focused meals to build muscle.\n";
-      advice += "- Avoid empty calories.\n";
+      advice += "- Increase nutrition calories, use healthy fats and proteins.\n- Eat more frequent balanced meals.\n- Avoid empty calories.\n";
     } else if (goal === "Maintain") {
-      advice += "- Balance calorie intake with energy expenditure.\n- Stay active, monitor weight regularly.\n";
+      advice += "- Balance calorie intake and physical activity.\n- Monitor weight consistently.\n";
     }
 
-    advice += `\nAdditional Lifestyle Guidance:\n`;
-    advice += "- Sleep 7-9 hours nightly; maintain a consistent schedule.\n";
-    advice += "- Manage stress with meditation, hobbies, or therapy.\n";
-    advice += "- Stay socially connected for mental well-being.\n";
+    advice += `\nAdditional Wellness Recommendations:\n`;
+    advice += "- Prioritize sleep (7-9 hours nightly).\n- Manage stress with mindfulness or exercise.\n- Stay socially connected.\n";
     advice += "- Limit processed foods, alcohol, and tobacco.\n";
-    advice += "- Hydrate adequately throughout the day.\n";
 
     if (diet && diet.toLowerCase() !== "none") {
-      advice += `\nDiet Preference:\n- Adapt foods to your ${diet} diet while ensuring nutrient adequacy.\n`;
+      advice += `\nDiet Preference Advice:\n- Adapt to your ${diet} diet ensuring nutrient adequacy.\n`;
     }
+
+    advice += `\nConsult healthcare professionals for personalized advice.\n`;
 
     return advice;
   }
@@ -257,98 +285,106 @@
       "Eat a wide variety of colorful fruits and vegetables.",
       "Choose whole grains over refined grains.",
       "Include lean proteins like beans, fish, poultry, and tofu.",
-      "Stay hydrated by drinking plenty of water daily.",
-      "Aim for 7-9 hours of quality sleep every night.",
-      "Practice mindful breathing, meditation, or yoga for stress relief.",
-      "Engage in at least 150 minutes of moderate exercise weekly.",
+      "Stay hydrated with plenty of water.",
+      "Aim for 7-9 hours quality sleep each night.",
+      "Practice mindfulness, meditation, or yoga for stress relief.",
+      "Engage in at least 150 minutes of moderate exercise each week.",
       "Maintain social connections to support mental well-being."
     ];
 
     const donts = [
-      "Avoid sugary beverages and processed snacks.",
-      "Limit saturated and trans fats in your diet.",
-      "Do not skip meals; maintain regular eating patterns.",
-      "Limit alcohol intake and avoid smoking.",
-      "Avoid excessive screen time and sedentary behaviors.",
-      "Don’t ignore signs of stress, anxiety, or depression."
+      "Avoid sugary drinks and processed snacks.",
+      "Limit saturated and trans fats.",
+      "Don't skip meals.",
+      "Limit alcohol and avoid tobacco use.",
+      "Avoid excessive screen time and sedentary lifestyle.",
+      "Pay attention to your mental health; seek help if needed."
     ];
 
     if (goal === "Lose") {
-      dos.unshift("Create a calorie deficit gradually with balanced nutrition.");
-      dos.unshift("Incorporate cardio and strength training exercises.");
+      dos.unshift("Create a gradual calorie deficit.");
+      dos.unshift("Include cardio and strength training workouts.");
       donts.unshift("Avoid late-night snacking and binge eating.");
     } else if (goal === "Gain") {
-      dos.unshift("Increase healthy calorie intake with nutrient-dense foods.");
-      dos.unshift("Eat multiple meals/snacks throughout the day.");
-      donts.unshift("Avoid empty calories from junk food.");
+      dos.unshift("Increase nutrient-dense calorie intake.");
+      dos.unshift("Eat multiple balanced meals and snacks daily.");
+      donts.unshift("Avoid empty calories and junk foods.");
     } else if (goal === "Maintain") {
-      dos.unshift("Balance calories with physical activity.");
-      dos.unshift("Monitor your weight regularly.");
+      dos.unshift("Balance calorie intake with physical activity.");
+      dos.unshift("Monitor weight regularly.");
       donts.unshift("Avoid overeating and excessive processed foods.");
     }
 
-    if (bmiCat === "Severely Underweight" || bmiCat === "Underweight") {
-      dos.push("Focus on calorie-rich nutrient foods to build healthy mass.");
-      donts.push("Do not skip meals or rely on low-nutrient empty calories.");
-    } else if (bmiCat === "Overweight" || bmiCat === "Obesity Class I" || bmiCat === "Obesity Class II" || bmiCat === "Obesity Class III") {
-      dos.push("Consult healthcare professionals for tailored weight plans.");
-      dos.push("Make gradual sustainable lifestyle changes.");
-      donts.push("Avoid fad diets and rapid weight loss methods.");
+    if (["Severely Underweight", "Underweight"].includes(bmiCat)) {
+      dos.push("Eat calorie-rich foods to gain healthy weight.");
+      donts.push("Avoid skipping meals or relying on low-nutrient foods.");
+    } else if (["Overweight","Obesity Class I","Obesity Class II","Obesity Class III"].includes(bmiCat)) {
+      dos.push("Seek help for sustainable weight loss.");
+      dos.push("Make gradual lifestyle changes.");
+      donts.push("Avoid fad and crash diets.");
     }
 
     if (diet && diet !== "" && diet.toLowerCase() !== "none") {
-      dos.push(`Adjust diet for your ${diet.toLowerCase()} preference to meet nutrient needs.`);
+      dos.push(`Adjust your diet to your ${diet} preference with balanced nutrients.`);
     }
 
     const wellnessTips = [
-      "Reduce stress through meditation, deep breathing, or gentle exercise.",
-      "Maintain consistent sleep schedules and create a calming nightly routine.",
-      "Take short breaks during work to avoid burnout and promote focus.",
-      "Stay socially connected with community, friends, or family.",
-      "Limit caffeine consumption especially in the afternoon and evening."
+      "Use breathing exercises or yoga to reduce stress.",
+      "Maintain regular sleep patterns and peaceful bedtime routines.",
+      "Take breaks to avoid burnout and improve focus.",
+      "Stay socially active.",
+      "Limit caffeine especially in the afternoon and night."
     ];
 
-    let output = "=== Personalized Dietary & Wellness Guide ===\n\n";
-    output += "Do's:\n";
-    dos.forEach((item, i) => {
-      output += `${i + 1}. ${item}\n`;
-    });
+    let output = "=== Personalized Dietary & Wellness Guide ===\n\nDo's:\n";
+    dos.forEach((item,i) => output += `${i+1}. ${item}\n`);
     output += "\nDon'ts:\n";
-    donts.forEach((item, i) => {
-      output += `${i + 1}. ${item}\n`;
-    });
+    donts.forEach((item,i) => output += `${i+1}. ${item}\n`);
     output += "\nAdditional Mental & Wellness Tips:\n";
-    wellnessTips.forEach((tip, i) => {
-      output += `${i + 1}. ${tip}\n`;
-    });
+    wellnessTips.forEach((item,i) => output += `${i+1}. ${item}\n`);
 
     return output;
   }
 
-  // BMI Advice textarea update
-  document.getElementById('calcBtn').addEventListener('click', () => {
-    const ageVal = document.getElementById('age').value.trim();
-    const weightVal = parseFloat(document.getElementById('weight').value);
-    const heightVal = parseFloat(document.getElementById('height').value);
-    const dietVal = document.getElementById('diet').value.trim();
+  // Reset button clears all inputs and outputs
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    ['age', 'weight', 'height', 'diet', 'goalSelect', 'foodQuery'].forEach(id => {
+      const elem = document.getElementById(id);
+      if (elem.tagName === "SELECT") elem.selectedIndex = 0;
+      else elem.value = "";
+    });
+    ['bmiAdvice', 'nutritionResult', 'dosOutput'].forEach(id => {
+      document.getElementById(id).value !== undefined 
+        ? document.getElementById(id).value = "" 
+        : document.getElementById(id).textContent = "";
+    });
+  });
 
-    if (!weightVal || !heightVal || weightVal <= 0 || heightVal <= 0) {
-      alert('Please fill in valid values for weight and height.');
+  // BMI calculation button event
+  document.getElementById('calcBtn').addEventListener('click', () => {
+    const age = document.getElementById('age').value.trim();
+    const weight = parseFloat(document.getElementById('weight').value);
+    const height = parseFloat(document.getElementById('height').value);
+    const diet = document.getElementById('diet').value.trim();
+
+    if (!weight || !height || weight <= 0 || height <= 0) {
+      alert('Please enter valid weight and height');
       return;
     }
 
-    const bmi = calculateBMI(weightVal, heightVal);
+    const bmi = calculateBMI(weight, height);
     const bmiCat = getBMICategory(bmi);
 
-    const detailedAdvice = generateDetailedAdvice(weightVal, heightVal, bmi, bmiCat, ageVal, dietVal, "General");
+    const detailedAdvice = generateDetailedAdvice(weight, height, bmi, bmiCat, age, diet, "General");
 
     document.getElementById('bmiAdvice').value = detailedAdvice;
   });
 
-  // Nutrition Lookup Logic
+  // Nutrition lookup event
   document.getElementById('searchBtn').addEventListener('click', async () => {
     const food = document.getElementById('foodQuery').value.trim();
     const output = document.getElementById('nutritionResult');
+
     if (!food) {
       alert('Please enter a food name to search.');
       return;
@@ -356,7 +392,7 @@
     output.value = 'Loading nutrition info...';
 
     try {
-      const apiKey = 'evbkpkYjm9qBAe6gXrcAgIhhFechn8Tj3Yd4AuIp'; // Replace with your USDA API key
+      const apiKey = 'evbkpkYjm9qBAe6gXrcAgIhhFechn8Tj3Yd4AuIp';  // Replace this string with your USDA API key
       const response = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${apiKey}&query=${encodeURIComponent(food)}&pageSize=1`);
       const data = await response.json();
       if (!data.foods || data.foods.length === 0) {
@@ -382,7 +418,7 @@
     }
   });
 
-  // Do's & Don'ts widget logic
+  // Do's & Don'ts button event
   document.getElementById('showDosBtn').addEventListener('click', () => {
     const goal = document.getElementById('goalSelect').value;
     const weight = parseFloat(document.getElementById('weight').value);
