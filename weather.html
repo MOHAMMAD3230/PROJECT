@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live Weather Lookup</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #232946; color: #fff; margin: 0; min-height: 100vh; }
+    .weather-card {
+      background: #fff; color: #232946; max-width: 350px; margin: 60px auto; border-radius: 14px; box-shadow: 0 2px 12px #15172833; padding: 32px 28px;
+    }
+    .weather-card h2 { margin-top: 0; }
+    .weather-card input[type="text"] { width: 80%; padding: 9px 11px; border-radius: 6px; border: 1px solid #bbb; margin-bottom: 14px; }
+    .weather-card button { background: #232946; color: #fff; border: none; border-radius: 6px; padding: 9px 14px; cursor: pointer; }
+    #result { margin-top: 18px; }
+    .label { font-weight: 500; color: #44318d; }
+  </style>
+</head>
+<body>
+  <div class="weather-card">
+    <h2>Weather Search</h2>
+    <input type="text" id="cityInput" placeholder="Enter city (e.g. Mumbai)" />
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="result">Enter a city and press the button.</div>
+  </div>
+  <script>
+    function getWeather() {
+      const city = document.getElementById('cityInput').value || 'Hyderabad';
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = 'Loading...';
+
+      const data = null;
+      const xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+
+      xhr.addEventListener('readystatechange', function () {
+        if (this.readyState === this.DONE) {
+          try {
+            const weather = JSON.parse(this.responseText);
+            resultDiv.innerHTML = `
+              <span class="label">City:</span> ${weather.name || city}<br>
+              <span class="label">Temperature:</span> ${weather.main && weather.main.temp ? weather.main.temp + '°C' : 'N/A'}<br>
+              <span class="label">Weather:</span> ${weather.weather && weather.weather[0] ? weather.weather[0].description : 'N/A'}<br>
+              <span class="label">Humidity:</span> ${weather.main && weather.main.humidity ? weather.main.humidity + '%' : 'N/A'}<br>
+              <span class="label">Wind Speed:</span> ${weather.wind && weather.wind.speed ? weather.wind.speed + ' m/s' : 'N/A'}<br>
+            `;
+          } catch (e) {
+            resultDiv.textContent = 'Could not parse response: ' + this.responseText;
+          }
+        }
+      });
+
+      xhr.open('GET', `https://open-weather13.p.rapidapi.com/city?city=${encodeURIComponent(city)}&lang=EN`);
+      xhr.setRequestHeader('x-rapidapi-key', '30cbe4bc30msh5fdcf92c4fd37b1p1c022fjsncc0f1842bb0a');
+      xhr.setRequestHeader('x-rapidapi-host', 'open-weather13.p.rapidapi.com');
+      xhr.send(data);
+    }
+  </script>
+</body>
+</html>
