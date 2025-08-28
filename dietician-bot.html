@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Advanced Dietician App with Reset Button</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Advanced Dietician App with Admin Login</title>
 <style>
+  /* Your existing styles */
   html, body {
     margin: 0; padding: 0;
     width: 100%; min-height: 100vh;
@@ -14,18 +15,15 @@
     overflow: auto;
     position: relative;
   }
-
   body::before {
     content: "";
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-image:
-      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent);
     background-size: 20px 20px;
     pointer-events: none;
     z-index: -1;
   }
-
   #appPanel {
     position: relative;
     max-width: 850px;
@@ -36,411 +34,528 @@
     padding: 30px 40px;
     z-index: 10;
   }
-
-  #appPanel h1 {
+  #appPanel h1, #appPanel h2, #dosWidget h2 {
     color: #00fff7;
-    margin-top: 0;
+    margin: 0 0 20px 0;
+    font-weight: 700;
     text-align: center;
-    font-weight: bold;
   }
-
   label {
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
   }
-
-  input, textarea, select, button {
+  input, select, textarea, button {
     width: 100%;
     padding: 12px 16px;
     margin-bottom: 18px;
     border-radius: 8px;
-    background-color: #222;
+    background: #222;
     border: 1px solid #444;
-    color: white;
+    color: #fff;
     font-size: 1em;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
   }
-
-  input:focus, textarea:focus, select:focus {
+  input:focus, select:focus, textarea:focus {
     border-color: #00fff7;
     box-shadow: 0 0 10px #00fff7;
   }
-
   button {
     cursor: pointer;
     border: none;
-    background-color: #00fff7;
+    background: #00fff7;
     color: #111;
     font-weight: 700;
-    transition: background-color 0.3s;
+    transition: background 0.3s;
   }
-
-  button:hover {
-    background-color: #00ccc7;
+  button:hover:not(:disabled) {
+    background: #00ccc7;
   }
-
+  button:disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
   textarea {
     resize: vertical;
     min-height: 160px;
     max-height: 320px;
-    overflow-y: auto;
     font-family: monospace;
   }
-
   .row {
     display: flex;
-    gap: 22px;
+    gap: 20px;
     flex-wrap: wrap;
   }
-
   .col {
     flex: 1;
     min-width: 170px;
   }
-
   #dosWidget {
-    max-width: 850px;
-    background: rgba(0,40,50,0.9);
-    margin: 40px auto;
+    margin: 40px auto 60px;
     padding: 30px 40px;
+    background: rgba(20,20,20,0.95);
     border-radius: 16px;
-    box-shadow: 0 0 35px rgba(0,255,214,0.55);
+    box-shadow: 0 0 35px rgba(0,255,255,0.15);
     color: #8df9e1;
-    font-size: 1.05em;
-    line-height: 1.6;
-    white-space: pre-wrap;
+    max-width: 850px;
     min-height: 350px;
     max-height: 520px;
     overflow-y: auto;
+    white-space: pre-wrap;
     user-select: text;
   }
-
-  #dosWidget h2 {
-    color: #00ffd6;
-    margin-top: 0;
-    margin-bottom: 12px;
-    font-weight: 700;
-    text-align: center;
-  }
-
-  /* Button group styling */
   #buttonsGroup {
     display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
   }
   #buttonsGroup button {
     flex: 1;
+    min-width: 120px;
   }
 </style>
 </head>
 <body>
-
 <div id="appPanel">
   <h1>Advanced Dietician App</h1>
-
   <section>
     <h2>Profile Information</h2>
     <div class="row">
-      <div class="col">
-        <label for="age">Age (years)</label>
-        <input type="number" id="age" placeholder="30" />
-      </div>
-      <div class="col">
-        <label for="weight">Weight (kg)</label>
-        <input type="number" id="weight" placeholder="70" />
-      </div>
-      <div class="col">
-        <label for="height">Height (cm)</label>
-        <input type="number" id="height" placeholder="175" />
-      </div>
-      <div class="col" style="flex-grow: 2;">
-        <label for="diet">Diet Preference</label>
-        <input type="text" id="diet" placeholder="e.g. Vegan, Keto" />
-      </div>
+      <div class="col"><label for="age">Age (years)</label><input id="age" type="number" placeholder="30" /></div>
+      <div class="col"><label for="weight">Weight (kg)</label><input id="weight" type="number" placeholder="70" /></div>
+      <div class="col"><label for="height">Height (cm)</label><input id="height" type="number" placeholder="175" /></div>
+      <div class="col" style="flex-grow: 2;"><label for="diet">Diet Preference</label><input id="diet" type="text" placeholder="e.g. Vegan, Keto" /></div>
     </div>
-
     <div id="buttonsGroup">
       <button id="calcBtn">Calculate BMI & Advice</button>
-      <button id="resetBtn" title="Reset all inputs and outputs">Reset All</button>
+      <button id="resetBtn" title="Reset all">Reset All</button>
+      <button id="printBmiBtn" title="Print BMI">Print</button>
+      <button id="saveBmiBtn" title="Save BMI">Save</button>
+      <button id="emailBmiBtn" title="Email BMI">Email</button>
     </div>
-
-    <textarea id="bmiAdvice" readonly placeholder="Your detailed health advice will appear here."></textarea>
+    <textarea id="bmiAdvice" readonly></textarea>
   </section>
-
   <section>
     <h2>Nutrition Lookup</h2>
-    <input type="text" id="foodQuery" placeholder="Enter food name to search" />
+    <input id="foodQuery" type="text" placeholder="Enter food name" />
     <div id="buttonsGroup">
-      <button id="searchBtn">Search Nutrition</button>
+      <button id="searchBtn">Search</button>
+      <button id="printNutritionBtn" title="Print Nutrition">Print</button>
+      <button id="saveNutritionBtn" title="Save Nutrition">Save</button>
+      <button id="emailNutritionBtn" title="Email Nutrition">Email</button>
     </div>
-    <textarea id="nutritionResult" readonly placeholder="Nutrition data will appear here."></textarea>
+    <textarea id="nutritionResult" readonly></textarea>
   </section>
 </div>
-
 <div id="dosWidget" aria-live="polite">
-  <h2>Your Personalized Do's & Don'ts & Wellness Tips</h2>
-  <select id="goalSelect" aria-label="Select your weight goal">
-    <option value="" selected disabled>Choose your weight goal...</option>
-    <option value="Lose">Weight Loss</option>
-    <option value="Gain">Weight Gain</option>
-    <option value="Maintain">Weight Maintenance</option>
+  <h2>Do's & Don'ts & Wellness Tips</h2>
+  <select id="goalSelect" aria-label="Select goal">
+    <option value="" selected disabled>Choose goal</option>
+    <option value="Lose">Lose Weight</option>
+    <option value="Gain">Gain Weight</option>
+    <option value="Maintain">Maintain Weight</option>
   </select>
-  <div id="buttonsGroup" style="margin-top:10px;">
+  <div id="buttonsGroup" style="margin-top: 16px;">
     <button id="showDosBtn">Show Recommendations</button>
+    <button id="printDosBtn" title="Print Dos & Don'ts">Print</button>
+    <button id="saveDosBtn" title="Save Dos & Don'ts">Save</button>
+    <button id="emailDosBtn" title="Email Dos & Don'ts">Email</button>
   </div>
   <pre id="dosOutput"></pre>
 </div>
-
 <script>
-  // Function to clear all inputs and outputs for fresh interaction
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    // Clear profile inputs
-    document.getElementById('age').value = "";
-    document.getElementById('weight').value = "";
-    document.getElementById('height').value = "";
-    document.getElementById('diet').value = "";
+  let isAdmin = false;
 
-    // Clear weight goal select
-    document.getElementById('goalSelect').selectedIndex = 0;
+  window.onload = function(){
+    const pwd = prompt("Enter admin password (leave blank if not admin):");
+    if(pwd === "chickenBiryani"){ // change this password to your desired admin password
+      isAdmin = true;
+      alert("Admin mode enabled");
+    } else {
+      alert("Logged in as regular user");
+    }
+    toggleAdminFeatures();
+  };
 
-    // Clear nutrition query
-    document.getElementById('foodQuery').value = "";
-
-    // Clear all output textareas and pre
-    document.getElementById('bmiAdvice').value = "";
-    document.getElementById('nutritionResult').value = "";
-    document.getElementById('dosOutput').textContent = "";
-  });
-
-  function calculateBMI(weight, height) {
-    const heightM = height / 100;
-    return +(weight / (heightM * heightM)).toFixed(1);
+  function toggleAdminFeatures(){
+    const adminButtons = [
+      'printBmiBtn','saveBmiBtn','emailBmiBtn',
+      'printNutritionBtn','saveNutritionBtn','emailNutritionBtn',
+      'printDosBtn','saveDosBtn','emailDosBtn'
+    ];
+    adminButtons.forEach(id=>{
+      const btn=document.getElementById(id);
+      if(btn){
+        btn.style.display = isAdmin ? 'inline-block' : 'none';
+        btn.disabled = !isAdmin;
+      }
+    });
   }
 
-  function getBMICategory(bmi) {
-    if (bmi < 16.5) return "Severely Underweight";
-    if (bmi < 18.5) return "Underweight";
-    if (bmi < 25) return "Normal weight";
-    if (bmi < 30) return "Overweight";
-    if (bmi < 35) return "Obesity Class I";
-    if (bmi < 40) return "Obesity Class II";
+  function saveTextFile(filename, text){
+    const blob = new Blob([text], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function sendEmail(subject, body){
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  function printContent(id){
+    const el = document.getElementById(id);
+    const content = el.value || el.textContent;
+    const w = window.open();
+    w.document.write('<pre style="font-family: monospace; white-space: pre-wrap; font-size: 16px;">' + content + '</pre>');
+    w.document.close();
+    w.focus();
+    w.print();
+    w.close();
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    ['age','weight','height','diet','goalSelect','foodQuery'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el.tagName.toLowerCase() === "select"){
+        el.selectedIndex = 0;
+      } else {
+        el.value = "";
+      }
+    });
+    ['bmiAdvice','nutritionResult','dosOutput'].forEach(id=>{
+      const el = document.getElementById(id);
+      if('value' in el){
+        el.value = "";
+      } else {
+        el.textContent = "";
+      }
+    });
+  });
+
+  function calculateBMI(weight, height){
+    const h = height / 100;
+    return +(weight / (h*h)).toFixed(1);
+  }
+
+  function getBmiCategory(bmi){
+    if(bmi < 16.5) return "Severely Underweight";
+    if(bmi < 18.5) return "Underweight";
+    if(bmi < 25) return "Normal weight";
+    if(bmi < 30) return "Overweight";
+    if(bmi < 35) return "Obesity Class I";
+    if(bmi < 40) return "Obesity Class II";
     return "Obesity Class III";
   }
 
-  function generateDetailedAdvice(weight, height, bmi, category, age, diet, goal) {
+  function generateDetailedAdvice(weight, height, bmi, category, age, diet, goal){
     let advice = `=== BMI Calculation & Health Advice ===\n\n`;
     advice += `Step 1: Convert height from cm to meters:\n  ${height} cm = ${(height / 100).toFixed(2)} m\n\n`;
     advice += `Step 2: Square the height in meters:\n  ${(height / 100).toFixed(2)} × ${(height / 100).toFixed(2)} = ${(height / 100 * height / 100).toFixed(4)} m²\n\n`;
-    advice += `Step 3: Calculate BMI by weight divided by squared height:\n  ${weight} ÷ ${(height / 100 * height / 100).toFixed(4)} = ${bmi}\n\n`;
-
+    advice += `Step 3: Calculate BMI:\n  ${weight} ÷ ${(height / 100 * height / 100).toFixed(4)} = ${bmi}\n\n`;
     advice += `BMI Classification: ${category}\n\n`;
-
-    switch (category) {
+    switch(category){
       case "Severely Underweight":
-        advice += "- Severe underweight risks: malnutrition, fractures, immunity issues.\n- Increase calorie and nutrient intake with professional guidance.\n";
+        advice += "- Severe underweight risks: malnutrition, fractures, immunity issues.\n- Increase calorie and nutrient intake.\n";
         break;
       case "Underweight":
-        advice += "- Underweight risks: nutrient deficiencies, fatigue.\n- Eat high-calorie, nutrient-dense foods and frequent meals.\n";
+        advice += "- Underweight risks: nutrient deficiencies, fatigue.\n- Eat calorie-dense foods and frequent meals.\n";
         break;
       case "Normal weight":
-        advice += "- Normal weight: maintain healthy lifestyle.\n- Balance diet and physical activity.\n";
+        advice += "- Normal weight: maintain balanced diet and exercise.\n";
         break;
       case "Overweight":
-        advice += "- Overweight: risk of diabetes, hypertension.\n- Moderate reduction in calories and more activity recommended.\n";
+        advice += "- Overweight: risk of chronic diseases.\n- Moderate calorie restriction and more activity recommended.\n";
         break;
       case "Obesity Class I":
       case "Obesity Class II":
       case "Obesity Class III":
-        advice += "- Obesity risks: cardiovascular disease, diabetes.\n- Seek health professional support for sustainable management.\n";
+        advice += "- Obesity risks: cardiovascular and metabolic diseases.\n- Seek professional help for sustainable management.\n";
         break;
     }
-
     advice += `\nWeight Goal: ${goal}\n`;
-    if (goal === "Lose") {
-      advice += "- Maintain moderate calorie deficit.\n- Emphasize vegetables, lean protein, hydration.\n- Include cardio and strength training.\n";
-    } else if (goal === "Gain") {
-      advice += "- Increase nutrition calories, use healthy fats and proteins.\n- Eat more frequent balanced meals.\n- Avoid empty calories.\n";
-    } else if (goal === "Maintain") {
-      advice += "- Balance calorie intake and physical activity.\n- Monitor weight consistently.\n";
-    }
-
-    advice += `\nAdditional Wellness Recommendations:\n`;
-    advice += "- Prioritize sleep (7-9 hours nightly).\n- Manage stress with mindfulness or exercise.\n- Stay socially connected.\n";
-    advice += "- Limit processed foods, alcohol, and tobacco.\n";
-
-    if (diet && diet.toLowerCase() !== "none") {
-      advice += `\nDiet Preference Advice:\n- Adapt to your ${diet} diet ensuring nutrient adequacy.\n`;
-    }
-
-    advice += `\nConsult healthcare professionals for personalized advice.\n`;
-
+    if(goal === "Lose")
+      advice += "- Moderate calorie deficit, hydration, exercise.\n";
+    else if(goal === "Gain")
+      advice += "- Increase calories with nutritious foods.\n";
+    else
+      advice += "- Balance intake and activity.\n";
+    advice += `\nAdditional Tips:\n- Sleep 7-9 hours.\n- Manage stress.\n- Stay socially connected.\n- Limit alcohol and processed foods.\n`;
+    if(diet && diet.toLowerCase() !== "none")
+      advice += `\nDiet Preference: Adapt your ${diet} diet for nutrition.\n`;
+    advice += "\nConsult healthcare professionals for personalized advice.\n";
     return advice;
   }
 
-  function generateGuide(goal, bmiCat, diet) {
+  function generateGuide(goal, bmiCat, diet){
     const dos = [
-      "Eat a wide variety of colorful fruits and vegetables.",
+      "Eat colorful fruits & vegetables daily.",
       "Choose whole grains over refined grains.",
-      "Include lean proteins like beans, fish, poultry, and tofu.",
-      "Stay hydrated with plenty of water.",
-      "Aim for 7-9 hours quality sleep each night.",
-      "Practice mindfulness, meditation, or yoga for stress relief.",
-      "Engage in at least 150 minutes of moderate exercise each week.",
-      "Maintain social connections to support mental well-being."
+      "Include lean and plant-based proteins.",
+      "Stay hydrated with water.",
+      "Aim for 7-9 hours quality sleep nightly.",
+      "Practice mindfulness or yoga to relieve stress.",
+      "Engage in 150 mins moderate exercise weekly.",
+      "Maintain social connections."
     ];
-
     const donts = [
       "Avoid sugary drinks and processed snacks.",
       "Limit saturated and trans fats.",
       "Don't skip meals.",
       "Limit alcohol and avoid tobacco use.",
-      "Avoid excessive screen time and sedentary lifestyle.",
-      "Pay attention to your mental health; seek help if needed."
+      "Avoid sedentary lifestyle.",
+      "Pay attention to mental health."
     ];
-
-    if (goal === "Lose") {
-      dos.unshift("Create a gradual calorie deficit.");
-      dos.unshift("Include cardio and strength training workouts.");
-      donts.unshift("Avoid late-night snacking and binge eating.");
-    } else if (goal === "Gain") {
-      dos.unshift("Increase nutrient-dense calorie intake.");
-      dos.unshift("Eat multiple balanced meals and snacks daily.");
-      donts.unshift("Avoid empty calories and junk foods.");
-    } else if (goal === "Maintain") {
-      dos.unshift("Balance calorie intake with physical activity.");
-      dos.unshift("Monitor weight regularly.");
-      donts.unshift("Avoid overeating and excessive processed foods.");
+    if(goal === "Lose"){
+      dos.unshift("Create a moderate calorie deficit.");
+      dos.unshift("Include cardio and strength training.");
+      donts.unshift("Avoid binge and late-night snacking.");
+    } else if(goal === "Gain"){
+      dos.unshift("Eat more nutrient-dense calories.");
+      dos.unshift("Eat frequent balanced meals.");
+      donts.unshift("Avoid empty calories.");
+    } else{
+      dos.unshift("Balance calorie intake with activity.");
+      dos.unshift("Regularly monitor your weight.");
+      donts.unshift("Avoid overeating.");
     }
-
-    if (["Severely Underweight", "Underweight"].includes(bmiCat)) {
-      dos.push("Eat calorie-rich foods to gain healthy weight.");
-      donts.push("Avoid skipping meals or relying on low-nutrient foods.");
-    } else if (["Overweight","Obesity Class I","Obesity Class II","Obesity Class III"].includes(bmiCat)) {
-      dos.push("Seek help for sustainable weight loss.");
-      dos.push("Make gradual lifestyle changes.");
-      donts.push("Avoid fad and crash diets.");
+    if(["Severely Underweight", "Underweight"].includes(bmiCat)){
+      dos.push("Focus on calorie-rich nutrient foods.");
+      donts.push("Avoid skipping meals.");
     }
-
-    if (diet && diet !== "" && diet.toLowerCase() !== "none") {
-      dos.push(`Adjust your diet to your ${diet} preference with balanced nutrients.`);
+    if(["Overweight", "Obesity Class I", "Obesity Class II", "Obesity Class III"].includes(bmiCat)){
+      dos.push("Seek professional weight management.");
+      donts.push("Avoid fad diets.");
     }
-
+    if(diet && diet.toLowerCase() !== "none"){
+      dos.push(`Adjust diet (${diet}) for nutrition completeness.`);
+    }
     const wellnessTips = [
-      "Use breathing exercises or yoga to reduce stress.",
-      "Maintain regular sleep patterns and peaceful bedtime routines.",
-      "Take breaks to avoid burnout and improve focus.",
-      "Stay socially active.",
-      "Limit caffeine especially in the afternoon and night."
+      "Use breathing exercises or yoga for stress relief.",
+      "Maintain regular sleep schedule.",
+      "Take breaks to prevent burnout.",
+      "Stay socially connected.",
+      "Limit caffeine late in the day."
     ];
-
-    let output = "=== Personalized Dietary & Wellness Guide ===\n\nDo's:\n";
-    dos.forEach((item,i) => output += `${i+1}. ${item}\n`);
-    output += "\nDon'ts:\n";
-    donts.forEach((item,i) => output += `${i+1}. ${item}\n`);
-    output += "\nAdditional Mental & Wellness Tips:\n";
-    wellnessTips.forEach((item,i) => output += `${i+1}. ${item}\n`);
-
+    let output = "=== Personalized Do's & Don'ts & Wellness Tips ===\n\nDo's:\n"+dos.map((d,i)=>`${i+1}. ${d}`).join("\n");
+    output += "\n\nDon'ts:\n"+donts.map((d,i)=>`${i+1}. ${d}`).join("\n");
+    output += "\n\nMental & Wellness Tips:\n"+wellnessTips.map((d,i)=>`${i+1}. ${d}`).join("\n");
     return output;
   }
 
-  // Reset button clears all inputs and outputs
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    ['age', 'weight', 'height', 'diet', 'goalSelect', 'foodQuery'].forEach(id => {
-      const elem = document.getElementById(id);
-      if (elem.tagName === "SELECT") elem.selectedIndex = 0;
-      else elem.value = "";
-    });
-    ['bmiAdvice', 'nutritionResult', 'dosOutput'].forEach(id => {
-      document.getElementById(id).value !== undefined 
-        ? document.getElementById(id).value = "" 
-        : document.getElementById(id).textContent = "";
-    });
-  });
+  // Event handlers for buttons
 
-  // BMI calculation button event
   document.getElementById('calcBtn').addEventListener('click', () => {
     const age = document.getElementById('age').value.trim();
     const weight = parseFloat(document.getElementById('weight').value);
     const height = parseFloat(document.getElementById('height').value);
-    const diet = document.getElementById('diet').value.trim();
+    const diet = document.getElementById('diet').value.trim() || 'None';
 
-    if (!weight || !height || weight <= 0 || height <= 0) {
+    if(!weight || !height || weight <= 0 || height <= 0){
       alert('Please enter valid weight and height');
       return;
     }
-
     const bmi = calculateBMI(weight, height);
-    const bmiCat = getBMICategory(bmi);
-
-    const detailedAdvice = generateDetailedAdvice(weight, height, bmi, bmiCat, age, diet, "General");
-
-    document.getElementById('bmiAdvice').value = detailedAdvice;
+    const category = getBmiCategory(bmi);
+    const advice = generateDetailedAdvice(weight, height, bmi, category, age, diet, "General");
+    document.getElementById('bmiAdvice').value = advice;
   });
 
-  // Nutrition lookup event
   document.getElementById('searchBtn').addEventListener('click', async () => {
     const food = document.getElementById('foodQuery').value.trim();
     const output = document.getElementById('nutritionResult');
-
-    if (!food) {
-      alert('Please enter a food name to search.');
+    if(!food){
+      alert('Please enter a food name');
       return;
     }
     output.value = 'Loading nutrition info...';
-
-    try {
-      const apiKey = 'evbkpkYjm9qBAe6gXrcAgIhhFechn8Tj3Yd4AuIp';  // Replace this string with your USDA API key
+    try{
+      const apiKey = 'evbkpkYjm9qBAe6gXrcAgIhhFechn8Tj3Yd4AuIp'; // Replace with your USDA API key
       const response = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${apiKey}&query=${encodeURIComponent(food)}&pageSize=1`);
       const data = await response.json();
-      if (!data.foods || data.foods.length === 0) {
+      if(!data.foods || data.foods.length === 0){
         output.value = 'No nutrition data found.';
         return;
       }
       const item = data.foods[0];
       let nutrients = {};
-      item.foodNutrients.forEach(n => {
+      item.foodNutrients.forEach(n=>{
         const name = n.nutrientName.toLowerCase();
-        if (name.includes("energy")) nutrients.Calories = n.value;
-        if (name.includes("protein")) nutrients.Protein = n.value;
-        if (name.includes("fat")) nutrients.Fat = n.value;
-        if (name.includes("carbohydrate")) nutrients.Carbohydrates = n.value;
+        if(name.includes('energy')) nutrients.Calories = n.value;
+        if(name.includes('protein')) nutrients.Protein = n.value;
+        if(name.includes('fat')) nutrients.Fat = n.value;
+        if(name.includes('carbohydrate')) nutrients.Carbohydrates = n.value;
       });
-      let result = `${item.description} (per serving):\n`;
-      for (const [key, val] of Object.entries(nutrients)) {
-        result += `${key}: ${val}\n`;
+      let results = `${item.description} (per serving):\n`;
+      for(const [k,v] of Object.entries(nutrients)){
+        results += `${k}: ${v}\n`;
       }
-      output.value = result;
-    } catch (e) {
+      output.value = results;
+    }catch(e){
       output.value = 'Error fetching nutrition data.';
     }
   });
 
-  // Do's & Don'ts button event
   document.getElementById('showDosBtn').addEventListener('click', () => {
     const goal = document.getElementById('goalSelect').value;
     const weight = parseFloat(document.getElementById('weight').value);
     const height = parseFloat(document.getElementById('height').value);
-    const diet = document.getElementById('diet').value.trim();
+    const diet = document.getElementById('diet').value.trim() || 'None';
 
-    if (!goal) {
-      alert("Please select your weight goal.");
+    if(!goal){
+      alert('Please select your goal');
       return;
     }
-    if (!weight || !height || weight <= 0 || height <= 0) {
-      alert("Please enter valid weight and height for better customization.");
+    if(!weight || !height || weight <= 0 || height <= 0){
+      alert('Please enter valid weight and height');
       return;
     }
-
     const bmi = calculateBMI(weight, height);
-    const bmiCat = getBMICategory(bmi);
-
-    const guideText = generateGuide(goal, bmiCat, diet);
-    document.getElementById('dosOutput').textContent = guideText;
+    const cat = getBmiCategory(bmi);
+    const guide = generateGuide(goal, cat, diet);
+    document.getElementById('dosOutput').textContent = guide;
   });
+
+  function checkAdmin(){
+    if(!isAdmin){
+      alert("Only admins can perform this action.");
+      return false;
+    }
+    return true;
+  }
+
+  // Attach export buttons events to admin only
+
+  document.getElementById('printBmiBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    printContent('bmiAdvice');
+  });
+  document.getElementById('saveBmiBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    saveTextFile('bmi_advice.txt', document.getElementById('bmiAdvice').value);
+  });
+  document.getElementById('emailBmiBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    sendEmail('BMI Advice', document.getElementById('bmiAdvice').value);
+  });
+
+  document.getElementById('printNutritionBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    printContent('nutritionResult');
+  });
+  document.getElementById('saveNutritionBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    saveTextFile('nutrition_data.txt', document.getElementById('nutritionResult').value);
+  });
+  document.getElementById('emailNutritionBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    sendEmail('Nutrition Data', document.getElementById('nutritionResult').value);
+  });
+
+  document.getElementById('printDosBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    printContent('dosOutput');
+  });
+  document.getElementById('saveDosBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    saveTextFile('dos_and_donts.txt', document.getElementById('dosOutput').textContent);
+  });
+  document.getElementById('emailDosBtn').addEventListener('click', () => {
+    if(!checkAdmin()) return;
+    sendEmail('Dos and Donts', document.getElementById('dosOutput').textContent);
+  });
+
 </script>
+
+  <script> import com.google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseServiceClient;
+import com.google.recaptchaenterprise.v1.Assessment;
+import com.google.recaptchaenterprise.v1.CreateAssessmentRequest;
+import com.google.recaptchaenterprise.v1.Event;
+import com.google.recaptchaenterprise.v1.ProjectName;
+import com.google.recaptchaenterprise.v1.RiskAnalysis.ClassificationReason;
+import java.io.IOException;
+
+public class CreateAssessment {
+
+  public static void main(String[] args) throws IOException {
+    // TO-DO: Replace the token and reCAPTCHA action variables before running the sample.
+    String projectID = "fluted-agency-468912-d7";
+    String recaptchaKey = "6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD";
+    String token = "action-token";
+    String recaptchaAction = "action-name";
+
+    createAssessment(projectID, recaptchaKey, token, recaptchaAction);
+  }
+
+  /**
+   * Create an assessment to analyse the risk of a UI action.
+   *
+   * @param projectID : Your Google Cloud project ID.
+   * @param recaptchaKey : The reCAPTCHA key associated with the site/app
+   * @param token : The generated token obtained from the client.
+   * @param recaptchaAction : Action name corresponding to the token.
+   */
+  public static void createAssessment(
+      String projectID, String recaptchaKey, String token, String recaptchaAction)
+      throws IOException {
+    // Create the reCAPTCHA client.
+    // TODO: Cache the client generation code (recommended) or call client.close() before exiting the method.
+    try (RecaptchaEnterpriseServiceClient client = RecaptchaEnterpriseServiceClient.create()) {
+
+      // Set the properties of the event to be tracked.
+      Event event = Event.newBuilder().setSiteKey(recaptchaKey).setToken(token).build();
+
+      // Build the assessment request.
+      CreateAssessmentRequest createAssessmentRequest =
+          CreateAssessmentRequest.newBuilder()
+              .setParent(ProjectName.of(projectID).toString())
+              .setAssessment(Assessment.newBuilder().setEvent(event).build())
+              .build();
+
+      Assessment response = client.createAssessment(createAssessmentRequest);
+
+      // Check if the token is valid.
+      if (!response.getTokenProperties().getValid()) {
+        System.out.println(
+            "The CreateAssessment call failed because the token was: "
+                + response.getTokenProperties().getInvalidReason().name());
+        return;
+      }
+
+      // Check if the expected action was executed.
+      if (!response.getTokenProperties().getAction().equals(recaptchaAction)) {
+        System.out.println(
+            "The action attribute in reCAPTCHA tag is: "
+                + response.getTokenProperties().getAction());
+        System.out.println(
+            "The action attribute in the reCAPTCHA tag "
+                + "does not match the action ("
+                + recaptchaAction
+                + ") you are expecting to score");
+        return;
+      }
+
+      // Get the risk score and the reason(s).
+      // For more information on interpreting the assessment, see:
+      // https://developers.google.com/recaptcha-enterprise/docs/interpret-assessment
+      for (ClassificationReason reason : response.getRiskAnalysis().getReasonsList()) {
+        System.out.println(reason);
+      }
+
+      float recaptchaScore = response.getRiskAnalysis().getScore();
+      System.out.println("The reCAPTCHA score is: " + recaptchaScore);
+
+      // Get the assessment name (ID). Use this to annotate the assessment.
+      String assessmentName = response.getName();
+      System.out.println(
+          "Assessment name: " + assessmentName.substring(assessmentName.lastIndexOf("/") + 1));
+    }
+  }
+}</script>  <br>
 
 </body>
 </html>
