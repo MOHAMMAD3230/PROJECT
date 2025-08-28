@@ -13,12 +13,7 @@
   function onSubmit(token) {
     document.getElementById("demo-form").submit();
   }
-</script><button class="g-recaptcha"
-    data-sitekey="6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD"
-    data-callback='onSubmit'
-    data-action='submit'>
-  Submit
-</button>
+</script>
   <link href="style.css" rel="stylesheet" type="text/css" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17083520520">
@@ -561,7 +556,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 
-<aplet> import com.google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseServiceClient;
+<script> import com.google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseServiceClient;
 import com.google.recaptchaenterprise.v1.Assessment;
 import com.google.recaptchaenterprise.v1.CreateAssessmentRequest;
 import com.google.recaptchaenterprise.v1.Event;
@@ -645,7 +640,13 @@ public class CreateAssessment {
           "Assessment name: " + assessmentName.substring(assessmentName.lastIndexOf("/") + 1));
     }
   }
-}</aplet>
+}</script>  <br>
+<button class="g-recaptcha"
+    data-sitekey="6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD"
+    data-callback='onSubmit'
+    data-action='submit'>
+  Submit
+</button>
 
 </body>
 
