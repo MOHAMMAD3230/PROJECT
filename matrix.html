@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MY_STUFF</title>
+  <style>
+    /* Matrix animated background canvas style */
+    #matrix {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: #000010;
+      display: block;
+    }
+
+    /* Box container style for categories */
+    .categories-box {
+      max-width: 300px;
+      margin: 30px auto;
+      background: rgba(0, 0, 20, 0.8); /* semi-transparent dark */
+      border: 2px solid #00bfff;      /* bright blue border */
+      border-radius: 10px;
+      padding: 20px 30px;
+      color: white;
+      font-family: monospace, monospace;
+      box-shadow: 0 0 15px rgba(0, 191, 255, 0.9);
+      overflow-wrap: break-word;
+    }
+
+    .categories-box a {
+      color: #00bfff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .categories-box a:hover {
+      text-decoration: underline;
+    }
+
+    /* Additional style to ensure text inside <pre> wraps nicely */
+    .categories-box pre {
+      white-space: pre-wrap;
+      margin: 0;
+    }
+.page-container {
+      display: flex;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 30px auto;
+      gap: 20px;
+      position: relative; /* above matrix */
+      z-index: 1;
+    }
+
+    /* Transparent style panels */
+    .transparent-panel {
+      flex: 0 0 48%;
+      background: rgba(0, 0, 20, 0.8); /* black semi-transparent */
+      padding: 20px;
+      box-shadow: 0 0 25px rgba(0,191,255,0.5);
+      font-family: monospace, monospace;
+      min-height: 200px; /* Optional: ensure height */
+      overflow: auto;
+      color: #00bfff;
+      text-decoration: underline;
+      font-weight: bold;
+      border-radius: 10px;
+      overflow-wrap: break-word;
+      border: 1.5px solid #00bfff; 
+      box-shadow: 0 0 15px rgba(237, 235, 240, 0.9);
+    }
+
+    /* Example scroll for overflow content */
+    .transparent-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+    .transparent-panel::-webkit-scrollbar-thumb {
+      background-color: rgba(0,191,255,0.6);
+      border-radius: 10px;
+    }
+
+    .google-maps-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px; /* optional rounded corners */
+  box-shadow: 0 0 20px rgba(0,191,255,0.5); /* subtle glow effect */
+}
+
+.google-maps-container iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
+  border-radius: 12px;
+}
+
+.page-title {
+  text-align: center;
+  color: #00eaff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 3em;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  user-select: none;
+
+  /* Crystal clear neon glow */
+  text-shadow:
+    0 0 1px #f1f3f3,
+    0 0 2px #fafafa,
+    0 0 3px #f8fafa,
+    0 0 5px #f9fbfb,
+    0 0 8px #f2f4f5,
+    0 0 10px #f9fbfb,
+    0 0 15px #f4f5f6; /* sharper, less blur */
+}
+
+ /* Narrow fixed width left panel */
+    #left-panel {
+      flex: 0 0 300px; /* fixed 300px width */
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 25px rgba(0, 191, 255, 0.5);
+      overflow: auto;
+      min-height: 400px;
+    }
+    /* Left panel link styles */
+    #left-panel h5 {
+      margin-bottom: 15px;
+      color: #00bfff;
+      font-weight: 600;
+    }
+    #left-panel p {
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+    #left-panel a {
+      color: #ffffff;
+      font-weight: bold;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    #left-panel a:hover {
+      color: #00e5ff;
+      text-decoration: underline;
+    }
+    #left-panel small {
+      color: #bbbbff;
+      font-weight: normal;
+      font-style: italic;
+    }
+    .site-footer {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #ccc;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 15px 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  user-select: none;
+  box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+}
+.site-footer small {
+  display: inline-block;
+  letter-spacing: 1px;
+}
+
+  </style>
+
+   <script src="https://www.google.com/recaptcha/enterprise.js?render=6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD"></script>
+  <!-- Your code -->
+</head>
+<!-- Replace the variables below. -->
+<script>
+  function onSubmit(token) {
+    document.getElementById("demo-form").submit();
+  }
+</script>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17083520520">
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-17083520520');
+</script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+ <h1 class="page-title">MY_STUFF</h1>
+
+  <div class="categories-box">
+    <h3>Categories</h3>
+    <pre>
+         <a href="songs.html">Songs</a> <br>
+         <a href="MSB.html">MSB</a> <br>
+         <a href="log.html">LogIn/ Signup</a> <br>
+         <a href="Activity 3">Activity 3</a> <br> 
+         <a href="dietician-bot.html">Dietician Bot</a><br>
+         <a href="radio.html">Radio</a> <br>...
+    </pre>
+  </div>
+
+  
+  <div class="page-container">
+    <div id="left-panel">
+      <h5>Search Engines for more</h5>
+      <p>
+        <a href="https://www.google.com" target="_blank">Google</a><br>
+        <small>Google will Track You</small>
+      </p>
+      <p>
+        <a href="https://www.startpage.com" target="_blank">Start page</a><br>
+        <small>Most Private search Engine</small>
+      </p>
+      <p>
+        <a href="https://www.ecosia.org" target="_blank">Ecosia</a><br>
+        <small>Save Trees</small>
+      </p>
+    </div>
+
+    <div class="transparent-panel" id="right-panel">
+      <div class="google-maps-container">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d487295.0253408883!2d78.1278458103649!3d17.41215306801848!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb99daeaebd2c7%3A0xae93b78392bafbc2!2sHyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1676714933089!5m2!1sen!2sin" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+  </div>
+
+   <footer class="site-footer">
+    <small>Coptright@2023. All rights reserved.</small>
+  </footer>
+  
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-K98KWTPT');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K98KWTPT"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DR9S4GJ2C4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DR9S4GJ2C4');
+</script>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688"
+     crossorigin="anonymous"></script>
+<!-- Display Ad -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-4592970036066688"
+     data-ad-slot="8733612932"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<script> import com.google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseServiceClient;
+import com.google.recaptchaenterprise.v1.Assessment;
+import com.google.recaptchaenterprise.v1.CreateAssessmentRequest;
+import com.google.recaptchaenterprise.v1.Event;
+import com.google.recaptchaenterprise.v1.ProjectName;
+import com.google.recaptchaenterprise.v1.RiskAnalysis.ClassificationReason;
+import java.io.IOException;
+
+public class CreateAssessment {
+
+  public static void main(String[] args) throws IOException {
+    // TO-DO: Replace the token and reCAPTCHA action variables before running the sample.
+    String projectID = "fluted-agency-468912-d7";
+    String recaptchaKey = "6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD";
+    String token = "action-token";
+    String recaptchaAction = "action-name";
+
+    createAssessment(projectID, recaptchaKey, token, recaptchaAction);
+  }
+
+  /**
+   * Create an assessment to analyse the risk of a UI action.
+   *
+   * @param projectID : Your Google Cloud project ID.
+   * @param recaptchaKey : The reCAPTCHA key associated with the site/app
+   * @param token : The generated token obtained from the client.
+   * @param recaptchaAction : Action name corresponding to the token.
+   */
+  public static void createAssessment(
+      String projectID, String recaptchaKey, String token, String recaptchaAction)
+      throws IOException {
+    // Create the reCAPTCHA client.
+    // TODO: Cache the client generation code (recommended) or call client.close() before exiting the method.
+    try (RecaptchaEnterpriseServiceClient client = RecaptchaEnterpriseServiceClient.create()) {
+
+      // Set the properties of the event to be tracked.
+      Event event = Event.newBuilder().setSiteKey(recaptchaKey).setToken(token).build();
+
+      // Build the assessment request.
+      CreateAssessmentRequest createAssessmentRequest =
+          CreateAssessmentRequest.newBuilder()
+              .setParent(ProjectName.of(projectID).toString())
+              .setAssessment(Assessment.newBuilder().setEvent(event).build())
+              .build();
+
+      Assessment response = client.createAssessment(createAssessmentRequest);
+
+      // Check if the token is valid.
+      if (!response.getTokenProperties().getValid()) {
+        System.out.println(
+            "The CreateAssessment call failed because the token was: "
+                + response.getTokenProperties().getInvalidReason().name());
+        return;
+      }
+
+      // Check if the expected action was executed.
+      if (!response.getTokenProperties().getAction().equals(recaptchaAction)) {
+        System.out.println(
+            "The action attribute in reCAPTCHA tag is: "
+                + response.getTokenProperties().getAction());
+        System.out.println(
+            "The action attribute in the reCAPTCHA tag "
+                + "does not match the action ("
+                + recaptchaAction
+                + ") you are expecting to score");
+        return;
+      }
+
+      // Get the risk score and the reason(s).
+      // For more information on interpreting the assessment, see:
+      // https://developers.google.com/recaptcha-enterprise/docs/interpret-assessment
+      for (ClassificationReason reason : response.getRiskAnalysis().getReasonsList()) {
+        System.out.println(reason);
+      }
+
+      float recaptchaScore = response.getRiskAnalysis().getScore();
+      System.out.println("The reCAPTCHA score is: " + recaptchaScore);
+
+      // Get the assessment name (ID). Use this to annotate the assessment.
+      String assessmentName = response.getName();
+      System.out.println(
+          "Assessment name: " + assessmentName.substring(assessmentName.lastIndexOf("/") + 1));
+    }
+  }
+}</script>  <br>
+<button class="g-recaptcha"
+    data-sitekey="6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD"
+    data-callback='onSubmit'
+    data-action='submit'>
+  Submit
+</button>
+
+</body>
+
+   <a href="https://www.iubenda.com/privacy-policy/23927842" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>  <br>
+<a href="https://www.iubenda.com/privacy-policy/23927842/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Cookie Policy ">Cookie Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>  <br>
+<a href="https://www.iubenda.com/terms-and-conditions/23927842" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Terms and Conditions ">Terms and Conditions</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script> <br>
+<script type="text/javascript" src="//embeds.iubenda.com/widgets/7766de88-e79b-468c-bd16-2df5dee75de9.js"></script>  <br>
+  <a href="https://www.iubenda.com/whistleblowing-form/en/7766de88-e79b-468c-bd16-2df5dee75de9" class="iubenda-white iubenda-embed  iub-body-embed iubenda-noiframe" title="Whistleblower Form">Whistleblower Form</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script> <br>
+  <a href="https://www.iubenda.com/dsar-form/en/7766de88-e79b-468c-bd16-2df5dee75de9" class="iubenda-white iubenda-embed  iub-body-embed iubenda-noiframe" title="DSAR Form">DSAR Form</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>  <br>
+  <script type="text/javascript" src="//embeds.iubenda.com/widgets/7766de88-e79b-468c-bd16-2df5dee75de9.js"></script>  <br>
+  <br> <script type="text/javascript">
+var _iub = _iub || [];
+_iub.csConfiguration = {"siteId":3996614,"cookiePolicyId":24679055,"lang":"en","storage":{"useSiteId":true}};
+</script>
+<script type="text/javascript" src="https://cs.iubenda.com/autoblocking/3996614.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/gpp/stub.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script> <br> 
+    <script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"></script>
+  <script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="88cRlmhOZvRviN" async></script> 
+<script id="usercentrics-cmp" src="https://app.usercentrics.eu/browser-ui/latest/loader.js" data-ruleset-id="WYvwv_y5yWQwdQ" async></script> 
+
+  <a href="https://www.iubenda.com/privacy-policy/24679055" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
+  <a href="https://www.iubenda.com/privacy-policy/24679055/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Cookie Policy ">Cookie Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script> 
+
+  <script type="text/javascript">
+var _iub = _iub || [];
+_iub.csConfiguration = {"siteId":3996614,"cookiePolicyId":24679055,"lang":"en","storage":{"useSiteId":true}};
+</script>
+<script type="text/javascript" src="https://cs.iubenda.com/autoblocking/3996614.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/gpp/stub.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
+
+  <script type="text/javascript">
+var _iub = _iub || [];
+_iub.csConfiguration = {"siteId":3996614,"cookiePolicyId":24679055,"lang":"en","storage":{"useSiteId":true}};
+</script>
+<script type="text/javascript" src="https://cs.iubenda.com/autoblocking/3996614.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/gpp/stub.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
+
+  <script type="text/javascript">
+var _iub = _iub || [];
+_iub.csConfiguration = {"siteId":3996614,"cookiePolicyId":24679055,"lang":"en","storage":{"useSiteId":true}};
+</script>
+<script type="text/javascript" src="https://cs.iubenda.com/autoblocking/3996614.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/gpp/stub.js"></script>
+<script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
+
+
+  <!-- Place the rest of your paste.txt content exactly here, outside the box container if needed -->
+
+  <script>
+    // Matrix animation code
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
+    const fontSize = 20;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(0);
+
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 16, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillStyle = (i % 2 === 0) ? '#00bfff' : '#e0f7ff';
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 50);
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
