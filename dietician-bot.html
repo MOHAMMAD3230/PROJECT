@@ -218,11 +218,23 @@
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
+  function escapeHtml(text) {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+      '`': '&#96;',
+    };
+    return String(text).replace(/[&<>"'`]/g, function(m) { return map[m]; });
+  }
+
   function printContent(id){
     const el = document.getElementById(id);
     const content = el.value || el.textContent;
     const w = window.open();
-    w.document.write('<pre style="font-family: monospace; white-space: pre-wrap; font-size: 16px;">' + content + '</pre>');
+    w.document.write('<pre style="font-family: monospace; white-space: pre-wrap; font-size: 16px;">' + escapeHtml(content) + '</pre>');
     w.document.close();
     w.focus();
     w.print();
