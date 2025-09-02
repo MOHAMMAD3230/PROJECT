@@ -1,2 +1,2 @@
-const VALID_USER = 'mohammad';
-const VALID_PASS = 'chickenBiryani';
+const VALID_USER = 'user';
+const VALID_PASS = 'password';
