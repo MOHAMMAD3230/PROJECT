@@ -1,2 +1,2 @@
-const VALID_USER = 'your_new_username';
-const VALID_PASS = 'your_new_password';
+const VALID_USER = 'mohammad';
+const VALID_PASS = 'chickenBiryani';
