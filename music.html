@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Professional Orange-Themed Music App</title>
+<style>
+  /* Full existing styling */
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(270deg, #f59d00, #cf7200 80%);
+    height: 100vh;
+    color: #4a2e00;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #f7a600;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff8dc;
+  }
+  header h1 { font-weight: 700; font-size: 1.75rem; letter-spacing: 3px; margin: 0; }
+  #loginArea { display: flex; gap: 0.5rem; align-items: center; }
+  #loginArea input {
+    padding: 0.4rem 0.75rem;
+    border: none;
+    border-radius: 2px;
+    font-size: 0.9rem;
+  }
+  #loginArea input:focus { outline: none; }
+  #loginArea button {
+    background: #ff9900;
+    border: 1px solid #ff9900;
+    color: #3a2701;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #loginArea button:hover { background: #ddb100; }
+  #loginMessage {
+    margin-left: 1rem;
+    min-width: 180px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff8dc;
+  }
+  #signoutButton { display: none; }
+  #app {
+    background: #fff9eccc;
+    max-width: 940px;
+    margin: 1rem auto 2rem auto;
+    border-radius: 1rem;
+    box-shadow: 0 0 30px #b26506cc;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+  }
+  nav.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  nav.tabs button {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #835c04;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: border-color 0.25s ease, color 0.25s ease;
+  }
+  nav.tabs button.active, nav.tabs button:hover {
+    color: #5b3d00;
+    border-bottom-color: #ad7d01;
+  }
+  section.tab-content {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+  form.search-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+  }
+  input[type=search] {
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #cda042;
+    font-size: 1rem;
+    color: #7a541f;
+  }
+  input[type=search]:focus {
+    outline: none;
+    border-color: #d8a919;
+    box-shadow: 0 0 10px #d8a919aa;
+    background: #fffbe1;
+  }
+  button.search-btn {
+    background: #d89110;
+    border: none;
+    color: #fff9ec;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  button.search-btn:hover:enabled {
+    background: #b36703;
+  }
+  button.search-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  ul.song-list {
+    list-style: none;
+    padding: 0;
+    border: 1px solid #cda042;
+    border-radius: 8px;
+    background: #fffbee;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  ul.song-list li {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid #e2dca8;
+    gap: 12px;
+  }
+  ul.song-list li:last-child {
+    border-bottom: none;
+  }
+  ul.song-list audio {
+    margin-left: auto;
+    max-width: 150px;
+  }
+  ul.song-list button {
+    background: #d89110;
+    border: none;
+    border-radius: 5px;
+    color: #fff9ec;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  ul.song-list button:hover:enabled {
+    background: #b36703;
+  }
+  ul.song-list button:disabled {
+    background: #bba16a;
+    cursor: not-allowed;
+  }
+  label[for="folderUpload"] {
+    display: inline-block;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #b99301;
+  }
+  input#folderUpload {
+    display: none;
+  }
+  #btnClearPlaylist {
+    margin-top: 0.75rem;
+    background: #b99301;
+    border: none;
+    border-radius: 6px;
+    color: #fffde6;
+    font-weight: 700;
+    padding: 0.5rem 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #btnClearPlaylist:hover {
+    background: #7d6500;
+  }
+  @media (max-width: 700px) {
+    #app {
+      padding: 1rem;
+    }
+    ul.song-list li {
+      gap: 8px;
+    }
+    ul.song-list audio {
+      width: 100px;
+    }
+  }
+</style>
+</head>
+<body>
+<header role="banner">
+  <h1>My Music</h1>
+  <div id="loginArea" aria-label="User login form">
+    <input type="text" id="usernameInput" placeholder="Username" aria-label="Username" autocomplete="username" />
+    <input type="password" id="passwordInput" placeholder="Password" aria-label="Password" autocomplete="current-password" />
+    <button id="loginButton" aria-label="Login">Login</button>
+    <button id="signoutButton" aria-label="Sign out">Sign Out</button>
+    <span id="loginMessage" role="alert" aria-live="polite" style="margin-left: 1rem;"></span>
+  </div>
+</header>
+
+<main id="app" tabindex="-1" hidden>
+  <nav class="tabs" role="tablist" aria-label="Main sections">
+    <button id="tabOnlineBtn" role="tab" aria-selected="true" aria-controls="tabOnline" tabindex="0" class="active">Online</button>
+    <button id="tabOfflineBtn" role="tab" aria-selected="false" aria-controls="tabOffline" tabindex="-1">Offline</button>
+    <button id="tabPlaylistBtn" role="tab" aria-selected="false" aria-controls="tabPlaylist" tabindex="-1">Playlist</button>
+  </nav>
+
+  <section id="tabOnline" class="tab-content" role="tabpanel" tabindex="0" aria-labelledby="tabOnlineBtn">
+    <form id="searchForm" class="search-form" aria-label="Song search">
+      <input id="searchInput" type="search" aria-label="Search songs or artists" placeholder="Search songs, artists..." />
+      <button id="searchButton" type="submit" class="search-btn" disabled>Search</button>
+    </form>
+    <ul id="onlineList" class="song-list" aria-live="polite" aria-label="Online songs"></ul>
+  </section>
+
+  <section id="tabOffline" class="tab-content" role="tabpanel" tabindex="0" aria-labelledby="tabOfflineBtn" hidden>
+    <label for="folderUpload" tabindex="0">📁 Upload Music Files and/or Folder</label>
+    <input type="file" id="folderUpload" multiple webkitdirectory directory accept="audio/*" aria-label="Upload music files or folder" disabled />
+    <input id="offlineFilter" type="search" placeholder="Filter offline songs" aria-label="Filter offline songs" disabled />
+    <ul id="offlineList" class="song-list" aria-live="polite" aria-label="Offline songs"></ul>
+  </section>
+
+  <section id="tabPlaylist" class="tab-content" role="tabpanel" tabindex="0" aria-labelledby="tabPlaylistBtn" hidden>
+    <button id="btnClearPlaylist" aria-label="Clear playlist">Clear Playlist</button>
+    <ul id="playlistList" class="song-list" aria-live="polite" aria-label="Your playlist"></ul>
+  </section>
+</main>
+
+<script>
+(() => {
+  const backendUrl = 'https://your-musicapp-backend.up.railway.app'; // Replace with your backend URL
+
+  const usernameInput = document.getElementById("usernameInput");
+  const passwordInput = document.getElementById("passwordInput");
+  const loginButton = document.getElementById("loginButton");
+  const signoutButton = document.getElementById("signoutButton");
+  const loginMessage = document.getElementById("loginMessage");
+
+  const tabsNav = document.querySelector("nav.tabs");
+  const tabButtons = [
+    document.getElementById("tabOnlineBtn"),
+    document.getElementById("tabOfflineBtn"),
+    document.getElementById("tabPlaylistBtn"),
+  ];
+  const tabContents = {
+    online: document.getElementById("tabOnline"),
+    offline: document.getElementById("tabOffline"),
+    playlist: document.getElementById("tabPlaylist"),
+  };
+
+  const searchForm = document.getElementById("searchForm");
+  const searchInput = document.getElementById("searchInput");
+  const searchButton = document.getElementById("searchButton");
+  const onlineList = document.getElementById("onlineList");
+
+  const folderUpload = document.getElementById("folderUpload");
+  const offlineFilter = document.getElementById("offlineFilter");
+  const offlineList = document.getElementById("offlineList");
+
+  const playlistList = document.getElementById("playlistList");
+  const btnClearPlaylist = document.getElementById("btnClearPlaylist");
+
+  let loggedIn = false;
+  let onlineSongs = [];
+  let offlineSongs = [];
+  let playlist = JSON.parse(localStorage.getItem("playlist") || "[]");
+  let userId = null;
+
+  function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  function setLoginEnabled(enabled) {
+    usernameInput.disabled = !enabled;
+    passwordInput.disabled = !enabled;
+    loginButton.disabled = !enabled;
+    searchInput.disabled = enabled;
+    searchButton.disabled = enabled;
+    folderUpload.disabled = enabled;
+    offlineFilter.disabled = enabled;
+  }
+
+  function switchTab(selectedName) {
+    tabButtons.forEach((btn) => {
+      const isSelected = btn.id.toLowerCase().startsWith("tab" + selectedName);
+      btn.setAttribute("aria-selected", isSelected);
+      btn.tabIndex = isSelected ? 0 : -1;
+      btn.classList.toggle("active", isSelected);
+    });
+    Object.entries(tabContents).forEach(([name, section]) => {
+      section.hidden = name !== selectedName;
+      if (!section.hidden) section.focus();
+    });
+  }
+
+  loginButton.addEventListener("click", async () => {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!username || !password) {
+      loginMessage.textContent = 'Please enter username and password.';
+      loginMessage.style.color = 'orange';
+      return;
+    }
+    try {
+      const res = await fetch(`${backendUrl}/api/login`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.authenticated) {
+        userId = data.userId;
+        loggedIn = true;
+        loginMessage.textContent = "Login successful!";
+        loginMessage.style.color = "#daf7a6";
+        document.getElementById("app").hidden = false;
+        tabsNav.hidden = false;
+        signoutButton.style.display = "inline-block";
+        setLoginEnabled(false);
+        folderUpload.disabled = false;
+        switchTab("online");
+        await loadOfflineSongs();
+        renderPlaylist();
+      } else {
+        loginMessage.textContent = data.error || "Invalid credentials.";
+        loginMessage.style.color = "#ffcccb";
+      }
+    } catch (err) {
+      loginMessage.textContent = "Network or server error.";
+      loginMessage.style.color = "#ffcccb";
+      console.error(err);
+    }
+  });
+
+  signoutButton.addEventListener("click", () => {
+    loggedIn = false;
+    userId = null;
+    usernameInput.value = "";
+    passwordInput.value = "";
+    loginMessage.textContent = "Signed out.";
+    loginMessage.style.color = "#fff8dc";
+    document.getElementById("app").hidden = true;
+    tabsNav.hidden = true;
+    signoutButton.style.display = "none";
+    setLoginEnabled(true);
+    folderUpload.disabled = true;
+    onlineList.innerHTML = "";
+    offlineList.innerHTML = "";
+    playlistList.innerHTML = "";
+  });
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const name = btn.id.replace("tab", "").replace("Btn", "").toLowerCase();
+      switchTab(name);
+    });
+  });
+
+  searchForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!searchInput.value.trim()) return;
+    onlineList.innerHTML = "<li>Loading...</li>";
+    const query = encodeURIComponent(searchInput.value.trim());
+    try {
+      const res = await fetch(
+        `https://itunes.apple.com/search?term=${query}&entity=song&limit=20`
+      );
+      const data = await res.json();
+      onlineSongs = data.results || [];
+      renderOnlineSongs();
+    } catch {
+      onlineList.innerHTML = "<li>Error loading songs.</li>";
+    }
+  });
+
+  function renderOnlineSongs() {
+    onlineList.innerHTML = "";
+    if (onlineSongs.length === 0) {
+      onlineList.innerHTML = "<li>No songs found.</li>";
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    onlineSongs.forEach((song) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <img src="${song.artworkUrl100}" alt="${song.trackName} artwork" />
+        <div>
+          <strong>${song.trackName}</strong><br />
+          <small>${song.artistName}</small>
+        </div>
+        <audio controls preload="none" src="${song.previewUrl}"></audio>
+        <button aria-label="Add ${song.trackName} to playlist">Add to Playlist</button>
+      `;
+      const btn = li.querySelector("button");
+      if (playlist.some((s) => s.trackId === song.trackId)) {
+        btn.disabled = true;
+        btn.textContent = "Added";
+        btn.style.cursor = "not-allowed";
+      }
+      btn.addEventListener("click", () => {
+        if (!playlist.some((s) => s.trackId === song.trackId)) {
+          playlist.push(song);
+          savePlaylist();
+          renderPlaylist();
+          btn.disabled = true;
+          btn.textContent = "Added";
+          btn.style.cursor = "not-allowed";
+        }
+      });
+      btn.style.cursor = "pointer";
+      fragment.appendChild(li);
+    });
+    onlineList.appendChild(fragment);
+  }
+
+  folderUpload.addEventListener("change", async (e) => {
+    if (!loggedIn) {
+      alert("Please login first!");
+      return;
+    }
+    const files = e.target.files;
+    if (!files.length) return;
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file);
+    }
+    formData.append('userId', userId);
+    try {
+      const res = await fetch(`${backendUrl}/api/upload-offline`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const uploadedTracks = await res.json();
+      offlineSongs = offlineSongs.concat(uploadedTracks.map(t => ({
+        name: t.originalname,
+        url: `${backendUrl}${t.url}`,
+        isOffline: true,
+      })));
+      renderOfflineSongs(offlineSongs);
+    } catch (e) {
+      alert("Failed to upload offline songs.");
+      console.error(e);
+    }
+  });
+
+  offlineFilter.addEventListener(debounce(() => {
+    const filter = offlineFilter.value.toLowerCase();
+    renderOfflineSongs(offlineSongs.filter(f => f.name.toLowerCase().includes(filter)));
+  }, 250));
+
+  function renderOfflineSongs(songs=offlineSongs) {
+    offlineList.innerHTML = "";
+    if (songs.length === 0) {
+      offlineList.innerHTML = "<li>No offline songs loaded.</li>";
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    songs.forEach(file => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div title="${file.name}">${file.name}</div>
+        <audio controls preload="none" src="${file.url}"></audio>
+        <button aria-label="Add ${file.name} to playlist">Add to Playlist</button>
+      `;
+      const btn = li.querySelector("button");
+      if (playlist.some(s => s.name === file.name)) {
+        btn.disabled = true;
+        btn.textContent = "Added";
+        btn.style.cursor = "not-allowed";
+      }
+      btn.style.cursor = "pointer";
+      btn.addEventListener("click", () => {
+        if (!playlist.some(s => s.name === file.name)) {
+          playlist.push(file);
+          savePlaylist();
+          renderPlaylist();
+          btn.disabled = true;
+          btn.textContent = "Added";
+          btn.style.cursor = "not-allowed";
+        }
+      });
+      fragment.appendChild(li);
+    });
+    offlineList.appendChild(fragment);
+  }
+
+  btnClearPlaylist.addEventListener("click", () => {
+    if (confirm("Are you sure you want to clear the playlist?")) {
+      playlist = [];
+      savePlaylist();
+      renderPlaylist();
+    }
+  });
+
+  function renderPlaylist() {
+    playlistList.innerHTML = "";
+    if (playlist.length === 0) {
+      playlistList.innerHTML = "<li>Your playlist is empty.</li>";
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    playlist.forEach((song, i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div>${song.trackName || song.name || "Unknown"}</div>
+        <audio controls preload="none" src="${song.previewUrl || song.url}"></audio>
+        <button aria-label="Remove ${song.trackName || song.name || "Song"} from playlist">Remove</button>
+      `;
+      const btn = li.querySelector("button");
+      btn.style.cursor = "pointer";
+      btn.addEventListener("click", () => {
+        playlist.splice(i, 1);
+        savePlaylist();
+        renderPlaylist();
+      });
+      fragment.appendChild(li);
+    });
+    playlistList.appendChild(fragment);
+  }
+
+  function savePlaylist() {
+    try {
+      localStorage.setItem("playlist", JSON.stringify(playlist));
+    } catch (e) {
+      console.warn("Could not save playlist:", e);
+    }
+  }
+
+  async function loadOfflineSongs() {
+    if (!loggedIn || !userId) return;
+    try {
+      const res = await fetch(`${backendUrl}/api/user-offline-tracks/${userId}`);
+      if (!res.ok) throw new Error(await res.text());
+      const tracks = await res.json();
+      offlineSongs = tracks.map(t => ({
+        name: t.originalname,
+        url: `${backendUrl}${t.url}`,
+        isOffline: true,
+      }));
+      renderOfflineSongs(offlineSongs);
+    } catch (e) {
+      console.warn("Failed to load offline songs", e);
+    }
+  }
+
+  function init() {
+    tabsNav.hidden = true;
+    document.getElementById("app").hidden = true;
+    signoutButton.style.display = "none";
+    setLoginEnabled(true);
+    folderUpload.disabled = true;
+    offlineFilter.disabled = true;
+
+    onlineList.innerHTML = "";
+    offlineList.innerHTML = "";
+    playlistList.innerHTML = "";
+  }
+  init();
+})();
+</script>
+</body>
+</html>
