@@ -476,6 +476,19 @@
   let onlineSongs = [],
       offlineFiles = [],
       playlist = JSON.parse(localStorage.getItem("playlist") || "[]");
+
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>'"`]/g, function (m) {
+      return ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;',
+        '`': '&#96;'
+      })[m];
+    });
+  }
   let isSignup = false;
 
   function disableTabs(disabled = true) {
@@ -689,10 +702,10 @@
       li.className = "songItem";
       const url = URL.createObjectURL(file);
       li.innerHTML = `
-        <div class="title" title="${file.name}" style="max-width:100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${file.name}</div>
-        <audio controls preload="none" src="${url}" aria-label="Play offline song ${file.name}"></audio>
+        <div class="title" title="${escapeHTML(file.name)}" style="max-width:100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(file.name)}</div>
+        <audio controls preload="none" src="${url}" aria-label="Play offline song ${escapeHTML(file.name)}"></audio>
         <div class="actions">
-          <button class="btnAction btnDelete" aria-label="Delete offline song ${file.name}">Delete</button>
+          <button class="btnAction btnDelete" aria-label="Delete offline song ${escapeHTML(file.name)}">Delete</button>
         </div>
       `;
       li.querySelector(".btnDelete").addEventListener("click", () => {
