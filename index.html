@@ -424,5 +424,192 @@ public class CreateAssessment {
       canvas.height = window.innerHeight;
     });
   </script>
+
+  <div id="calc-widget" style="position: fixed; top: 10px; right: 10px; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; z-index: 9999; background: white;">
+  <button id="toggle-calc" aria-label="Toggle Calculator" style="width: 100%; background: #344e86; color: white; border: none; border-radius: 12px 12px 0 0; padding: 10px; font-size: 1rem; cursor: pointer;">Calculator ▼</button>
+  <div id="calc-content" style="display: none; background: #f9fafb; border-radius: 0 0 12px 12px; padding: 12px;">
+    <div id="display" style="background: #344e86; color: white; font-size: 2rem; padding: 12px 15px; border-radius: 10px; text-align: right; min-height: 50px; user-select: none;">0</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px;">
+      <button class="clear" style="background:#f56262; color:white; border:none; border-radius: 8px; font-weight: 600; padding: 10px 0;">C</button>
+      <button id="backspace" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">←</button>
+      <button class="operator" data-op="%" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">%</button>
+      <button class="operator" data-op="/" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">÷</button>
+
+      <button class="number" data-num="7" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">7</button>
+      <button class="number" data-num="8" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">8</button>
+      <button class="number" data-num="9" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">9</button>
+      <button class="operator" data-op="*" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">×</button>
+
+      <button class="number" data-num="4" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">4</button>
+      <button class="number" data-num="5" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">5</button>
+      <button class="number" data-num="6" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">6</button>
+      <button class="operator" data-op="-" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">−</button>
+
+      <button class="number" data-num="1" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">1</button>
+      <button class="number" data-num="2" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">2</button>
+      <button class="number" data-num="3" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">3</button>
+      <button class="operator" data-op="+" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">+</button>
+
+      <button class="number" data-num="0" style="grid-column: span 2; background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">0</button>
+      <button class="number" data-num="." style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">.</button>
+      <button class="equal" style="background:#5078e1; color:white; border:none; border-radius: 8px; font-weight: 600; cursor:pointer;">=</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const widget = document.getElementById('calc-widget');
+    const toggleBtn = document.getElementById('toggle-calc');
+    const calcContent = document.getElementById('calc-content');
+    const display = document.getElementById('display');
+
+    let currentInput = '0';
+    let lastInput = '';
+    let resetNext = false;
+
+    toggleBtn.addEventListener('click', () => {
+      if (calcContent.style.display === 'none') {
+        calcContent.style.display = 'block';
+        toggleBtn.textContent = 'Calculator ▲';
+      } else {
+        calcContent.style.display = 'none';
+        toggleBtn.textContent = 'Calculator ▼';
+      }
+    });
+
+    function updateDisplay() {
+      display.textContent = currentInput;
+    }
+
+    function appendNumber(num) {
+      if (resetNext) {
+        currentInput = '';
+        resetNext = false;
+      }
+      if (num === '.' && currentInput.includes('.')) return;
+      if (currentInput === '0' && num !== '.') {
+        currentInput = num;
+      } else {
+        currentInput += num;
+      }
+      updateDisplay();
+    }
+
+    function appendOperator(op) {
+      if (resetNext) resetNext = false;
+      if (isOperator(lastInput)) {
+        currentInput = currentInput.slice(0, -1) + op;
+      } else {
+        currentInput += op;
+      }
+      updateDisplay();
+    }
+
+    function isOperator(char) {
+      return ['+', '-', '*', '/', '%'].includes(char);
+    }
+
+    function clearAll() {
+      currentInput = '0';
+      lastInput = '';
+      resetNext = false;
+      updateDisplay();
+    }
+
+    function backspace() {
+      if (resetNext) {
+        clearAll();
+        return;
+      }
+      if (currentInput.length > 1) {
+        currentInput = currentInput.slice(0, -1);
+      } else {
+        currentInput = '0';
+      }
+      updateDisplay();
+    }
+
+    function calculate() {
+      try {
+        if (isOperator(currentInput.slice(-1))) {
+          currentInput = currentInput.slice(0, -1);
+        }
+        let expression = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
+        let result = Function('"use strict";return (' + expression + ')')();
+        if (result === Infinity || result === -Infinity) {
+          currentInput = 'Error: Division by zero';
+        } else if (isNaN(result)) {
+          currentInput = 'Error';
+        } else {
+          currentInput = result.toString();
+        }
+      } catch {
+        currentInput = 'Error';
+      }
+      updateDisplay();
+      resetNext = true;
+    }
+
+    const numberButtons = widget.querySelectorAll('.number');
+    const operatorButtons = widget.querySelectorAll('.operator');
+    const clearBtn = widget.querySelector('.clear');
+    const backspaceBtn = widget.querySelector('#backspace');
+    const equalsBtn = widget.querySelector('.equal');
+
+    numberButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        appendNumber(btn.getAttribute('data-num'));
+        lastInput = btn.getAttribute('data-num');
+      });
+    });
+
+    operatorButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        appendOperator(btn.getAttribute('data-op'));
+        lastInput = btn.getAttribute('data-op');
+      });
+    });
+
+    clearBtn.addEventListener('click', () => {
+      clearAll();
+      lastInput = '';
+    });
+
+    backspaceBtn.addEventListener('click', () => {
+      backspace();
+      lastInput = currentInput.slice(-1);
+    });
+
+    equalsBtn.addEventListener('click', () => {
+      calculate();
+      lastInput = '';
+    });
+
+    // Keyboard support while widget is open
+    window.addEventListener('keydown', (e) => {
+      if (calcContent.style.display === 'block') {
+        if ((e.key >= '0' && e.key <= '9') || e.key === '.') {
+          appendNumber(e.key);
+          lastInput = e.key;
+        } else if (['+', '-', '*', '/', '%'].includes(e.key)) {
+          appendOperator(e.key);
+          lastInput = e.key;
+        } else if (e.key === 'Enter' || e.key === '=') {
+          e.preventDefault();
+          calculate();
+          lastInput = '';
+        } else if (e.key === 'Backspace') {
+          backspace();
+          lastInput = currentInput.slice(-1);
+        } else if (e.key.toLowerCase() === 'c') {
+          clearAll();
+          lastInput = '';
+        }
+      }
+    });
+  })();
+</script>
+
 </body>
 </html>
