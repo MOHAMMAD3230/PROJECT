@@ -50,12 +50,10 @@
         .rating-3 { color: #ecc94b; } /* Yellow */
         .rating-2 { color: #ed8936; } /* Orange */
         .rating-1 { color: #e53e3e; } /* Red */
-
         .severity-critical { background-color: #e53e3e; } /* Red */
         .severity-high { background-color: #ed8936; } /* Orange */
         .severity-medium { background-color: #ecc94b; } /* Yellow */
         .severity-low { background-color: #48bb78; } /* Green */
-
         /* Loading spinner styles */
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
@@ -79,12 +77,9 @@
                 <li><a href="#home" class="text-gray-300 hover:text-blue-300 transition duration-300">Home</a></li>
                 <li><a href="#domain-analysis" class="text-gray-300 hover:text-blue-300 transition duration-300">Domain Analysis</a></li>
                 <li><a href="#yara-detection" class="text-gray-300 hover:text-blue-300 transition duration-300">YARA Detection</a></li>
-                <li><a href="#ioc-management" class="text-gray-300 hover:text-blue-300 transition duration-300">IOCs</a></li>
-                <li><a href="#threat-intel" class="text-gray-300 hover:text-blue-300 transition duration-300">Threat Intel</a></li>
             </ul>
         </nav>
     </header>
-
     <main class="container py-8">
         <!-- Home Section -->
         <section id="home" class="text-center mb-16">
@@ -92,10 +87,8 @@
             <p class="text-xl text-gray-300 mb-8">Your intelligent bot for real-time cyber threat detection, domain analysis, and proactive security.</p>
             <div class="flex justify-center space-x-4">
                 <a href="#domain-analysis" class="btn-primary text-lg font-semibold shadow-lg hover:shadow-xl">Start Domain Scan</a>
-                <a href="#ioc-management" class="btn-primary text-lg font-semibold shadow-lg hover:shadow-xl bg-gray-600 hover:bg-gray-700">View IOC Dashboard</a>
             </div>
         </section>
-
         <!-- Domain Analysis Section -->
         <section id="domain-analysis" class="card mb-16">
             <h3 class="text-3xl font-bold text-blue-400 mb-6">Domain Analysis & Reputation</h3>
@@ -112,7 +105,6 @@
                 </div>
             </div>
         </section>
-
         <!-- YARA Signature Detection Section -->
         <section id="yara-detection" class="card mb-16">
             <h3 class="text-3xl font-bold text-blue-400 mb-6">YARA Signature Detection</h3>
@@ -129,12 +121,10 @@
                 </div>
             </div>
         </section>
-
         <!-- Malicious Activity Policies Section -->
         <section id="malicious-activity" class="card mb-16">
             <h3 class="text-3xl font-bold text-blue-400 mb-6">Malicious Activity Policies & Detections</h3>
             <p class="text-gray-300 mb-6">Our system identifies and categorizes malicious activities based on predefined policies, ensuring targeted and effective responses across various threat types.</p>
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <div class="card bg-gray-700">
                     <h4 class="text-xl font-semibold mb-2 text-white"><i class="fas fa-bug mr-2 text-red-400"></i> Malware Detection</h4>
@@ -161,7 +151,6 @@
                     <p class="text-gray-300 text-sm">Detects financial fraud like Ponzi schemes through transaction analysis and network graph analysis.</p>
                 </div>
             </div>
-
             <h4 class="text-2xl font-bold text-white mb-4">Recent Detections Log (Simulated)</h4>
             <div id="detectionLog" class="space-y-4">
                 <!-- Simulated detection logs will be inserted here -->
@@ -185,59 +174,12 @@
                 </div>
             </div>
         </section>
-
-        <!-- IOC Management & Visualization Section -->
-        <section id="ioc-management" class="card mb-16">
-            <h3 class="text-3xl font-bold text-blue-400 mb-6">Indicators of Compromise (IOC) Management</h3>
-            <div class="flex flex-col md:flex-row gap-4 mb-6">
-                <input type="text" id="iocInput" placeholder="Enter primary domain/IP to watch (e.g., badactor.org)" class="input-field flex-grow">
-                <button id="showAssociationsBtn" class="btn-primary flex-shrink-0 flex items-center justify-center">
-                    <i class="fas fa-network-wired mr-2"></i> Show Associations
-                </button>
-            </div>
-
-            <h4 class="text-2xl font-bold text-white mb-4">Compromised IPs & Other IOCs</h4>
-            <div id="iocCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <!-- IOC cards will be dynamically inserted here -->
-                <div class="col-span-full text-center text-gray-400" id="iocPlaceholder">
-                    Enter a domain/IP and click "Show Associations" to view related IOCs.
-                </div>
-            </div>
-
-            <h4 class="text-2xl font-bold text-white mb-4">Associated Domains & Infrastructure</h4>
-            <div id="domainAssociations" class="card bg-gray-700 p-4">
-                <p class="text-gray-400" id="domainAssociationsPlaceholder">Associations for the queried domain/IP will appear here.</p>
-                <ul id="associationsList" class="list-disc list-inside text-gray-300 space-y-2 hidden">
-                    <!-- Associations will be dynamically inserted here -->
-                </ul>
-            </div>
-        </section>
-
-        <!-- Real-time Threat Intelligence Integration Section -->
-        <section id="threat-intel" class="card mb-16">
-            <h3 class="text-3xl font-bold text-blue-400 mb-6">Real-time Threat Intelligence</h3>
-            <p class="text-gray-300 mb-6">Our platform continuously integrates with live threat intelligence databases, providing up-to-the-minute insights into emerging threats and malicious campaigns. This ensures proactive defense against the latest cyber risks.</p>
-            <div class="flex flex-col md:flex-row gap-4 mb-6">
-                <input type="text" id="threatIntelQuery" placeholder="Query for specific threat intel (e.g., 'latest phishing campaigns')" class="input-field flex-grow">
-                <button id="getThreatIntelBtn" class="btn-primary flex-shrink-0 flex items-center justify-center">
-                    <i class="fas fa-brain mr-2"></i> Get Intelligence
-                </button>
-            </div>
-            <div id="threatIntelOutput" class="card bg-gray-700 p-4">
-                <div id="threatIntelSpinner" class="hidden flex justify-center items-center">
-                    <div class="spinner"></div>
-                    <span class="ml-2 text-gray-400">Fetching intelligence...</span>
-                </div>
-                <p class="text-gray-400" id="threatIntelPlaceholder">Latest threat intelligence updates will appear here.</p>
-                <div id="threatIntelContent" class="text-gray-300 hidden"></div>
-            </div>
-        </section>
+        
+        
     </main>
-
     <footer class="bg-gray-800 py-6 text-center text-gray-400">
         <p>&copy; 2025 CyberGuard AI. All rights reserved.</p>
     </footer>
-
     <script>
         // Helper function to get a random rating and corresponding class
         function getRandomRating() {
@@ -252,7 +194,6 @@
             }
             return { rating, colorClass };
         }
-
         // Helper function to get a random severity and corresponding class
         function getRandomSeverity() {
             const severities = ['Critical', 'High', 'Medium', 'Low'];
@@ -266,7 +207,6 @@
             }
             return { severity: randomSeverity, severityClass };
         }
-
         // --- Domain Analysis Logic ---
         document.getElementById('scanDomainBtn').addEventListener('click', () => {
             const domain = document.getElementById('domainInput').value.trim();
@@ -276,23 +216,18 @@
             if (domainAnalysisPlaceholder) {
                 domainAnalysisPlaceholder.classList.add('hidden');
             }
-
-
             if (!domain) {
                 resultsDiv.innerHTML = '<p class="col-span-full text-red-400 text-center">Please enter a domain to scan.</p>';
                 return;
             }
-
             // Simulate API call delay
             resultsDiv.innerHTML = '<div class="col-span-full flex justify-center items-center"><div class="spinner"></div><span class="ml-2 text-gray-400">Scanning domain...</span></div>';
-
             setTimeout(() => {
                 const { rating: overallRating, colorClass: overallColor } = getRandomRating();
                 const { rating: emailAuthRating, colorClass: emailAuthColor } = getRandomRating();
                 const { rating: blacklistRating, colorClass: blacklistColor } = getRandomRating();
                 const { rating: domainAgeRating, colorClass: domainAgeColor } = getRandomRating();
                 const { rating: ipRating, colorClass: ipColor } = getRandomRating();
-
                 const domainData = {
                     overallReputation: overallRating,
                     emailAuth: emailAuthRating > 2 ? 'All Pass/Configured' : 'Some Issues',
@@ -306,7 +241,6 @@
                     lastScanned: new Date().toLocaleString(),
                     source: 'Simulated Threat Intelligence Feeds'
                 };
-
                 resultsDiv.innerHTML = `
                     <div class="card bg-gray-700">
                         <h4 class="text-xl font-semibold mb-2 text-white">Overall Reputation</h4>
@@ -347,7 +281,6 @@
                 `;
             }, 1500);
         });
-
         // --- YARA Signature Detection Logic ---
         document.getElementById('scanYaraBtn').addEventListener('click', () => {
             const content = document.getElementById('yaraContentInput').value.trim();
@@ -357,19 +290,14 @@
             if (yaraDetectionPlaceholder) {
                 yaraDetectionPlaceholder.classList.add('hidden');
             }
-
-
             if (!content) {
                 resultsDiv.innerHTML = '<p class="col-span-full text-red-400 text-center">Please paste content to scan.</p>';
                 return;
             }
-
             resultsDiv.innerHTML = '<div class="col-span-full flex justify-center items-center"><div class="spinner"></div><span class="ml-2 text-gray-400">Scanning with YARA...</span></div>';
-
             setTimeout(() => {
                 const mockYARAMatches = [];
                 const commonMalwareStrings = ['evil.exe', 'malicious_payload', 'trojan_dropper', 'phishing_link', 'ransomware_note'];
-
                 let foundMatch = false;
                 for (const str of commonMalwareStrings) {
                     if (content.toLowerCase().includes(str.toLowerCase())) {
@@ -388,12 +316,10 @@
                         });
                     }
                 }
-
                 if (!foundMatch) {
                     resultsDiv.innerHTML = '<p class="col-span-full text-green-400 text-center">No YARA signatures detected in the provided content.</p>';
                     return;
                 }
-
                 resultsDiv.innerHTML = mockYARAMatches.map(match => `
                     <div class="card bg-gray-700">
                         <h4 class="text-xl font-semibold mb-2 text-white">Rule: ${match.ruleName}</h4>
@@ -406,9 +332,7 @@
                 `).join('');
             }, 1500);
         });
-
         // --- IOC Management Logic ---
-
         // Helper function to escape HTML special characters
         function escapeHTML(str) {
             return str.replace(/[&<>"']/g, function (m) {
@@ -422,14 +346,12 @@
                 }
             });
         }
-
         document.getElementById('showAssociationsBtn').addEventListener('click', () => {
             const primaryInput = document.getElementById('iocInput').value.trim();
             const iocCardsContainer = document.getElementById('iocCardsContainer');
             const domainAssociationsList = document.getElementById('associationsList');
             const domainAssociationsPlaceholder = document.getElementById('domainAssociationsPlaceholder');
             const iocPlaceholder = document.getElementById('iocPlaceholder'); // Get reference to the placeholder *before* clearing parent
-
             // Clear previous results and hide placeholders/lists
             if (iocCardsContainer) {
                 iocCardsContainer.innerHTML = ''; // This will remove iocPlaceholder
@@ -438,13 +360,10 @@
                 domainAssociationsList.innerHTML = ''; // Clear previous associations
                 domainAssociationsList.classList.add('hidden');
             }
-
             // Hide the domain associations placeholder if it exists
             if (domainAssociationsPlaceholder) {
                 domainAssociationsPlaceholder.classList.add('hidden');
             }
-
-
             if (!primaryInput) {
                 if (iocCardsContainer) {
                     iocCardsContainer.innerHTML = '<p class="col-span-full text-red-400 text-center">Please enter a primary domain/IP.</p>';
@@ -455,7 +374,6 @@
                 }
                 return;
             }
-
             // Show loading indicators
             if (iocCardsContainer) {
                 iocCardsContainer.innerHTML = '<div class="col-span-full flex justify-center items-center"><div class="spinner"></div><span class="ml-2 text-gray-400">Fetching IOCs...</span></div>';
@@ -464,8 +382,6 @@
                 domainAssociationsPlaceholder.textContent = 'Fetching associations...';
                 domainAssociationsPlaceholder.classList.remove('hidden'); // Make sure it's visible with loading text
             }
-
-
             setTimeout(() => {
                 const mockIOCs = [
                     {
@@ -505,7 +421,6 @@
                         source: 'OSINT Feed',
                     }
                 ];
-
                 const mockAssociations = [
                     `Subdomain: sub.${primaryInput}`,
                     `Related IP: 203.0.113.45`,
@@ -513,7 +428,6 @@
                     `Hosting Provider: EvilHost Inc.`,
                     `Linked Phishing Campaign ID: PHISH-2025-07-ABC`,
                 ];
-
                 if (iocCardsContainer) {
                     if (mockIOCs.length > 0) {
                         iocCardsContainer.innerHTML = mockIOCs.map(ioc => `
@@ -542,7 +456,6 @@
                         `;
                     }
                 }
-
                 if (domainAssociationsList && domainAssociationsPlaceholder) {
                     if (mockAssociations.length > 0) {
                         domainAssociationsList.innerHTML = mockAssociations.map(assoc => `<li>${escapeHTML(assoc)}</li>`).join('');
@@ -554,10 +467,8 @@
                         domainAssociationsList.classList.add('hidden'); // Ensure list is hidden if no associations
                     }
                 }
-
             }, 2000);
         });
-
         // --- Threat Intelligence Logic (using Gemini API) ---
         document.getElementById('getThreatIntelBtn').addEventListener('click', async () => {
             const query = document.getElementById('threatIntelQuery').value.trim();
@@ -565,7 +476,6 @@
             const threatIntelPlaceholder = document.getElementById('threatIntelPlaceholder');
             const threatIntelContent = document.getElementById('threatIntelContent');
             const threatIntelSpinner = document.getElementById('threatIntelSpinner');
-
             if (threatIntelPlaceholder) {
                 threatIntelPlaceholder.classList.add('hidden');
             }
@@ -573,8 +483,6 @@
                 threatIntelContent.classList.add('hidden');
                 threatIntelContent.innerHTML = ''; // Clear previous content
             }
-
-
             if (!query) {
                 if (threatIntelPlaceholder) {
                     threatIntelPlaceholder.classList.remove('hidden');
@@ -582,27 +490,21 @@
                 }
                 return;
             }
-
             if (threatIntelSpinner) {
                 threatIntelSpinner.classList.remove('hidden');
             }
-
-
             try {
                 let chatHistory = [];
                 chatHistory.push({ role: "user", parts: [{ text: `Provide a concise, simulated real-time threat intelligence update or analysis for the query: "${query}". Focus on recent trends, common attack vectors, and potential impacts. Keep it under 200 words.` }] });
                 const payload = { contents: chatHistory };
                 const apiKey = ""; // Canvas will provide this
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 const result = await response.json();
-
                 if (result.candidates && result.candidates.length > 0 &&
                     result.candidates[0].content && result.candidates[0].content.parts &&
                     result.candidates[0].content.parts.length > 0) {
@@ -629,7 +531,6 @@
                 }
             }
         });
-
         // Smooth scrolling for navigation
         document.querySelectorAll('nav a').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
