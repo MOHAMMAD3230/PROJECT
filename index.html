@@ -457,159 +457,431 @@ public class CreateAssessment {
   </div>
 </div>
 
+<!-- Widget container -->
+<style>
+  /* --- Widget styles --- */
+  .widget-container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 9999;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  .widget {
+    border-radius: 24px;
+    padding: 0;
+    background: rgba(255,255,255,0.12);
+    box-shadow:
+      0 8px 32px rgba(255,255,255,0.20),
+      inset 0 0 40px rgba(255,255,255,0.12);
+    backdrop-filter: saturate(180%) blur(18px);
+    -webkit-backdrop-filter: saturate(180%) blur(18px);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    color: white;
+    user-select: none;
+    overflow: hidden;
+    flex-direction: column;
+  }
+  .toggle-container {
+    text-align: right;
+    padding: 12px 22px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.10);
+    user-select: none;
+    border-radius: 24px 24px 0 0;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .toggle-btn {
+    font-size: 1rem;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    padding: 7px 18px;
+    font-weight: 700;
+    backdrop-filter: saturate(180%) blur(15px);
+    background: rgba(255,255,255,0.25);
+    color: #eee;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  .toggle-btn:hover { background: rgba(255,255,255,0.45); }
+  .widget-content {
+    padding: 16px 24px 24px 24px;
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+  }
+  label {
+    font-size: 0.9rem;
+    color: #b7b7b7;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+  }
+  input {
+    font-size: 1rem;
+    border-radius: 16px;
+    border: none;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.15);
+    color: #eee;
+    width: 100%;
+    transition: background-color 0.3s ease;
+  }
+  input:focus {
+    outline: 2px solid rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.3);
+  }
+  .flex-row {
+    display: flex;
+    gap: 14px;
+  }
+  .flex-row > div { flex: 1; }
+  #mohammad_countdown #countdown {
+    font-size: 1.5rem;
+    margin-top: 14px;
+    text-align: center;
+    text-shadow: 0 0 6px rgba(255,255,255,0.8);
+    user-select: none;
+    color: #eee;
+  }
+  #mohammad_countdown .action-btn {
+    font-size: 1rem;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    padding: 12px 16px;
+    font-weight: 700;
+    backdrop-filter: saturate(180%) blur(12px);
+    background: rgba(255,255,255,0.25);
+    color: #eee;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  #mohammad_countdown .action-btn:hover {
+    background: rgba(255,255,255,0.45);
+  }
+  #delhi_widget .clock {
+    background: rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 14px;
+    text-align: center;
+    margin-bottom: 16px;
+    color: #eee;
+  }
+  #delhi_widget .city {
+    font-weight: 800;
+    font-size: 1.5rem;
+  }
+  #delhi_widget .time {
+    font-size: 2rem;
+  }
+  #delhi_widget .date {
+    font-size: 1.1rem;
+    opacity: 0.75;
+  }
+  #delhi_widget #tasks {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  #delhi_widget #tasks h2 {
+    margin-top: 0;
+    font-weight: 800;
+    font-size: 1.45rem;
+    color: #eee;
+  }
+  #delhi_widget #tasksList {
+    list-style: none;
+    padding-left: 0;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  #delhi_widget #tasksList li {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.12);
+    margin-bottom: 10px;
+    cursor: pointer;
+    user-select: none;
+    color: #eee;
+    transition: background-color 0.25s ease;
+  }
+  #delhi_widget #tasksList li:hover {
+    background: rgba(255,255,255,0.25);
+  }
+  #delhi_widget #tasksList li.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #bbb;
+  }
+  #delhi_widget .action-btn {
+    font-size: 1rem;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    padding: 12px;
+    font-weight: 700;
+    backdrop-filter: saturate(180%) blur(12px);
+    background: rgba(255,255,255,0.25);
+    color: #eee;
+    transition: background-color 0.3s ease;
+    user-select: none;
+    margin-bottom: 12px;
+  }
+  #delhi_widget .action-btn:hover {
+    background: rgba(255,255,255,0.45);
+  }
+</style>
+
+<div class="widget-container">
+  <div id="mohammad_countdown" class="widget">
+    <div class="toggle-container">
+      <button id="countdownToggleBtn" class="toggle-btn">Show</button>
+    </div>
+    <div class="widget-content" id="countdownContent">
+      <strong style="font-size:1.3rem; font-weight:700;">Mohammad Countdown Timer</strong>
+      <div class="flex-row" style="margin-top:10px;">
+        <div>
+          <label for="addDays">Days</label>
+          <input type="number" id="addDays" min="0" value="0" />
+        </div>
+        <div>
+          <label for="addHours">Hours</label>
+          <input type="number" id="addHours" min="0" max="23" value="0" />
+        </div>
+        <div>
+          <label for="addMinutes">Minutes</label>
+          <input type="number" id="addMinutes" min="0" max="59" value="0" />
+        </div>
+      </div>
+      <div class="flex-row" style="margin-top:12px;">
+        <button id="applyOffset" class="action-btn">Apply</button>
+        <button id="startBtn" class="action-btn">Start</button>
+        <button id="pauseBtn" class="action-btn">Pause</button>
+        <button id="resetBtn" class="action-btn">Reset</button>
+      </div>
+      <div id="countdown">0d 0h 0m 0s</div>
+      <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+    </div>
+  </div>
+
+  <div id="delhi_widget" class="widget">
+    <div class="toggle-container">
+      <button id="delhiToggleBtn" class="toggle-btn">Show</button>
+    </div>
+    <div class="widget-content" id="delhiContent">
+      <div class="clock">
+        <div class="city">Delhi</div>
+        <div id="delhiTime" class="time">--:--:--</div>
+        <div id="delhiDate" class="date">--/--/----</div>
+      </div>
+      <div id="tasks">
+        <h2>Tasks</h2>
+        <input type="text" id="taskInput" placeholder="Task description" />
+        <input type="date" id="dateInput" />
+        <input type="time" id="timeInput" />
+        <button id="addTaskBtn" class="action-btn">Add Task</button>
+        <ul id="tasksList"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-  (function() {
-    const widget = document.getElementById('calc-widget');
-    const toggleBtn = document.getElementById('toggle-calc');
-    const calcContent = document.getElementById('calc-content');
-    const display = document.getElementById('display');
+  const countdownToggleBtn = document.getElementById('countdownToggleBtn');
+  const countdownContent = document.getElementById('countdownContent');
+  const delhiToggleBtn = document.getElementById('delhiToggleBtn');
+  const delhiContent = document.getElementById('delhiContent');
 
-    let currentInput = '0';
-    let lastInput = '';
-    let resetNext = false;
+  countdownContent.style.display = 'none';
+  delhiContent.style.display = 'none';
+  countdownToggleBtn.textContent = 'Show';
+  delhiToggleBtn.textContent = 'Show';
 
-    toggleBtn.addEventListener('click', () => {
-      if (calcContent.style.display === 'none') {
-        calcContent.style.display = 'block';
-        toggleBtn.textContent = 'Calculator ▲';
-      } else {
-        calcContent.style.display = 'none';
-        toggleBtn.textContent = 'Calculator ▼';
-      }
-    });
+  countdownToggleBtn.addEventListener('click', () => {
+    if (countdownContent.style.display === 'none') {
+      countdownContent.style.display = 'flex';
+      countdownToggleBtn.textContent = 'Hide';
+    } else {
+      countdownContent.style.display = 'none';
+      countdownToggleBtn.textContent = 'Show';
+    }
+  });
 
-    function updateDisplay() {
-      display.textContent = currentInput;
+  delhiToggleBtn.addEventListener('click', () => {
+    if (delhiContent.style.display === 'none') {
+      delhiContent.style.display = 'flex';
+      delhiToggleBtn.textContent = 'Hide';
+    } else {
+      delhiContent.style.display = 'none';
+      delhiToggleBtn.textContent = 'Show';
+    }
+  });
+
+  // Countdown Timer Logic
+  let timerInterval = null;
+  const countdownEl = document.getElementById('countdown');
+  const beepSound = document.getElementById('beepSound');
+
+  const targetDateOrig = new Date(2025, 11, 31, 23, 59, 59).getTime();
+  let targetDate = targetDateOrig;
+
+  let paused = false;
+  let pauseTime = null;
+  let useOriginalTarget = true;
+
+  const addDaysInput = document.getElementById('addDays');
+  const addHoursInput = document.getElementById('addHours');
+  const addMinutesInput = document.getElementById('addMinutes');
+  const applyOffsetBtn = document.getElementById('applyOffset');
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const diff = targetDate - now;
+
+    if (diff <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      countdownEl.textContent = "Time's up!";
+      beepSound.play();
+      return;
     }
 
-    function appendNumber(num) {
-      if (resetNext) {
-        currentInput = '';
-        resetNext = false;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  function startTimer() {
+    if (!timerInterval) {
+      if (paused && pauseTime) {
+        const pauseDuration = new Date().getTime() - pauseTime;
+        targetDate += pauseDuration;
+        paused = false;
+        pauseTime = null;
       }
-      if (num === '.' && currentInput.includes('.')) return;
-      if (currentInput === '0' && num !== '.') {
-        currentInput = num;
-      } else {
-        currentInput += num;
-      }
-      updateDisplay();
+      timerInterval = setInterval(updateCountdown, 1000);
+      updateCountdown();
     }
+  }
 
-    function appendOperator(op) {
-      if (resetNext) resetNext = false;
-      if (isOperator(lastInput)) {
-        currentInput = currentInput.slice(0, -1) + op;
-      } else {
-        currentInput += op;
-      }
-      updateDisplay();
+  function pauseTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      paused = true;
+      pauseTime = new Date().getTime();
     }
+  }
 
-    function isOperator(char) {
-      return ['+', '-', '*', '/', '%'].includes(char);
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    paused = false;
+    pauseTime = null;
+    targetDate = new Date().getTime();
+    addDaysInput.value = 0;
+    addHoursInput.value = 0;
+    addMinutesInput.value = 0;
+    useOriginalTarget = false;
+    countdownEl.textContent = '0d 0h 0m 0s';
+  }
+
+  function applyOffset() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    paused = false;
+    pauseTime = null;
+    const baseTime = useOriginalTarget ? targetDateOrig : new Date().getTime();
+    const addDays = Math.max(0, parseInt(addDaysInput.value) || 0);
+    const addHours = Math.min(23, Math.max(0, parseInt(addHoursInput.value) || 0));
+    const addMinutes = Math.min(59, Math.max(0, parseInt(addMinutesInput.value) || 0));
+    const offsetMs = addDays * 24 * 60 * 60 * 1000 +
+                     addHours * 60 * 60 * 1000 +
+                     addMinutes * 60 * 1000;
+    targetDate = baseTime + offsetMs;
+    updateCountdown();
+  }
+
+  applyOffsetBtn.addEventListener('click', applyOffset);
+  startBtn.addEventListener('click', startTimer);
+  pauseBtn.addEventListener('click', pauseTimer);
+  resetBtn.addEventListener('click', resetTimer);
+
+  // Delhi Widget Logic
+  const delhiTimeEl = document.getElementById('delhiTime');
+  const delhiDateEl = document.getElementById('delhiDate');
+  const tasksListEl = document.getElementById('tasksList');
+
+  function updateDelhiClock() {
+    const now = new Date();
+    const delhiStrTime = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour12: false });
+    const delhiStrDate = now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
+    delhiTimeEl.textContent = delhiStrTime;
+    delhiDateEl.textContent = delhiStrDate;
+  }
+  setInterval(updateDelhiClock, 1000);
+  updateDelhiClock();
+
+  const taskInput = document.getElementById('taskInput');
+  const dateInput = document.getElementById('dateInput');
+  const timeInput = document.getElementById('timeInput');
+  const addTaskBtn = document.getElementById('addTaskBtn');
+
+  function loadTasks() {
+    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    tasksListEl.innerHTML = '';
+    const nowTimestamp = Date.now();
+
+    tasks.forEach(({desc, datetime}, i) => {
+      const li = document.createElement('li');
+      li.textContent = `${desc} (${new Date(datetime).toLocaleString()})`;
+
+      if (datetime && datetime <= nowTimestamp) li.classList.add('completed');
+      li.onclick = () => {
+        tasks.splice(i, 1);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        loadTasks();
+      };
+      tasksListEl.appendChild(li);
+    });
+  }
+
+  addTaskBtn.onclick = () => {
+    const desc = taskInput.value.trim();
+    const date = dateInput.value;
+    const time = timeInput.value;
+    if (!desc || !date || !time) {
+      alert('Please enter task description, date, and time.');
+      return;
     }
-
-    function clearAll() {
-      currentInput = '0';
-      lastInput = '';
-      resetNext = false;
-      updateDisplay();
+    const datetime = new Date(date + 'T' + time + ':00').getTime();
+    if (isNaN(datetime)) {
+      alert('Invalid date/time');
+      return;
     }
+    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    tasks.push({desc, datetime});
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    taskInput.value = '';
+    dateInput.value = '';
+    timeInput.value = '';
+    loadTasks();
+  };
 
-    function backspace() {
-      if (resetNext) {
-        clearAll();
-        return;
-      }
-      if (currentInput.length > 1) {
-        currentInput = currentInput.slice(0, -1);
-      } else {
-        currentInput = '0';
-      }
-      updateDisplay();
-    }
-
-    function calculate() {
-      try {
-        if (isOperator(currentInput.slice(-1))) {
-          currentInput = currentInput.slice(0, -1);
-        }
-        let expression = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
-        let result = Function('"use strict";return (' + expression + ')')();
-        if (result === Infinity || result === -Infinity) {
-          currentInput = 'Error: Division by zero';
-        } else if (isNaN(result)) {
-          currentInput = 'Error';
-        } else {
-          currentInput = result.toString();
-        }
-      } catch {
-        currentInput = 'Error';
-      }
-      updateDisplay();
-      resetNext = true;
-    }
-
-    const numberButtons = widget.querySelectorAll('.number');
-    const operatorButtons = widget.querySelectorAll('.operator');
-    const clearBtn = widget.querySelector('.clear');
-    const backspaceBtn = widget.querySelector('#backspace');
-    const equalsBtn = widget.querySelector('.equal');
-
-    numberButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        appendNumber(btn.getAttribute('data-num'));
-        lastInput = btn.getAttribute('data-num');
-      });
-    });
-
-    operatorButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        appendOperator(btn.getAttribute('data-op'));
-        lastInput = btn.getAttribute('data-op');
-      });
-    });
-
-    clearBtn.addEventListener('click', () => {
-      clearAll();
-      lastInput = '';
-    });
-
-    backspaceBtn.addEventListener('click', () => {
-      backspace();
-      lastInput = currentInput.slice(-1);
-    });
-
-    equalsBtn.addEventListener('click', () => {
-      calculate();
-      lastInput = '';
-    });
-
-    // Keyboard support while widget is open
-    window.addEventListener('keydown', (e) => {
-      if (calcContent.style.display === 'block') {
-        if ((e.key >= '0' && e.key <= '9') || e.key === '.') {
-          appendNumber(e.key);
-          lastInput = e.key;
-        } else if (['+', '-', '*', '/', '%'].includes(e.key)) {
-          appendOperator(e.key);
-          lastInput = e.key;
-        } else if (e.key === 'Enter' || e.key === '=') {
-          e.preventDefault();
-          calculate();
-          lastInput = '';
-        } else if (e.key === 'Backspace') {
-          backspace();
-          lastInput = currentInput.slice(-1);
-        } else if (e.key.toLowerCase() === 'c') {
-          clearAll();
-          lastInput = '';
-        }
-      }
-    });
-  })();
+  loadTasks();
 </script>
+
 
 </body>
 </html>
