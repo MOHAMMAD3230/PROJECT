@@ -1,343 +1,545 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Offline & Online Music Player Tabs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <style>
-    /* (Same styles as before; omitted for brevity) */
-    /* ... copy all styles from the previous answer here ... */
-    body {
-      background: linear-gradient(135deg, #243b55, #141e30);
-      color: #fff;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .container {
-      max-width: 960px;
-      width: 100%;
-      background: rgba(34, 34, 34, 0.93);
-      border-radius: 18px;
-      box-shadow: 0 6px 36px #0008;
-      padding: 24px 28px;
-    }
-    /* ... other styles remain unchanged ... */
-  </style>
+  <meta charset="UTF-8" />
+  <title>Offline & Online Music Player Tabs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    /* Enable vertical and horizontal scrolling for entire page */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #243b55, #141e30);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      overflow-x: auto; /* horizontal scroll */
+      overflow-y: auto; /* vertical scroll */
+      /* Remove flex centering so scroll works on body */
+      display: block;
+    }
+
+    body {
+      width: 100%;
+      max-width: 960px;
+      margin: 20px auto; /* center container with margin for scroll */
+      box-sizing: border-box;
+    }
+
+    .container {
+      width: 100%;
+      background: rgba(34, 34, 34, 0.93);
+      border-radius: 18px;
+      box-shadow: 0 6px 36px #0008;
+      padding: 24px 28px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      /* No scroll on container */
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px 20px;
+      background: transparent;
+      border: 2px solid #555;
+      border-radius: 12px;
+      color: #bbb;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      user-select: none;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background-color: #ffc107;
+      border-color: #e6ac00;
+      color: #111;
+      font-weight: 600;
+    }
+    .tab-panel {
+      display: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 12px;
+      /* Remove scroll on playlist */
+      max-height: none;
+      max-width: 100%;
+      overflow: visible;
+      white-space: normal;
+      border-radius: 12px;
+      background: #222;
+      box-shadow: inset 0 0 6px #0008;
+      box-sizing: border-box;
+    }
+    ul li {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #333;
+      color: #eee;
+      user-select: none;
+      outline: none;
+      white-space: normal;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    ul li:last-child {
+      border-bottom: none;
+    }
+    ul li.active,
+    ul li:hover,
+    ul li:focus-visible {
+      background-color: #ffc107;
+      color: #111;
+      font-weight: 600;
+    }
+    input[type="file"], input[type="text"] {
+      background: #333;
+      border-radius: 8px;
+      border: 1px solid #555;
+      color: #fff;
+      padding: 6px 12px;
+      max-width: 100%;
+      user-select: none;
+      box-sizing: border-box;
+    }
+    input[type="text"] {
+      font-size: 14px;
+    }
+    .audio-bar {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #seekSlider {
+      flex-grow: 1;
+      cursor: pointer;
+    }
+    .time-display {
+      min-width: 70px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+    .flex-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .card-player h2,
+    .card-search h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-weight: 700;
+      color: #ffc107;
+      user-select: none;
+      text-align: center;
+    }
+    .search-result {
+      background: #222;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px #0009;
+      padding: 8px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      color: #eee;
+      max-width: 100%;
+      overflow: visible;
+      white-space: normal;
+      box-sizing: border-box;
+    }
+    .search-result img {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      object-fit: cover;
+    }
+    .search-track-meta {
+      flex-grow: 1;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+    .playlist-btn {
+      flex-shrink: 0;
+      margin-left: 8px;
+      user-select: none;
+    }
+    #onlineResults {
+      max-height: none;
+      max-width: 100%;
+      overflow: visible;
+      white-space: normal;
+      padding-right: 8px;
+      margin-top: 12px;
+      box-sizing: border-box;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      .tab-btn {
+        font-size: 16px;
+        padding: 10px 14px;
+      }
+      .card-player h2, .card-search h3 {
+        font-size: 18px;
+      }
+      input[type="text"] {
+        font-size: 12px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="container" aria-label="Music player with tabs">
-    <div class="tabs" role="tablist" aria-label="Music Player Tabs">
-      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="offlineTab" id="offlineTabBtn">Offline Music</button>
-      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="onlineTab" id="onlineTabBtn">Online Music</button>
-    </div>
-
-    <!-- Offline Music Tab -->
-    <section id="offlineTab" class="tab-panel active" role="tabpanel" aria-labelledby="offlineTabBtn">
-      <div class="card-player" aria-label="Offline local music player">
-        <h2>Offline Music Player</h2>
-        <input type="file" id="fileInput" multiple accept="audio/*" aria-label="Select audio files" />
-        <ul id="playlist" aria-live="polite" aria-relevant="additions"></ul>
-        <div id="trackInfo" aria-live="polite" aria-atomic="true">Select a song to play</div>
-        <audio id="audioPlayer" controls aria-label="Audio player controls"></audio>
-        <div class="audio-bar">
-          <input type="range" id="seekSlider" value="0" step="1" aria-label="Seek slider" />
-          <div class="time-display">
-            <span id="currentTime">00:00</span>
-            <span id="duration">00:00</span>
-          </div>
-        </div>
-        <div class="flex-row">
-          <button class="btn btn-warning" id="prevBtn" type="button">Prev</button>
-          <button class="btn btn-warning" id="nextBtn" type="button">Next</button>
-          <button class="btn btn-danger" id="offlineResetBtn" type="button">Reset</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Online Music Tab -->
-    <section id="onlineTab" class="tab-panel" role="tabpanel" aria-labelledby="onlineTabBtn" hidden>
-      <div class="card-search" aria-label="Online music preview search and playlist">
-        <h3>Online Music Preview Search</h3>
-        <input
-          type="text"
-          id="onlineSearchInput"
-          placeholder="Search online music..."
-          aria-label="Online music search input"
-        />
-        <button class="btn btn-primary" id="onlineSearchBtn" type="button">Search</button>
-        <button class="btn btn-warning" id="onlineResetBtn" type="button">Reset</button>
-        <div id="onlineResults" aria-live="polite" style="margin-top: 12px"></div>
-        <h6 class="fw-bold mt-4" style="user-select:none;">Online Playlist (30s Previews)</h6>
-        <ul id="onlinePlaylist" aria-live="polite" aria-relevant="additions"></ul>
-        <div id="onlineTrackInfo" aria-live="polite" aria-atomic="true" style="margin-bottom: 16px;">
-          Select a preview track to play / use playlist controls
-        </div>
-        <audio id="onlineAudioPlayer" controls aria-label="Online audio player controls"></audio>
-        <div class="flex-row" style="margin-top: auto;">
-          <button class="btn btn-info" id="onlinePrevBtn" type="button">Prev</button>
-          <button class="btn btn-info" id="onlineNextBtn" type="button">Next</button>
-          <button class="btn btn-success" id="onlinePlayAllBtn" type="button">Play All Sequentially</button>
-        </div>
-      </div>
-    </section>
-  </div>
+  <div class="container" aria-label="Music player with tabs">
+    <div class="tabs" role="tablist" aria-label="Music Player Tabs">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="offlineTab" id="offlineTabBtn">Offline Music</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="onlineTab" id="onlineTabBtn">Online Music</button>
+    </div>
+    <!-- Offline Music Tab -->
+    <section id="offlineTab" class="tab-panel active" role="tabpanel" aria-labelledby="offlineTabBtn">
+      <div class="card-player" aria-label="Offline local music player">
+        <h2>Offline Music Player</h2>
+        <!-- Offline Search & Reset -->
+        <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+          <input type="text" id="offlineSearchInput" placeholder="Search offline music..." aria-label="Offline music search input" style="flex-grow:1; padding: 6px; border-radius: 6px; border: 1px solid #555; background:#222; color:#fff; min-width: 150px;" />
+          <button class="btn btn-warning" id="offlineSearchResetBtn" type="button" style="flex-shrink: 0; min-width: 80px;">Reset</button>
+        </div>
+        <input type="file" id="fileInput" multiple accept="audio/*" aria-label="Select audio files" />
+        <ul id="playlist" aria-live="polite" aria-relevant="additions"></ul>
+        <div id="trackInfo" aria-live="polite" aria-atomic="true" style="text-align:center; margin-top:8px;">Select a song to play</div>
+        <audio id="audioPlayer" controls aria-label="Audio player controls" style="width: 100%; margin-top: 12px;"></audio>
+        <div class="audio-bar">
+          <input type="range" id="seekSlider" value="0" step="1" aria-label="Seek slider" />
+          <div class="time-display">
+            <span id="currentTime">00:00</span>
+            <span id="duration">00:00</span>
+          </div>
+        </div>
+        <div class="flex-row">
+          <button class="btn btn-warning" id="prevBtn" type="button" style="min-width: 80px;">Prev</button>
+          <button class="btn btn-warning" id="nextBtn" type="button" style="min-width: 80px;">Next</button>
+          <button class="btn btn-danger" id="offlineResetBtn" type="button" style="min-width: 80px;">Reset</button>
+        </div>
+      </div>
+    </section>
+    <!-- Online Music Tab -->
+    <section id="onlineTab" class="tab-panel" role="tabpanel" aria-labelledby="onlineTabBtn" hidden>
+      <div class="card-search" aria-label="Online music preview search and playlist">
+        <h3>Online Music Preview Search</h3>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+          <input
+            type="text"
+            id="onlineSearchInput"
+            placeholder="Search online music..."
+            aria-label="Online music search input"
+            style="flex-grow:1; padding: 6px; border-radius: 6px; border: 1px solid #555; background:#222; color:#fff; min-width: 150px;"
+          />
+          <button class="btn btn-warning" id="onlineResetBtn" type="button" style="min-width: 80px; flex-shrink: 0;">Reset</button>
+          <button class="btn btn-primary" id="onlineSearchBtn" type="button" style="min-width: 80px; margin-left: auto; flex-shrink: 0;">Search</button>
+        </div>
+        <div id="onlineResults" aria-live="polite"></div>
+        <h6 class="fw-bold mt-4" style="user-select:none; text-align:center;">Online Playlist (30s Previews)</h6>
+        <ul id="onlinePlaylist" aria-live="polite" aria-relevant="additions"></ul>
+        <div id="onlineTrackInfo" aria-live="polite" aria-atomic="true" style="margin-bottom: 16px; text-align:center;">
+          Select a preview track to play / use playlist controls
+        </div>
+        <audio id="onlineAudioPlayer" controls aria-label="Online audio player controls" style="width: 100%; margin-top: 12px;"></audio>
+        <div class="flex-row" style="margin-top: auto;">
+          <button class="btn btn-info" id="onlinePrevBtn" type="button" style="min-width: 80px;">Prev</button>
+          <button class="btn btn-info" id="onlineNextBtn" type="button" style="min-width: 80px;">Next</button>
+          <button class="btn btn-success" id="onlinePlayAllBtn" type="button" style="min-width: 150px;">Play All Sequentially</button>
+        </div>
+      </div>
+    </section>
+  </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Tab switching logic
-  const offlineTabBtn = document.getElementById('offlineTabBtn');
-  const onlineTabBtn = document.getElementById('onlineTabBtn');
-  const offlineTab = document.getElementById('offlineTab');
-  const onlineTab = document.getElementById('onlineTab');
+  // Tab switching logic
+  const offlineTabBtn = document.getElementById('offlineTabBtn');
+  const onlineTabBtn = document.getElementById('onlineTabBtn');
+  const offlineTab = document.getElementById('offlineTab');
+  const onlineTab = document.getElementById('onlineTab');
+  offlineTabBtn.addEventListener('click', () => {
+    offlineTabBtn.classList.add('active');
+    offlineTabBtn.setAttribute('aria-selected', 'true');
+    onlineTabBtn.classList.remove('active');
+    onlineTabBtn.setAttribute('aria-selected', 'false');
+    offlineTab.classList.add('active');
+    offlineTab.removeAttribute('hidden');
+    onlineTab.classList.remove('active');
+    onlineTab.setAttribute('hidden', '');
+  });
+  onlineTabBtn.addEventListener('click', () => {
+    onlineTabBtn.classList.add('active');
+    onlineTabBtn.setAttribute('aria-selected', 'true');
+    offlineTabBtn.classList.remove('active');
+    offlineTabBtn.setAttribute('aria-selected', 'false');
+    onlineTab.classList.add('active');
+    onlineTab.removeAttribute('hidden');
+    offlineTab.classList.remove('active');
+    offlineTab.setAttribute('hidden', '');
+  });
 
-  offlineTabBtn.addEventListener('click', () => {
-    offlineTabBtn.classList.add('active');
-    offlineTabBtn.setAttribute('aria-selected', 'true');
-    onlineTabBtn.classList.remove('active');
-    onlineTabBtn.setAttribute('aria-selected', 'false');
+  // --- Offline Player Logic ---
+  const fileInput = document.getElementById("fileInput");
+  const playlist = document.getElementById("playlist");
+  const audioPlayer = document.getElementById("audioPlayer");
+  const trackInfo = document.getElementById("trackInfo");
+  const seekSlider = document.getElementById("seekSlider");
+  const currentTime = document.getElementById("currentTime");
+  const duration = document.getElementById("duration");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const offlineResetBtn = document.getElementById("offlineResetBtn");
+  const offlineSearchInput = document.getElementById('offlineSearchInput');
+  const offlineSearchResetBtn = document.getElementById('offlineSearchResetBtn');
+  let tracks = [];
+  let currentTrack = -1;
 
-    offlineTab.classList.add('active');
-    offlineTab.removeAttribute('hidden');
-    onlineTab.classList.remove('active');
-    onlineTab.setAttribute('hidden', '');
-  });
+  fileInput.addEventListener("change", () => {
+    tracks = [];
+    playlist.innerHTML = "";
+    Array.from(fileInput.files).forEach((file, idx) => {
+      const li = document.createElement("li");
+      li.textContent = file.name.replace(/\.(mp3|wav|ogg)$/i, "");
+      li.tabIndex = 0;
+      li.addEventListener("click", () => playTrack(idx));
+      li.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" || e.key === " ") playTrack(idx);
+      });
+      playlist.appendChild(li);
+      tracks.push(file);
+    });
+    offlineSearchInput.value = '';
+    Array.from(playlist.children).forEach(li => li.style.display = '');
+  });
 
-  onlineTabBtn.addEventListener('click', () => {
-    onlineTabBtn.classList.add('active');
-    onlineTabBtn.setAttribute('aria-selected', 'true');
-    offlineTabBtn.classList.remove('active');
-    offlineTabBtn.setAttribute('aria-selected', 'false');
+  offlineSearchInput.addEventListener('input', () => {
+    const filter = offlineSearchInput.value.toLowerCase();
+    Array.from(playlist.children).forEach(li => {
+      li.style.display = li.textContent.toLowerCase().includes(filter) ? '' : 'none';
+    });
+  });
 
-    onlineTab.classList.add('active');
-    onlineTab.removeAttribute('hidden');
-    offlineTab.classList.remove('active');
-    offlineTab.setAttribute('hidden', '');
-  });
+  offlineSearchResetBtn.addEventListener('click', () => {
+    offlineSearchInput.value = '';
+    Array.from(playlist.children).forEach(li => {
+      li.style.display = '';
+    });
+  });
 
-  // --- Offline Player Logic ---
-  const fileInput = document.getElementById("fileInput");
-  const playlist = document.getElementById("playlist");
-  const audioPlayer = document.getElementById("audioPlayer");
-  const trackInfo = document.getElementById("trackInfo");
-  const seekSlider = document.getElementById("seekSlider");
-  const currentTime = document.getElementById("currentTime");
-  const duration = document.getElementById("duration");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const offlineResetBtn = document.getElementById("offlineResetBtn");
+  function playTrack(idx) {
+    if (tracks.length === 0) return;
+    currentTrack = idx;
+    const file = tracks[idx];
+    audioPlayer.src = URL.createObjectURL(file);
+    trackInfo.textContent = file.name;
+    highlightCurrent();
+    audioPlayer.play();
+  }
 
-  let tracks = [];
-  let currentTrack = -1;
+  function highlightCurrent() {
+    Array.from(playlist.children).forEach((li, i) => {
+      li.classList.toggle("active", i === currentTrack);
+    });
+  }
 
-  fileInput.addEventListener("change", () => {
-    tracks = [];
-    playlist.innerHTML = "";
-    Array.from(fileInput.files).forEach((file, idx) => {
-      const li = document.createElement("li");
-      li.textContent = file.name.replace(/\.(mp3|wav|ogg)$/i, "");
-      li.tabIndex = 0;
-      li.addEventListener("click", () => playTrack(idx));
-      li.addEventListener("keypress", (e) => {
-        if (e.key === "Enter" || e.key === " ") playTrack(idx);
-      });
-      playlist.appendChild(li);
-      tracks.push(file);
-    });
-    // Removed auto-play on adding files to playlist
-  });
+  prevBtn.addEventListener("click", () => {
+    if (currentTrack > 0) playTrack(currentTrack - 1);
+  });
 
-  function playTrack(idx) {
-    if (tracks.length === 0) return;
-    currentTrack = idx;
-    const file = tracks[idx];
-    audioPlayer.src = URL.createObjectURL(file);
-    trackInfo.textContent = file.name;
-    highlightCurrent();
-    audioPlayer.play();
-  }
+  nextBtn.addEventListener("click", () => {
+    if (currentTrack < tracks.length - 1) playTrack(currentTrack + 1);
+  });
 
-  function highlightCurrent() {
-    Array.from(playlist.children).forEach((li, i) => {
-      li.classList.toggle("active", i === currentTrack);
-    });
-  }
+  audioPlayer.addEventListener("ended", () => {
+    if (currentTrack < tracks.length - 1) playTrack(currentTrack + 1);
+  });
 
-  prevBtn.addEventListener("click", () => {
-    if (currentTrack > 0) playTrack(currentTrack - 1);
-  });
+  audioPlayer.addEventListener("loadedmetadata", () => {
+    seekSlider.max = Math.floor(audioPlayer.duration) || 0;
+    duration.textContent = formatTime(audioPlayer.duration);
+  });
 
-  nextBtn.addEventListener("click", () => {
-    if (currentTrack < tracks.length - 1) playTrack(currentTrack + 1);
-  });
+  audioPlayer.addEventListener("timeupdate", () => {
+    seekSlider.value = Math.floor(audioPlayer.currentTime);
+    currentTime.textContent = formatTime(audioPlayer.currentTime);
+  });
 
-  audioPlayer.addEventListener("ended", () => {
-    if (currentTrack < tracks.length - 1) playTrack(currentTrack + 1);
-  });
+  seekSlider.addEventListener("input", () => {
+    audioPlayer.currentTime = seekSlider.value;
+  });
 
-  audioPlayer.addEventListener("loadedmetadata", () => {
-    seekSlider.max = Math.floor(audioPlayer.duration) || 0;
-    duration.textContent = formatTime(audioPlayer.duration);
-  });
+  function formatTime(sec) {
+    sec = Math.floor(sec);
+    const m = Math.floor(sec / 60),
+      s = sec % 60;
+    return `${String(m).padStart(2, 0)}:${String(s).padStart(2, 0)}`;
+  }
 
-  audioPlayer.addEventListener("timeupdate", () => {
-    seekSlider.value = Math.floor(audioPlayer.currentTime);
-    currentTime.textContent = formatTime(audioPlayer.currentTime);
-  });
+  offlineResetBtn.addEventListener("click", () => {
+    tracks = [];
+    currentTrack = -1;
+    playlist.innerHTML = "";
+    audioPlayer.pause();
+    audioPlayer.src = "";
+    trackInfo.textContent = "Select a song to play";
+    seekSlider.value = 0;
+    currentTime.textContent = "00:00";
+    duration.textContent = "00:00";
+    offlineSearchInput.value = '';
+  });
 
-  seekSlider.addEventListener("input", () => {
-    audioPlayer.currentTime = seekSlider.value;
-  });
+  // --- Online Player Logic ---
+  const onlineResults = document.getElementById("onlineResults");
+  const onlinePlaylist = document.getElementById("onlinePlaylist");
+  const onlineAudioPlayer = document.getElementById("onlineAudioPlayer");
+  const onlineTrackInfo = document.getElementById("onlineTrackInfo");
+  const onlinePrevBtn = document.getElementById("onlinePrevBtn");
+  const onlineNextBtn = document.getElementById("onlineNextBtn");
+  const onlinePlayAllBtn = document.getElementById("onlinePlayAllBtn");
+  const onlineResetBtn = document.getElementById("onlineResetBtn");
+  const onlineSearchBtn = document.getElementById("onlineSearchBtn");
+  let onlineTracks = [];
+  let onlinePlaylistTracks = [];
+  let currentOnlineTrack = -1;
+  let playAllSeq = false;
 
-  function formatTime(sec) {
-    sec = Math.floor(sec);
-    const m = Math.floor(sec / 60),
-      s = sec % 60;
-    return `${String(m).padStart(2, 0)}:${String(s).padStart(2, 0)}`;
-  }
+  onlineSearchBtn.addEventListener('click', searchOnlineMusic);
 
-  offlineResetBtn.addEventListener("click", () => {
-    tracks = [];
-    currentTrack = -1;
-    playlist.innerHTML = "";
-    audioPlayer.pause();
-    audioPlayer.src = "";
-    trackInfo.textContent = "Select a song to play";
-    seekSlider.value = 0;
-    currentTime.textContent = "00:00";
-    duration.textContent = "00:00";
-  });
+  async function searchOnlineMusic() {
+    const query = document.getElementById("onlineSearchInput").value.trim();
+    onlineResults.innerHTML = "";
+    if (!query) return;
+    try {
+      const resp = await fetch(
+        `https://itunes.apple.com/search?term=${encodeURIComponent(
+          query
+        )}&media=music&limit=10`
+      );
+      const data = await resp.json();
+      if (!data.results.length) {
+        onlineResults.innerHTML = "<div>No results found.</div>";
+        return;
+      }
+      onlineTracks = data.results;
+      onlineResults.innerHTML = "";
+      onlineTracks.forEach((track, idx) => {
+        const resultDiv = document.createElement("div");
+        resultDiv.className = "search-result";
+        resultDiv.innerHTML = `
+          <img src="${track.artworkUrl100}" alt="cover" />
+          <div class="search-track-meta">
+            <div class="fw-bold">${track.trackName || "Untitled"}</div>
+            <div>${track.artistName || "Unknown"}<br /><span class="badge text-bg-dark">${track.collectionName || ""}</span></div>
+          </div>
+          <button class="btn btn-success btn-sm playlist-btn" type="button">+ Playlist</button>
+          <audio class="search-preview-audio" controls src="${track.previewUrl}"></audio>
+          `;
+        const playlistBtn = resultDiv.querySelector(".playlist-btn");
+        playlistBtn.addEventListener("click", () => {
+          addToOnlinePlaylist(idx);
+        });
+        onlineResults.appendChild(resultDiv);
+      });
+    } catch (err) {
+      onlineResults.innerHTML = "<div>Error loading previews.</div>";
+    }
+  }
 
-  // --- Online Player Logic ---
-  const onlineResults = document.getElementById("onlineResults");
-  const onlinePlaylist = document.getElementById("onlinePlaylist");
-  const onlineAudioPlayer = document.getElementById("onlineAudioPlayer");
-  const onlineTrackInfo = document.getElementById("onlineTrackInfo");
-  const onlinePrevBtn = document.getElementById("onlinePrevBtn");
-  const onlineNextBtn = document.getElementById("onlineNextBtn");
-  const onlinePlayAllBtn = document.getElementById("onlinePlayAllBtn");
-  const onlineResetBtn = document.getElementById("onlineResetBtn");
-  const onlineSearchBtn = document.getElementById("onlineSearchBtn");
+  function addToOnlinePlaylist(idx) {
+    const track = onlineTracks[idx];
+    if (!track) return;
+    onlinePlaylistTracks.push(track);
+    renderOnlinePlaylist();
+  }
 
-  let onlineTracks = [];
-  let onlinePlaylistTracks = [];
-  let currentOnlineTrack = -1;
-  let playAllSeq = false;
+  function renderOnlinePlaylist() {
+    onlinePlaylist.innerHTML = "";
+    onlinePlaylistTracks.forEach((track, idx) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="fw-bold">${track.trackName}</span> - <span>${track.artistName}</span>`;
+      li.tabIndex = 0;
+      li.addEventListener("click", () => playOnlineTrack(idx));
+      li.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" || e.key === " ") playOnlineTrack(idx);
+      });
+      if (idx === currentOnlineTrack) li.classList.add("active");
+      onlinePlaylist.appendChild(li);
+    });
+  }
 
-  onlineSearchBtn.addEventListener('click', searchOnlineMusic);
+  function playOnlineTrack(idx) {
+    if (!onlinePlaylistTracks.length) return;
+    currentOnlineTrack = idx;
+    const track = onlinePlaylistTracks[idx];
+    onlineAudioPlayer.src = track.previewUrl;
+    onlineTrackInfo.textContent = `${track.trackName} by ${track.artistName}`;
+    renderOnlinePlaylist();
+    onlineAudioPlayer.play();
+  }
 
-  async function searchOnlineMusic() {
-    const query = document.getElementById("onlineSearchInput").value.trim();
-    onlineResults.innerHTML = "";
-    if (!query) return;
-    try {
-      const resp = await fetch(
-        `https://itunes.apple.com/search?term=${encodeURIComponent(
-          query
-        )}&media=music&limit=10`
-      );
-      const data = await resp.json();
-      if (!data.results.length) {
-        onlineResults.innerHTML = "<div>No results found.</div>";
-        return;
-      }
-      onlineTracks = data.results;
-      onlineResults.innerHTML = "";
-      onlineTracks.forEach((track, idx) => {
-        const resultDiv = document.createElement("div");
-        resultDiv.className = "search-result";
-        resultDiv.innerHTML = `
-          <img src="${track.artworkUrl100}" alt="cover" />
-          <div class="search-track-meta">
-            <div class="fw-bold">${track.trackName || "Untitled"}</div>
-            <div>${track.artistName || "Unknown"}<br /><span class="badge text-bg-dark">${track.collectionName || ""}</span></div>
-          </div>
-          <button class="btn btn-success btn-sm playlist-btn" type="button">+ Playlist</button>
-          <audio class="search-preview-audio" controls src="${track.previewUrl}"></audio>
-          `;
-        resultDiv.querySelector(".playlist-btn").addEventListener("click", () => {
-          addToOnlinePlaylist(idx);
-        });
-        onlineResults.appendChild(resultDiv);
-      });
-    } catch (err) {
-      onlineResults.innerHTML = "<div>Error loading previews.</div>";
-    }
-  }
+  onlinePrevBtn.addEventListener("click", () => {
+    if (currentOnlineTrack > 0) playOnlineTrack(currentOnlineTrack - 1);
+  });
 
-  window.addToOnlinePlaylist = function (idx) {
-    const track = onlineTracks[idx];
-    if (!track) return;
-    onlinePlaylistTracks.push(track);
-    renderOnlinePlaylist();
-    // NO autoplay here
-  };
+  onlineNextBtn.addEventListener("click", () => {
+    if (currentOnlineTrack < onlinePlaylistTracks.length - 1)
+      playOnlineTrack(currentOnlineTrack + 1);
+  });
 
-  function renderOnlinePlaylist() {
-    onlinePlaylist.innerHTML = "";
-    onlinePlaylistTracks.forEach((track, idx) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<span class="fw-bold">${track.trackName}</span> - <span>${track.artistName}</span>`;
-      li.tabIndex = 0;
-      li.addEventListener("click", () => playOnlineTrack(idx));
-      li.addEventListener("keypress", (e) => {
-        if (e.key === "Enter" || e.key === " ") playOnlineTrack(idx);
-      });
-      if (idx === currentOnlineTrack) li.classList.add("active");
-      onlinePlaylist.appendChild(li);
-    });
-  }
+  onlineAudioPlayer.addEventListener("ended", () => {
+    if (playAllSeq && currentOnlineTrack < onlinePlaylistTracks.length - 1) {
+      playOnlineTrack(currentOnlineTrack + 1);
+    } else {
+      playAllSeq = false;
+    }
+  });
 
-  function playOnlineTrack(idx) {
-    if (!onlinePlaylistTracks.length) return;
-    currentOnlineTrack = idx;
-    const track = onlinePlaylistTracks[idx];
-    onlineAudioPlayer.src = track.previewUrl;
-    onlineTrackInfo.textContent = `${track.trackName} by ${track.artistName}`;
-    renderOnlinePlaylist();
-    onlineAudioPlayer.play();
-  }
+  onlinePlayAllBtn.addEventListener("click", () => {
+    if (!onlinePlaylistTracks.length) return;
+    playAllSeq = true;
+    playOnlineTrack(0);
+  });
 
-  onlinePrevBtn.addEventListener("click", () => {
-    if (currentOnlineTrack > 0) playOnlineTrack(currentOnlineTrack - 1);
-  });
-  onlineNextBtn.addEventListener("click", () => {
-    if (currentOnlineTrack < onlinePlaylistTracks.length - 1)
-      playOnlineTrack(currentOnlineTrack + 1);
-  });
-  onlineAudioPlayer.addEventListener("ended", () => {
-    if (playAllSeq && currentOnlineTrack < onlinePlaylistTracks.length - 1) {
-      playOnlineTrack(currentOnlineTrack + 1);
-    } else {
-      playAllSeq = false;
-    }
-  });
-  onlinePlayAllBtn.addEventListener("click", () => {
-    if (!onlinePlaylistTracks.length) return;
-    playAllSeq = true;
-    playOnlineTrack(0);
-  });
-
-  onlineResetBtn.addEventListener("click", () => {
-    document.getElementById("onlineSearchInput").value = "";
-    onlineResults.innerHTML = "";
-    onlinePlaylist.innerHTML = "";
-    onlineTracks = [];
-    onlinePlaylistTracks = [];
-    currentOnlineTrack = -1;
-    playAllSeq = false;
-    onlineTrackInfo.textContent = "Select a preview track to play / use playlist controls";
-    onlineAudioPlayer.pause();
-    onlineAudioPlayer.src = "";
-    onlineAudioPlayer.currentTime = 0;
-  });
+  onlineResetBtn.addEventListener("click", () => {
+    document.getElementById("onlineSearchInput").value = "";
+    onlineResults.innerHTML = "";
+    onlinePlaylist.innerHTML = "";
+    onlineTracks = [];
+    onlinePlaylistTracks = [];
+    currentOnlineTrack = -1;
+    playAllSeq = false;
+    onlineTrackInfo.textContent = "Select a preview track to play / use playlist controls";
+    onlineAudioPlayer.pause();
+    onlineAudioPlayer.src = "";
+    onlineAudioPlayer.currentTime = 0;
+  });
 });
 </script>
 </body>
