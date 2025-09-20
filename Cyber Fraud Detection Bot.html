@@ -332,7 +332,7 @@
       const out = document.getElementById('iocResults');
       if(!val) return out.innerHTML = '<p class="text-red-400">Enter IOC data.</p>';
       const list = val.split(/[\n,]+/).map(i => i.trim()).filter(Boolean);
-      out.innerHTML = `<p>Processed ${list.length} IOCs:</p><ul>${list.map(i => `<li>${i}</li>`).join('')}</ul>`;
+      out.innerHTML = `<p>Processed ${list.length} IOCs:</p><ul>${list.map(i => `<li>${escapeHTML(i)}</li>`).join('')}</ul>`;
     });
 
     // Utility function to escape user-provided text for HTML
