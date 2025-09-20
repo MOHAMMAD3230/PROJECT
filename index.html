@@ -291,9 +291,7 @@
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 
-<script>
-
-import com.google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseServiceClient;
+<script> import com.google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseServiceClient;
 import com.google.recaptchaenterprise.v1.Assessment;
 import com.google.recaptchaenterprise.v1.CreateAssessmentRequest;
 import com.google.recaptchaenterprise.v1.Event;
@@ -363,7 +361,7 @@ public class CreateAssessment {
 
       // Get the risk score and the reason(s).
       // For more information on interpreting the assessment, see:
-      // https://cloud.google.com/recaptcha-enterprise/docs/interpret-assessment
+      // https://developers.google.com/recaptcha-enterprise/docs/interpret-assessment
       for (ClassificationReason reason : response.getRiskAnalysis().getReasonsList()) {
         System.out.println(reason);
       }
@@ -377,9 +375,10 @@ public class CreateAssessment {
           "Assessment name: " + assessmentName.substring(assessmentName.lastIndexOf("/") + 1));
     }
   }
-}
+}</script>
 
-</script>
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD"></script>
+
 
 </body>
 
