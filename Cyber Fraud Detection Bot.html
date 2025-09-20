@@ -219,6 +219,16 @@
   <footer class="bg-gray-800 py-5 text-center text-gray-400"><small>© 2025 CyberGuard AI. All rights reserved.</small></footer>
 
   <script>
+    // Escapes HTML meta-characters to prevent XSS
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/`/g, '&#96;');
+    }
     // Tab nav
     const tabs = document.querySelectorAll('.tab-link');
     const contents = document.querySelectorAll('.tab-content');
@@ -436,8 +446,8 @@
         const keywords = ['redirect','bounce','cloak','hidden','proxy','difference'];
         const found = keywords.some(k => val.includes(k));
         out.innerHTML = found
-          ? `<p>Warning: Cloaking detected for <code>${val}</code>.</p>`
-          : `<p>No cloaking detected for <code>${val}</code>.</p>`;
+          ? `<p>Warning: Cloaking detected for <code>${escapeHTML(val)}</code>.</p>`
+          : `<p>No cloaking detected for <code>${escapeHTML(val)}</code>.</p>`;
       });
     });
   </script>
