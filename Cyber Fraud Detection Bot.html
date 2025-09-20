@@ -411,8 +411,8 @@
         const keywords = ['malware','virus','trojan','ransomware','worm','spyware','adware'];
         const found = keywords.some(k => val.includes(k));
         out.innerHTML = found
-          ? `<p>Alert! Domain <code>${val}</code> associated with malware.</p>`
-          : `<p>No malware signs for <code>${val}</code>.</p>`;
+          ? `<p>Alert! Domain <code>${escapeHTML(val)}</code> associated with malware.</p>`
+          : `<p>No malware signs for <code>${escapeHTML(val)}</code>.</p>`;
       });
     });
 
