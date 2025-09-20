@@ -426,8 +426,8 @@
         const keywords = ['casino','bet','poker','slots','roulette','gamble','bingo','bookmaker','wager','jackpot','blackjack'];
         const found = keywords.some(k => val.includes(k));
         out.innerHTML = found
-          ? `<p>Warning: <code>${val}</code> involved in gambling activities.</p>`
-          : `<p>No gambling activity for <code>${val}</code>.</p>`;
+          ? `<p>Warning: <code>${escapeHTML(val)}</code> involved in gambling activities.</p>`
+          : `<p>No gambling activity for <code>${escapeHTML(val)}</code>.</p>`;
       });
     });
 
