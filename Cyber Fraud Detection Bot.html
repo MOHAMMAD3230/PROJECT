@@ -219,6 +219,21 @@
   <footer class="bg-gray-800 py-5 text-center text-gray-400"><small>© 2025 CyberGuard AI. All rights reserved.</small></footer>
 
   <script>
+    // Escapes HTML special chars in a string for safe insertion into innerHTML
+    function escapeHTML(str) {
+      return str.replace(/[&<>"'`=\/]/g, function(s) {
+        return ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+          '`': '&#96;',
+          '=': '&#61;',
+          '/': '&#47;'
+        })[s];
+      });
+    }
     // Escapes HTML meta-characters to prevent XSS
     function escapeHTML(str) {
       return String(str)
@@ -441,8 +456,8 @@
         const keywords = ['phishing','pretext','baiting','scareware','spoof','email fraud'];
         const found = keywords.some(k => val.includes(k));
         out.innerHTML = found
-          ? `<p>Warning: <code>${val}</code> shows social engineering signs.</p>`
-          : `<p>No social engineering signs for <code>${val}</code>.</p>`;
+          ? `<p>Warning: <code>${escapeHTML(val)}</code> shows social engineering signs.</p>`
+          : `<p>No social engineering signs for <code>${escapeHTML(val)}</code>.</p>`;
       });
     });
 
