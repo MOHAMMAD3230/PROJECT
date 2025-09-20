@@ -320,6 +320,16 @@
       out.innerHTML = `<p>Processed ${list.length} IOCs:</p><ul>${list.map(i => `<li>${i}</li>`).join('')}</ul>`;
     });
 
+    // Utility function to escape user-provided text for HTML
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     // Similarity Scan
     document.getElementById('similarityScanBtn').addEventListener('click', async () => {
       const val = document.getElementById('similarityInput').value.trim();
@@ -356,7 +366,7 @@
       if(!files || files.length === 0) return out.innerHTML = '<p class="text-red-400">Select files to process.</p>';
       out.innerHTML = '<div class="spinner"></div>';
       await simulateAsync(() => {
-        out.innerHTML = `<ul>${Array.from(files).map(f => `<li>${f.name}</li>`).join('')}</ul>`;
+        out.innerHTML = `<ul>${Array.from(files).map(f => `<li>${escapeHTML(f.name)}</li>`).join('')}</ul>`;
       });
     });
 
