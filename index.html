@@ -10,7 +10,7 @@
   <title>MY_STUFF</title>
   <style>
     /* Matrix animated background canvas style */
-    #matrix {
+     #matrix {
       position: fixed;
       top: 0; left: 0;
       width: 100%;
@@ -20,9 +20,10 @@
       display: block;
     }
 
+
     /* Box container style for categories */
-    .categories-box {
-      max-width: 300px;
+     .categories-box {
+      max-width: 400px;
       margin: 30px auto;
       background: rgba(0, 0, 20, 0.8); /* semi-transparent dark */
       border: 2px solid #00bfff;      /* bright blue border */
@@ -34,21 +35,26 @@
       overflow-wrap: break-word;
     }
 
-    .categories-box a {
+
+       .categories-box a {
       color: #00bfff;
       text-decoration: none;
       font-weight: bold;
     }
 
+
     .categories-box a:hover {
       text-decoration: underline;
     }
 
+
+
     /* Additional style to ensure text inside <pre> wraps nicely */
-    .categories-box pre {
+     .categories-box pre {
       white-space: pre-wrap;
       margin: 0;
     }
+
 .page-container {
       display: flex;
       justify-content: space-between;
@@ -736,7 +742,44 @@
 </script>
 <a href="https://www.iubenda.com/privacy-policy/12072372" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script><br>
   <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Cookie Policy ">Cookie Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script><br>
-  
+
+    <script>
+    // Matrix animation code
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
+    const fontSize = 20;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(0);
+
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 16, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillStyle = (i % 2 === 0) ? '#00bfff' : '#e0f7ff';
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 50);
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+
 
 </body>
 </html>
