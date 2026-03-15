@@ -223,7 +223,8 @@
     <pre>
       <a href="Activity 3">Activity 3</a> <br> 
       <a href="music.html" style="color:#00bfff;">My_Music</a> <br>
-      <a href="radio.html" style="color:#00bfff;">Live Radio</a> <br>      
+      <a href="radio.html" style="color:#00bfff;">Live Radio</a> <br>
+      <a href="https://mohammad3230.github.io/Games-More-.../" onclick="initiateUplink(event, 'https://mohammad3230.github.io/Games-More-.../')">MY_STUFF_AIO v2.0</a>
     </pre>
   </div>
 
@@ -879,6 +880,28 @@ public class CreateAssessment {
     }
   }
 }
+  </script>
+
+  <script>
+
+    function initiateUplink(event, target) {
+    // Cyberpunk loading effect
+    addTerminalLog(`[UPLINK] Establishing connection to ${target}...`, "#00ff88");
+    
+    // Visual feedback
+    document.getElementById('pulseNode').style.backgroundColor = "#00ff88";
+    document.getElementById('statusLabel').innerText = "STATUS: UPLINKING";
+    
+    // Allow navigation after 1.5s (or instantly)
+    setTimeout(() => {
+        window.open(target, '_blank'); // Open in new tab
+    }, 1500);
+    
+    // Prevent default navigation during animation
+    event.preventDefault();
+    return false;
+}
+
   </script>
 
 
