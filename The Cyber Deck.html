@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="https://mohammad3230.github.io/Games-More-.../favicon.png" type="image/png" sizes="32x32" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MY_STUFF_AIO</title>
+    <style>
+        /* Matrix animated background canvas style */
+        #matrix {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #000010;
+            display: block;
+        }
+
+        /* Top-left container for categories */
+        .top-left-container {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 10;
+        }
+
+        /* BOTTOM LEFT & RIGHT PANELS */
+        .bottom-left-panel {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 160px;
+            height: 220px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 0 25px rgba(0, 255, 127, 0.5);
+            color: white;
+            font-family: monospace, monospace;
+            z-index: 5;
+        }
+
+        .bottom-right-panel {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 200px; /* Adjusted for Cyber Deck content */
+            height: 300px;
+            min-height: 380px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 25px rgba(255, 165, 0, 0.5);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            color: white;
+            font-family: monospace, monospace;
+            z-index: 5;
+            transition: box-shadow 0.5s ease, border 0.5s ease;
+        }
+
+        /* === CATEGORIES PANEL === */
+        .categories-panel {
+            width: 180px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.0);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 25px rgba(0, 191, 255, 0.5);
+            overflow: hidden;
+            color: white;
+            font-family: monospace, monospace;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .categories-panel.expanded {
+            width: 220px;
+            height: 420px;
+            box-shadow: 0 0 35px rgba(0, 191, 255, 0.8);
+        }
+
+        .dropdown-content { display: none; }
+        .dropdown-content.show { display: block !important; }
+
+        .filter-container {
+            height: 240px;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: #00bfff rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            border-radius: 6px;
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .filter-container::-webkit-scrollbar { width: 8px; }
+        .filter-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.5); border-radius: 4px; }
+        .filter-container::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00bfff, #0080ff); border-radius: 4px; }
+
+        .categories-panel h3 { color: #00bfff; font-weight: 600; font-size: 1.2em; margin: 0 0 10px 0; }
+        .bottom-left-panel h5, .bottom-right-panel h5 { color: #00f0ff; font-weight: 600; font-size: 1.1em; margin: 0 0 15px 0; }
+
+        .categories-panel a:not(.dropbtn), .bottom-left-panel a, .bottom-right-panel a {
+            color: #ffffff; font-weight: bold; text-decoration: none; transition: color 0.3s ease;
+        }
+        .categories-panel a:not(.dropbtn):hover, .bottom-left-panel a:hover, .bottom-right-panel a:hover { color: #00e5ff; }
+        .categories-panel small, .bottom-left-panel small, .bottom-right-panel small { color: #bbbbff; font-weight: normal; font-style: italic; }
+
+        .dropbtn {
+            background: rgba(0, 191, 255, 0.3); color: #ffffff; padding: 12px; font-size: 0.9em;
+            border: 1px solid rgba(0, 191, 255, 0.5); border-radius: 6px; cursor: pointer;
+            font-family: monospace; font-weight: bold; width: 100%; text-align: left; box-sizing: border-box;
+        }
+
+        #categoryFilter {
+            width: 100%; padding: 10px 12px; border: none; border-bottom: 1px solid rgba(0, 191, 255, 0.5);
+            background: rgba(0, 0, 0, 0.8); color: #e0f7ff; font-family: monospace; font-size: 0.9em; box-sizing: border-box;
+        }
+
+        .dropdown-content a { color: #e0f7ff; padding: 12px 14px; text-decoration: none; display: block; font-size: 0.9em; border-bottom: 1px solid rgba(0, 191, 255, 0.2); }
+        .dropdown-content a:hover { background: rgba(0, 191, 255, 0.4); color: #ffffff; padding-left: 18px; }
+
+        .main-category .main-link { color: #00e5ff; font-weight: bold; padding: 10px 12px; display: block; border-bottom: 1px solid rgba(0, 191, 255, 0.2); }
+        .main-category .submenu a { color: #bbbbff; padding: 8px 20px; display: block; font-size: 0.85em; }
+
+        html, body { margin: 0; padding: 0; height: 100%; overflow-x: hidden; }
+        
+        .page-title {
+            text-align: center; color: #00eaff; font-family: 'Segoe UI', sans-serif; font-size: 3em;
+            text-transform: uppercase; letter-spacing: 4px; margin-top: 30px; margin-bottom: 20px; user-select: none;
+            text-shadow: 0 0 5px #f9fbfb, 0 0 15px #f4f5f6;
+        }
+
+         .site-footer {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #e0f7ff;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 3px 7px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: fixed;        /* keeps it at bottom even when scrolling */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  user-select: none;
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(0, 191, 255, 0.3);
+  z-index: 10;            /* above canvas and panels */
+}
+
+.site-footer small {
+  display: inline-block;
+  letter-spacing: 1px;
+  color: #00e5ff;
+}
+
+        .page-title .version { font-size: 0.55em; color: #00e5ff; letter-spacing: 1px; margin-left: 8px; font-weight: 400; }
+
+        /* Cyber Deck Specifics */
+        .network-pulse { width: 8px; height: 8px; border-radius: 50%; background-color: #00f0ff; box-shadow: 0 0 8px #00f0ff; }
+        #terminalLog { display: flex; flex-direction: column-reverse; overflow-y: hidden; }
+        #graphSvg { overflow: visible !important; }
+    </style>
+</head>
+<body>
+  
+   <canvas id="matrix"></canvas>
+  <h1 class="page-title">
+  MY_STUFF_AIO
+  <span class="version">v2.0</span>
+</h1>
+                                           
+
+  <!-- FIXED CATEGORIES PANEL (TOP LEFT) -->
+  <div class="top-left-container">
+    <div class="categories-panel" id="categoriesPanel">
+      <h3>Categories</h3>
+      <div class="dropdown">
+        <button onclick="toggleCategoryPanel()" class="dropbtn">☰ Filter Categories</button>
+        <div id="categoryDropdown" class="dropdown-content filter-container">
+
+          <input type="text" id="categoryFilter" placeholder="🔍 Search categories..." onkeyup="filterCategories()">
+
+          <!-- Main option with sub‑options -->
+          <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 MY_STUFF v1.0</a>
+            <div class="submenu" style="display: none;">
+              <a href="https://mohammad3230.github.io/PROJECT/">MY_STUFF v1.0</a>
+            </div>
+          </div>
+
+          <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 Online Games</a>
+            <div class="submenu" style="display: none;">
+              <a href="snake.html">Snake Game</a>
+              <a href="#">API Docs</a>
+              <a href="#">Changelogs</a>
+            </div>
+          </div>
+
+        <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 News</a>
+            <div class="submenu" style="display: none;">
+              <a href="https://timesofindia.indiatimes.com/">The Times of India</a>
+              <a href="https://www.thehindu.com/latest-news/">The Hindu</a>
+              <a href="#">Changelogs</a>
+            </div>
+          </div>
+
+        <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 Documentation</a>
+            <div class="submenu" style="display: none;">
+              <a href="#">User Guides</a>
+              <a href="#">API Docs</a>
+              <a href="#">Changelogs</a>
+            </div>
+          </div>
+
+          <a href="https://in.pinterest.com/">📌 Pinterest</a>
+          <a href="music.html">🎵 My_Music</a>
+          <a href="radio.html">📡 Live Radio</a>
+        <a href="https://www.zedge.net/ringtones">🖼️ Zedge Wallpapers</a> 
+          <a href="#">⚙️ Settings</a>
+          <a href="#">🎨 Templates</a>
+          <a href="#">📤 Exports</a>
+          <a href="#">📊 Analytics</a>
+          <a href="#">💾 Backup</a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="bottom-left-panel">
+        <h5>Search Engines</h5>
+        <p><a href="https://www.google.com" target="_blank">Google</a><br><small>Google will Track You</small></p>
+        <p><a href="https://www.startpage.com" target="_blank">Startpage</a><br><small>Most Private search Engine</small></p>
+        <p><a href="https://www.ecosia.org" target="_blank">Ecosia</a><br><small>Save Trees</small></p>
+    </div>
+
+    <div class="bottom-right-panel" id="systemPanel">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px;">
+            <h5 style="font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #ffa500; margin: 0;">Cyber Deck</h5>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <span id="muteBtn" onclick="toggleMute()" style="cursor: pointer; font-size: 0.8em; color: #00f0ff; user-select: none;">🔊</span>
+                <span id="autoResponse" onclick="toggleAutoResponse()" style="cursor: pointer; font-size: 0.8em; color: #00ff88; user-select: none; margin-left: 5px;">AUTO: OFF</span>
+<span id="breachCount" style="font-size: 0.7em; color: #ff4444; font-weight: bold;">0</span>
+
+                <span id="digitalClock" style="font-size: 0.8em; color: #00f0ff; font-weight: bold; font-family: monospace;">00:00:00</span>
+            </div>
+        </div>
+        
+        <div style="font-size: 0.65em; color: #8888ff; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 165, 0, 0.2); padding-bottom: 5px;">
+            UPTIME: <span id="uptimeVar" style="color: #bbbbff; font-weight: bold;">00:00:00:00</span>
+        </div>
+
+        <div style="margin-bottom: 12px; border-top: 1px solid rgba(255, 165, 0, 0.1); padding-top: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.7em; margin-bottom: 4px;">
+                <span style="color: #bbbbff;">CORE_DECRYPTION:</span>
+                <span id="decryptVal" style="color: #00f0ff; font-weight: bold;">0%</span>
+            </div>
+            <div style="width: 100%; height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 2px; overflow: hidden;">
+                <div id="decryptBar" style="width: 0%; height: 100%; background: #00f0ff; transition: all 0.5s ease; box-shadow: 0 0 10px #00f0ff;"></div>
+            </div>
+        </div>
+        <div style="margin: 12px 0; border-top: 1px solid rgba(255, 0, 100, 0.3); padding-top: 8px;">
+    <div style="display: flex; justify-content: space-between; font-size: 0.7em; margin-bottom: 4px;">
+        <span style="color: #ff0080;">THREAT LEVEL:</span>
+        <span id="threatVal" style="color: #ff4444; font-weight: bold;">0%</span>
+    </div>
+    <div style="width: 100%; height: 4px; background: rgba(255, 0, 100, 0.1); border-radius: 2px; overflow: hidden;">
+        <div id="threatBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff0080, #ff4444); transition: all 0.5s ease; box-shadow: 0 0 8px #ff0080;"></div>
+    </div>
+</div>
+
+
+        <div style="margin-bottom: 12px; border-top: 1px solid rgba(0, 240, 255, 0.2); padding-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <small id="statusLabel" style="color: #00f0ff; letter-spacing: 1px; font-weight: bold; font-size: 0.7em;">STATUS: SECURE</small>
+                <div class="network-pulse" id="pulseNode"></div>
+            </div>
+            <div style="width: 100%; height: 40px; background: rgba(0, 240, 255, 0.05); border-radius: 4px; margin-bottom: 8px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.1); position: relative;">
+                <svg width="100%" height="100%" viewBox="0 0 200 40" preserveAspectRatio="none" id="graphSvg">
+                    <polyline id="graphLine" fill="none" stroke="#00f0ff" stroke-width="1.5" points="0,40 20,40 40,40 60,40 80,40 100,40 120,40 140,40 160,40 180,40 200,40" />
+                    <g id="particleGroup"></g>
+                </svg>
+            </div>
+            <div style="font-size: 0.7em; display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #bbbbff;">DOWNLINK:</span>
+                    <span><span id="downMB" style="color: #00f0ff; font-weight: bold;">0</span> <small>Mbps</small></span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #bbbbff;">UPLINK:</span>
+                    <span><span id="upMB" style="color: #00f0ff; font-weight: bold;">0</span> <small>Mbps</small></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9em; margin-top: 2px;">
+                    <span>PING: <span id="pingVal" style="color: #00f0ff;">20</span>ms</span>
+                    <span>LOSS: <span id="lossVal" style="color: #00f0ff;">0.00%</span></span>
+                </div>
+            </div>
+        </div>
+       
+        <div id="terminalLog" style="font-size: 0.65em; color: #ffa500; height: 60px; background: rgba(0,0,0,0.4); padding: 5px; border-radius: 4px; border: 1px solid rgba(255,165,0,0.1); line-height: 1.2;">
+            <div>> initializing_sys_v2.0...</div>
+        </div>
+       <audio id="alertSound" src="https://www.soundjay.com/misc/sounds/beep-07.wav" preload="auto"></audio>
+
+    </div>
+
+    <footer class="site-footer">
+    <small>Copyright © 2023 All rights reserved</small>
+  </footer>
+
+ <script>
+    // Matrix animation
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas();
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
+    const fontSize = 20;
+    let columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(0);
+
+    // Track background state for pulses
+    let currentBg = { r: 0, g: 0, b: 16 }; 
+
+    function drawMatrix() {
+        // Apply dynamic background color
+        ctx.fillStyle = `rgba(${currentBg.r}, ${currentBg.g}, ${currentBg.b}, 0.1)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.font = fontSize + 'px monospace';
+        for (let i = 0; i < drops.length; i++) {
+            const text = characters.charAt(Math.floor(Math.random() * characters.length));
+            // Matrix characters also shift slightly towards red as threat increases
+            const colorShift = currentBg.r > 20 ? '#ff5555' : (i % 2 === 0 ? '#00bfff' : '#e0f7ff');
+            ctx.fillStyle = colorShift;
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+    setInterval(drawMatrix, 50);
+    window.addEventListener('resize', () => { 
+        resizeCanvas(); 
+        columns = Math.floor(canvas.width / fontSize); 
+        drops.length = columns; 
+        drops.fill(0); 
+    });
+
+    // UI Helpers
+    function toggleCategoryPanel() {
+        document.getElementById('categoriesPanel').classList.toggle('expanded');
+        document.getElementById('categoryDropdown').classList.toggle('show');
+    }
+
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        const mainCategory = event.target.closest(".main-category");
+        if (!mainCategory) return;
+        const submenu = mainCategory.querySelector(".submenu");
+        if (!submenu) return;
+        submenu.style.display = submenu.style.display === "none" ? "block" : "none";
+    }
+
+    function filterCategories() {
+        const filter = document.getElementById("categoryFilter").value.toUpperCase();
+        const links = document.getElementById("categoryDropdown").querySelectorAll("a");
+        links.forEach(el => {
+            const txt = el.textContent || el.innerText;
+            el.style.display = txt.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+        });
+    }
+
+    // Cyber Deck Logic
+    let startTime = Date.now();
+    let graphPoints = [35, 30, 32, 28, 35, 30, 25, 30, 35, 38, 40];
+    let decryptPercent = 0;
+    let isMuted = false;
+    let lastBreachStatus = false;
+    let breachCount = 0;
+    let autoResponse = false;
+    const deckLogs = ["Decrypting block...", "RSA Key Found", "Bypassing Firewall", "Node link: Active", "Shifting Frequency"];
+
+    function updateDashboard() {
+        const now = new Date();
+        document.getElementById('digitalClock').innerText = now.toLocaleTimeString('en-GB');
+        let diff = Math.floor((Date.now() - startTime) / 1000) + 87200;
+        document.getElementById('uptimeVar').innerText = `${Math.floor(diff/86400).toString().padStart(2,'0')}:${Math.floor((diff%86400)/3600).toString().padStart(2,'0')}:${Math.floor((diff%3600)/60).toString().padStart(2,'0')}:${(diff%60).toString().padStart(2,'0')}`;
+
+        let dl = (Math.random() * 45 + 10).toFixed(1);
+        let ul = (Math.random() * 15 + 2).toFixed(1);
+        let lossNum = (Math.random() > 0.92) ? (Math.random() * 0.15) : (Math.random() * 0.01);
+        
+        if (autoResponse && lossNum > 0.05) {
+            lossNum = 0.00;
+            addTerminalLog("AUTO-RESPONSE: Threat neutralized", "#00ff88");
+        }
+
+        const isBreach = lossNum > 0.05;
+        const color = isBreach ? "#ff4444" : "#00f0ff";
+
+        if (isBreach) {
+            breachCount++;
+            document.getElementById('breachCount').innerText = breachCount;
+            if (!lastBreachStatus) {
+                if (!isMuted) document.getElementById('alertSound').play().catch(()=>{});
+                addTerminalLog("BREACH_DETECTED", "#ff4444");
+            }
+        }
+        
+        lastBreachStatus = isBreach;
+        document.getElementById('statusLabel').innerText = isBreach ? "STATUS: BREACH" : "STATUS: SECURE";
+        document.getElementById('statusLabel').style.color = color;
+        document.getElementById('pulseNode').style.backgroundColor = color;
+
+        document.getElementById('downMB').innerText = dl;
+        document.getElementById('upMB').innerText = ul;
+        document.getElementById('lossVal').innerText = lossNum.toFixed(2) + "%";
+
+        if (decryptPercent < 99.9) decryptPercent += Math.random() * 0.5;
+        else if (Math.random() > 0.98) decryptPercent = 0;
+        document.getElementById('decryptVal').innerText = decryptPercent.toFixed(1) + "%";
+        document.getElementById('decryptBar').style.width = decryptPercent + "%";
+
+        // Threat Level & Background Tint Logic
+        let threatLevel = Math.min(100, (lossNum * 2000) + (decryptPercent * 0.4));
+        document.getElementById('threatVal').innerText = threatLevel.toFixed(0) + '%';
+        document.getElementById('threatBar').style.width = threatLevel + '%';
+        document.getElementById('threatBar').style.boxShadow = `0 0 8px hsl(${120 - threatLevel}, 100%, 50%)`;
+
+        // Shift background to red if threat > 80%
+        if (threatLevel > 80) {
+            currentBg = { r: 40, g: 0, b: 0 }; // Dark Red alert
+            document.getElementById('systemPanel').style.boxShadow = "0 0 40px rgba(255, 0, 0, 0.6)";
+        } else {
+            currentBg = { r: 0, g: 0, b: 16 }; // Standard Blue/Black
+            document.getElementById('systemPanel').style.boxShadow = "0 0 25px rgba(255, 165, 0, 0.5)";
+        }
+
+        graphPoints.shift(); 
+        graphPoints.push(Math.floor(Math.random() * 30 + 5));
+        document.getElementById('graphLine').setAttribute("points", graphPoints.map((p, i) => `${i * 20},${p}`).join(" "));
+        
+        if (Math.random() > 0.85) addTerminalLog(deckLogs[Math.floor(Math.random() * deckLogs.length)], "#ffa500");
+    }
+
+    function addTerminalLog(msg, color) {
+        const t = document.getElementById('terminalLog');
+        const entry = document.createElement('div');
+        entry.style.color = color;
+        entry.textContent = "> " + msg;
+        t.prepend(entry);
+        if (t.childNodes.length > 5) t.removeChild(t.lastElementChild);
+    }
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        document.getElementById('muteBtn').innerText = isMuted ? "🔇" : "🔊";
+    }
+
+    function toggleAutoResponse() {
+        autoResponse = !autoResponse;
+        const btn = document.getElementById('autoResponse');
+        btn.innerText = `AUTO: ${autoResponse ? 'ON' : 'OFF'}`;
+        btn.style.color = autoResponse ? '#00ff88' : '#8888ff';
+    }
+
+    // Hard Reset Logic
+    const deckHeader = document.querySelector('.bottom-right-panel h5');
+    deckHeader.style.cursor = "pointer";
+    deckHeader.title = "System Reset";
+    deckHeader.addEventListener('click', () => {
+        breachCount = 0;
+        decryptPercent = 0;
+        document.getElementById('breachCount').innerText = "0";
+        document.getElementById('terminalLog').innerHTML = "";
+        addTerminalLog("SYSTEM_RESET: OK", "#00f0ff");
+    });
+
+    setInterval(updateDashboard, 1000);
+</script>
+
+<script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas();
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
+    const fontSize = 20;
+    let columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(0);
+    let currentBg = { r: 0, g: 0, b: 16 }; 
+
+    function drawMatrix() {
+        ctx.fillStyle = `rgba(${currentBg.r}, ${currentBg.g}, ${currentBg.b}, 0.1)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = fontSize + 'px monospace';
+        for (let i = 0; i < drops.length; i++) {
+            const text = characters.charAt(Math.floor(Math.random() * characters.length));
+            const colorShift = currentBg.r > 20 ? '#ff5555' : (i % 2 === 0 ? '#00bfff' : '#e0f7ff');
+            ctx.fillStyle = colorShift;
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+    setInterval(drawMatrix, 50);
+    window.addEventListener('resize', () => { resizeCanvas(); columns = Math.floor(canvas.width / fontSize); drops.length = columns; drops.fill(0); });
+
+    function toggleCategoryPanel() {
+        document.getElementById('categoriesPanel').classList.toggle('expanded');
+        document.getElementById('categoryDropdown').classList.toggle('show');
+    }
+
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        const mainCategory = event.target.closest(".main-category");
+        if (!mainCategory) return;
+        const submenu = mainCategory.querySelector(".submenu");
+        if (submenu) submenu.style.display = submenu.style.display === "none" ? "block" : "none";
+    }
+
+    let startTime = Date.now();
+    let graphPoints = [35, 30, 32, 28, 35, 30, 25, 30, 35, 38, 40];
+    let decryptPercent = 0;
+    let tracePercent = 0;
+    let isMuted = false;
+    let lastBreachStatus = false;
+    let breachCount = 0;
+    let autoResponse = false;
+    let isLockdown = false;
+    const deckLogs = ["Decrypting block...", "RSA Key Found", "Bypassing Firewall", "Node link: Active", "Shifting Frequency"];
+
+    function updateDashboard() {
+        if (isLockdown) return;
+
+        const now = new Date();
+        document.getElementById('digitalClock').innerText = now.toLocaleTimeString('en-GB');
+        let diff = Math.floor((Date.now() - startTime) / 1000) + 87200;
+        document.getElementById('uptimeVar').innerText = `${Math.floor(diff/86400).toString().padStart(2,'0')}:${Math.floor((diff%86400)/3600).toString().padStart(2,'0')}:${Math.floor((diff%3600)/60).toString().padStart(2,'0')}:${(diff%60).toString().padStart(2,'0')}`;
+
+        let dl = (Math.random() * 45 + 10).toFixed(1);
+        let ul = (Math.random() * 15 + 2).toFixed(1);
+        let lossNum = (Math.random() > 0.92) ? (Math.random() * 0.15) : (Math.random() * 0.01);
+        
+        if (autoResponse && lossNum > 0.05) {
+            lossNum = 0.00;
+            addTerminalLog("AUTO-RESPONSE: Threat neutralized", "#00ff88");
+        }
+
+        const isBreach = lossNum > 0.05;
+        const color = isBreach ? "#ff4444" : "#00f0ff";
+
+        // Trace Logic
+        if (isBreach) {
+            tracePercent += 2.5; 
+            breachCount++;
+            document.getElementById('breachCount').innerText = breachCount;
+            if (!lastBreachStatus) {
+                if (!isMuted) document.getElementById('alertSound').play().catch(()=>{});
+                addTerminalLog("BREACH_DETECTED", "#ff4444");
+            }
+        } else if (tracePercent > 0) {
+            tracePercent -= 0.5; // Trace slowly fades if secure
+        }
+
+        tracePercent = Math.max(0, Math.min(100, tracePercent));
+        document.getElementById('traceVal').innerText = tracePercent.toFixed(0) + "%";
+        document.getElementById('traceBar').style.width = tracePercent + "%";
+
+        if (tracePercent >= 100) {
+            isLockdown = true;
+            addTerminalLog("SYSTEM LOCKDOWN: TRACE COMPLETE", "#ff0000");
+            document.body.style.filter = "grayscale(1) contrast(2) invert(1)";
+            return;
+        }
+
+        lastBreachStatus = isBreach;
+        document.getElementById('statusLabel').innerText = isBreach ? "STATUS: BREACH" : "STATUS: SECURE";
+        document.getElementById('statusLabel').style.color = color;
+        document.getElementById('pulseNode').style.backgroundColor = color;
+        document.getElementById('downMB').innerText = dl;
+        document.getElementById('upMB').innerText = ul;
+        document.getElementById('lossVal').innerText = lossNum.toFixed(2) + "%";
+
+        if (decryptPercent < 99.9) decryptPercent += Math.random() * 0.5;
+        else if (Math.random() > 0.98) decryptPercent = 0;
+        document.getElementById('decryptVal').innerText = decryptPercent.toFixed(1) + "%";
+        document.getElementById('decryptBar').style.width = decryptPercent + "%";
+
+        let threatLevel = Math.min(100, (lossNum * 2000) + (decryptPercent * 0.4));
+        document.getElementById('threatVal').innerText = threatLevel.toFixed(0) + '%';
+        document.getElementById('threatBar').style.width = threatLevel + '%';
+        document.getElementById('threatBar').style.boxShadow = `0 0 8px hsl(${120 - threatLevel}, 100%, 50%)`;
+
+        if (threatLevel > 80) {
+            currentBg = { r: 40, g: 0, b: 0 };
+            document.getElementById('systemPanel').style.boxShadow = "0 0 40px rgba(255, 0, 0, 0.6)";
+        } else {
+            currentBg = { r: 0, g: 0, b: 16 };
+            document.getElementById('systemPanel').style.boxShadow = "0 0 25px rgba(255, 165, 0, 0.5)";
+        }
+
+        graphPoints.shift(); 
+        graphPoints.push(Math.floor(Math.random() * 30 + 5));
+        document.getElementById('graphLine').setAttribute("points", graphPoints.map((p, i) => `${i * 20},${p}`).join(" "));
+        
+        if (Math.random() > 0.85) addTerminalLog(deckLogs[Math.floor(Math.random() * deckLogs.length)], "#ffa500");
+    }
+
+    function addTerminalLog(msg, color) {
+        const t = document.getElementById('terminalLog');
+        const entry = document.createElement('div');
+        entry.style.color = color;
+        entry.textContent = "> " + msg;
+        t.prepend(entry);
+        if (t.childNodes.length > 5) t.removeChild(t.lastElementChild);
+    }
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        document.getElementById('muteBtn').innerText = isMuted ? "🔇" : "🔊";
+    }
+
+    function toggleAutoResponse() {
+        autoResponse = !autoResponse;
+        const btn = document.getElementById('autoResponse');
+        btn.innerText = `AUTO: ${autoResponse ? 'ON' : 'OFF'}`;
+        btn.style.color = autoResponse ? '#00ff88' : '#8888ff';
+    }
+
+    // Reset handles lockdown too
+    const deckHeader = document.querySelector('.bottom-right-panel h5');
+    deckHeader.style.cursor = "pointer";
+    deckHeader.addEventListener('click', () => {
+        breachCount = 0;
+        decryptPercent = 0;
+        tracePercent = 0;
+        isLockdown = false;
+        document.body.style.filter = "none";
+        document.getElementById('breachCount').innerText = "0";
+        document.getElementById('terminalLog').innerHTML = "";
+        addTerminalLog("SYSTEM_PURGE: SUCCESSFUL", "#00f0ff");
+    });
+
+    setInterval(updateDashboard, 1000);
+</script>
+
+    
+</body>
+</html>
