@@ -1,16 +1,14 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
-
-  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />  
-
-  
+  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MY_STUFF</title>
+  
   <style>
     /* Matrix animated background canvas style */
-     #matrix {
+    #matrix {
       position: fixed;
       top: 0; left: 0;
       width: 100%;
@@ -20,13 +18,12 @@
       display: block;
     }
 
-
     /* Box container style for categories */
-     .categories-box {
+    .categories-box {
       max-width: 400px;
       margin: 30px auto;
-      background: rgba(0, 0, 20, 0.1); /* semi-transparent dark */
-      border: 2px solid #00bfff;      /* bright blue border */
+      background: rgba(0, 0, 20, 0.1);
+      border: 2px solid #00bfff;
       border-radius: 10px;
       padding: 20px 30px;
       color: white;
@@ -35,107 +32,97 @@
       overflow-wrap: break-word;
     }
 
-
-       .categories-box a {
+    .categories-box a {
       color: #00bfff;
       text-decoration: none;
       font-weight: bold;
     }
 
-
     .categories-box a:hover {
       text-decoration: underline;
     }
 
-
-
-    /* Additional style to ensure text inside <pre> wraps nicely */
-     .categories-box pre {
+    .categories-box pre {
       white-space: pre-wrap;
       margin: 0;
     }
 
-.page-container {
+    .page-container {
       display: flex;
       justify-content: space-between;
       max-width: 1200px;
       margin: 30px auto;
       gap: 20px;
-      position: relative; /* above matrix */
+      position: relative;
       z-index: 1;
     }
 
-    /* Transparent style panels */
     .transparent-panel {
       flex: 0 0 48%;
-      background: rgba(0, 0, 20, 0.8); /* black semi-transparent */
+      background: rgba(0, 0, 20, 0.8);
       padding: 20px;
       box-shadow: 0 0 25px rgba(0,191,255,0.5);
       font-family: monospace, monospace;
-      min-height: 200px; /* Optional: ensure height */
+      min-height: 200px;
       overflow: auto;
       color: #00bfff;
       text-decoration: underline;
       font-weight: bold;
       border-radius: 10px;
       overflow-wrap: break-word;
-      border: 1.5px solid #00bfff; 
-      box-shadow: 0 0 15px rgba(237, 235, 240, 0.9);
+      border: 1.5px solid #00bfff;
     }
 
-    /* Example scroll for overflow content */
     .transparent-panel::-webkit-scrollbar {
       width: 8px;
     }
+    
     .transparent-panel::-webkit-scrollbar-thumb {
       background-color: rgba(0,191,255,0.6);
       border-radius: 10px;
     }
 
     .google-maps-container {
-  position: relative;
-  width: 100%;
-  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-  height: 0;
-  overflow: hidden;
-  border-radius: 12px; /* optional rounded corners */
-  box-shadow: 0 0 20px rgba(0,191,255,0.5); /* subtle glow effect */
-}
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,191,255,0.5);
+    }
 
-.google-maps-container iframe {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100% !important;
-  height: 100% !important;
-  border: 0;
-  border-radius: 12px;
-}
+    .google-maps-container iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      border: 0;
+      border-radius: 12px;
+    }
 
-.page-title {
-  text-align: center;
-  color: #00eaff;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 3em;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  margin-top: 30px;
-  margin-bottom: 20px;
-  user-select: none;
+    .page-title {
+      text-align: center;
+      color: #00eaff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 3em;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      user-select: none;
+      text-shadow:
+        0 0 1px #f1f3f3,
+        0 0 2px #fafafa,
+        0 0 3px #f8fafa,
+        0 0 5px #f9fbfb,
+        0 0 8px #f2f4f5,
+        0 0 10px #f9fbfb,
+        0 0 15px #f4f5f6;
+    }
 
-  /* Crystal clear neon glow */
-  text-shadow:
-    0 0 1px #f1f3f3,
-    0 0 2px #fafafa,
-    0 0 3px #f8fafa,
-    0 0 5px #f9fbfb,
-    0 0 8px #f2f4f5,
-    0 0 10px #f9fbfb,
-    0 0 15px #f4f5f6; /* sharper, less blur */
-}
-
- /* Narrow fixed width left panel */
     #left-panel {
-      flex: 0 0 190px; /* fixed 300px width */
+      flex: 0 0 190px;
       background: rgba(0, 0, 0, 0.3);
       border-radius: 12px;
       padding: 20px;
@@ -143,80 +130,339 @@
       overflow: auto;
       min-height: 200px;
     }
-    /* Left panel link styles */
+
     #left-panel h5 {
       margin-bottom: 15px;
       color: #00bfff;
       font-weight: 600;
     }
+
     #left-panel p {
       margin-bottom: 15px;
       line-height: 1.4;
     }
+
     #left-panel a {
       color: #ffffff;
       font-weight: bold;
       text-decoration: none;
       transition: color 0.3s ease;
     }
+
     #left-panel a:hover {
       color: #00e5ff;
       text-decoration: underline;
     }
+
     #left-panel small {
       color: #bbbbff;
       font-weight: normal;
       font-style: italic;
     }
-    .site-footer {
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #ccc;
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 15px 10px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  position: relative;
-  bottom: 0;
-  width: 100%;
-  user-select: none;
-  box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
-}
-.site-footer small {
-  display: inline-block;
-  letter-spacing: 1px;
-}
 
+    .site-footer {
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #ccc;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 15px 10px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      user-select: none;
+      box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+    }
+
+    .site-footer small {
+      display: inline-block;
+      letter-spacing: 1px;
+    }
+
+    /* Widget container styles */
+    .widget-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 9999;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .widget {
+      border-radius: 24px;
+      padding: 0;
+      background: rgba(255,255,255,0.12);
+      box-shadow:
+        0 8px 32px rgba(255,255,255,0.20),
+        inset 0 0 40px rgba(255,255,255,0.12);
+      backdrop-filter: saturate(180%) blur(18px);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: white;
+      user-select: none;
+      overflow: hidden;
+      flex-direction: column;
+    }
+
+    .toggle-container {
+      text-align: right;
+      padding: 12px 22px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.10);
+      user-select: none;
+      border-radius: 24px 24px 0 0;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .toggle-btn {
+      font-size: 1rem;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      padding: 7px 18px;
+      font-weight: 700;
+      backdrop-filter: saturate(180%) blur(15px);
+      background: rgba(255,255,255,0.25);
+      color: #eee;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    .toggle-btn:hover { 
+      background: rgba(255,255,255,0.45); 
+    }
+
+    .widget-content {
+      padding: 16px 24px 24px 24px;
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #b7b7b7;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"] {
+      font-size: 1rem;
+      border-radius: 16px;
+      border: none;
+      padding: 8px 14px;
+      background: rgba(255,255,255,0.15);
+      color: #eee;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    input:focus {
+      outline: 2px solid rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.3);
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 14px;
+    }
+
+    .flex-row > div { 
+      flex: 1; 
+    }
+
+    #countdown {
+      font-size: 1.5rem;
+      margin-top: 14px;
+      text-align: center;
+      text-shadow: 0 0 6px rgba(255,255,255,0.8);
+      user-select: none;
+      color: #eee;
+    }
+
+    .action-btn {
+      font-size: 1rem;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      padding: 12px 16px;
+      font-weight: 700;
+      backdrop-filter: saturate(180%) blur(12px);
+      background: rgba(255,255,255,0.25);
+      color: #eee;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    .action-btn:hover {
+      background: rgba(255,255,255,0.45);
+    }
+
+    .clock {
+      background: rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 16px;
+      color: #eee;
+    }
+
+    .city {
+      font-weight: 800;
+      font-size: 1.5rem;
+    }
+
+    .time {
+      font-size: 2rem;
+    }
+
+    .date {
+      font-size: 1.1rem;
+      opacity: 0.75;
+    }
+
+    #tasks {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    #tasks h2 {
+      margin-top: 0;
+      font-weight: 800;
+      font-size: 1.45rem;
+      color: #eee;
+    }
+
+    #tasksList {
+      list-style: none;
+      padding-left: 0;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    #tasksList li {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.12);
+      margin-bottom: 10px;
+      cursor: pointer;
+      user-select: none;
+      color: #eee;
+      transition: background-color 0.25s ease;
+    }
+
+    #tasksList li:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    #tasksList li.completed {
+      text-decoration: line-through;
+      opacity: 0.6;
+      color: #bbb;
+    }
+
+    #calc-widget {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      border-radius: 12px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      z-index: 9998;
+      background: white;
+    }
+
+    #calc-widget button {
+      width: 100%;
+      background: #344e86;
+      color: white;
+      border: none;
+      border-radius: 12px 12px 0 0;
+      padding: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    #calc-content {
+      display: none;
+      background: #f9fafb;
+      border-radius: 0 0 12px 12px;
+      padding: 12px;
+    }
+
+    #display {
+      background: #344e86;
+      color: white;
+      font-size: 2rem;
+      padding: 12px 15px;
+      border-radius: 10px;
+      text-align: right;
+      min-height: 50px;
+      user-select: none;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .calc-btn {
+      background: #e3e8f7;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 10px 0;
+      font-weight: 600;
+    }
+
+    .calc-btn.operator {
+      background: #5a73f4;
+      color: white;
+    }
+
+    .calc-btn.clear {
+      background: #f56262;
+      color: white;
+    }
+
+    .calc-btn.equal {
+      background: #5078e1;
+      color: white;
+      font-weight: 600;
+    }
   </style>
 
-   <script src="https://www.google.com/recaptcha/enterprise.js?render=6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD"></script>
-  <!-- Your code -->
-</head>
-<!-- Replace the variables below. -->
-<script>
-  function onSubmit(token) {
-    document.getElementById("demo-form").submit();
-  }
-</script>
-  <link href="style.css" rel="stylesheet" type="text/css" />
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17083520520">
-</script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17083520520"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-17083520520');
+    gtag('config', 'GT-NC6T5LRJ');
+    gtag('config', 'G-DR9S4GJ2C4');
+  </script>
 
-  gtag('config', 'AW-17083520520');
-</script>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688" crossorigin="anonymous"></script>
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688"
-     crossorigin="anonymous"></script>
- <script src="https://www.google.com/recaptcha/enterprise.js?render=reCAPTCHA_site_key"></script>
-  
+  <!-- reCAPTCHA -->
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD"></script>
 </head>
 <body>
   <canvas id="matrix"></canvas>
- <h1 class="page-title">MY_STUFF</h1>
+  <h1 class="page-title">MY_STUFF</h1>
 
   <div class="categories-box">
     <h3>Categories</h3>
@@ -228,7 +474,6 @@
     </pre>
   </div>
 
-  
   <div class="page-container">
     <div id="left-panel">
       <h5>Search Engines for more</h5>
@@ -247,663 +492,437 @@
     </div>
   </div>
 
- 
+  <!-- Calculator Widget -->
+  <div id="calc-widget">
+    <button id="toggle-calc" aria-label="Toggle Calculator">Calculator ▼</button>
+    <div id="calc-content">
+      <div id="display">0</div>
+      <div class="calc-grid">
+        <button class="calc-btn clear">C</button>
+        <button id="backspace" class="calc-btn">←</button>
+        <button class="calc-btn operator" data-op="%">%</button>
+        <button class="calc-btn operator" data-op="/">÷</button>
 
-  
+        <button class="calc-btn number" data-num="7">7</button>
+        <button class="calc-btn number" data-num="8">8</button>
+        <button class="calc-btn number" data-num="9">9</button>
+        <button class="calc-btn operator" data-op="*">×</button>
 
-   <footer class="site-footer">
-    <small>Copyright © 2023 All rights reserved</small>
+        <button class="calc-btn number" data-num="4">4</button>
+        <button class="calc-btn number" data-num="5">5</button>
+        <button class="calc-btn number" data-num="6">6</button>
+        <button class="calc-btn operator" data-op="-">−</button>
+
+        <button class="calc-btn number" data-num="1">1</button>
+        <button class="calc-btn number" data-num="2">2</button>
+        <button class="calc-btn number" data-num="3">3</button>
+        <button class="calc-btn operator" data-op="+">+</button>
+
+        <button class="calc-btn number" data-num="0" style="grid-column: span 2;">0</button>
+        <button class="calc-btn number" data-num=".">.</button>
+        <button class="calc-btn equal">=</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Widgets Container -->
+  <div class="widget-container">
+    <div id="mohammad_countdown" class="widget">
+      <div class="toggle-container">
+        <button id="countdownToggleBtn" class="toggle-btn">Show</button>
+      </div>
+      <div class="widget-content" id="countdownContent">
+        <strong style="font-size:1.3rem; font-weight:700;">Mohammad Countdown Timer</strong>
+        <div class="flex-row" style="margin-top:10px;">
+          <div>
+            <label for="addDays">Days</label>
+            <input type="number" id="addDays" min="0" value="0" />
+          </div>
+          <div>
+            <label for="addHours">Hours</label>
+            <input type="number" id="addHours" min="0" max="23" value="0" />
+          </div>
+          <div>
+            <label for="addMinutes">Minutes</label>
+            <input type="number" id="addMinutes" min="0" max="59" value="0" />
+          </div>
+        </div>
+        <div class="flex-row" style="margin-top:12px;">
+          <button id="applyOffset" class="action-btn">Apply</button>
+          <button id="startBtn" class="action-btn">Start</button>
+          <button id="pauseBtn" class="action-btn">Pause</button>
+          <button id="resetBtn" class="action-btn">Reset</button>
+        </div>
+        <div id="countdown">0d 0h 0m 0s</div>
+        <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+      </div>
+    </div>
+
+    <div id="delhi_widget" class="widget">
+      <div class="toggle-container">
+        <button id="delhiToggleBtn" class="toggle-btn">Show</button>
+      </div>
+      <div class="widget-content" id="delhiContent">
+        <div class="clock">
+          <div class="city">Delhi</div>
+          <div id="delhiTime" class="time">--:--:--</div>
+          <div id="delhiDate" class="date">--/--/----</div>
+        </div>
+        <div id="tasks">
+          <h2>Tasks</h2>
+          <input type="text" id="taskInput" placeholder="Task description" />
+          <input type="date" id="dateInput" />
+          <input type="time" id="timeInput" />
+          <button id="addTaskBtn" class="action-btn">Add Task</button>
+          <ul id="tasksList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <small>Copyright © 2023-2026 All rights reserved</small>
   </footer>
 
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'GT-NC6T5LRJ');
-</script>
-
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DR9S4GJ2C4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-DR9S4GJ2C4');
-</script>
-
- 
-  <div id="calc-widget" style="position: fixed; top: 10px; right: 10px; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; z-index: 9999; background: white;">
-  <button id="toggle-calc" aria-label="Toggle Calculator" style="width: 100%; background: #344e86; color: white; border: none; border-radius: 12px 12px 0 0; padding: 10px; font-size: 1rem; cursor: pointer;">Calculator ▼</button>
-  <div id="calc-content" style="display: none; background: #f9fafb; border-radius: 0 0 12px 12px; padding: 12px;">
-    <div id="display" style="background: #344e86; color: white; font-size: 2rem; padding: 12px 15px; border-radius: 10px; text-align: right; min-height: 50px; user-select: none;">0</div>
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px;">
-      <button class="clear" style="background:#f56262; color:white; border:none; border-radius: 8px; font-weight: 600; padding: 10px 0;">C</button>
-      <button id="backspace" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">←</button>
-      <button class="operator" data-op="%" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">%</button>
-      <button class="operator" data-op="/" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">÷</button>
-
-      <button class="number" data-num="7" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">7</button>
-      <button class="number" data-num="8" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">8</button>
-      <button class="number" data-num="9" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">9</button>
-      <button class="operator" data-op="*" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">×</button>
-
-      <button class="number" data-num="4" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">4</button>
-      <button class="number" data-num="5" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">5</button>
-      <button class="number" data-num="6" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">6</button>
-      <button class="operator" data-op="-" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">−</button>
-
-      <button class="number" data-num="1" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">1</button>
-      <button class="number" data-num="2" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">2</button>
-      <button class="number" data-num="3" style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">3</button>
-      <button class="operator" data-op="+" style="background:#5a73f4; color:white; border:none; border-radius: 8px; cursor:pointer;">+</button>
-
-      <button class="number" data-num="0" style="grid-column: span 2; background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">0</button>
-      <button class="number" data-num="." style="background:#e3e8f7; border:none; border-radius: 8px; cursor:pointer;">.</button>
-      <button class="equal" style="background:#5078e1; color:white; border:none; border-radius: 8px; font-weight: 600; cursor:pointer;">=</button>
-    </div>
-  </div>
-</div>
-
-<!-- Widget container -->
-<style>
-  /* --- Widget styles --- */
-  .widget-container {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    width: 320px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    z-index: 9999;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  .widget {
-    border-radius: 24px;
-    padding: 0;
-    background: rgba(255,255,255,0.12);
-    box-shadow:
-      0 8px 32px rgba(255,255,255,0.20),
-      inset 0 0 40px rgba(255,255,255,0.12);
-    backdrop-filter: saturate(180%) blur(18px);
-    -webkit-backdrop-filter: saturate(180%) blur(18px);
-    border: 1.5px solid rgba(255,255,255,0.25);
-    color: white;
-    user-select: none;
-    overflow: hidden;
-    flex-direction: column;
-  }
-  .toggle-container {
-    text-align: right;
-    padding: 12px 22px;
-    cursor: pointer;
-    background: rgba(255,255,255,0.10);
-    user-select: none;
-    border-radius: 24px 24px 0 0;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-  }
-  .toggle-btn {
-    font-size: 1rem;
-    border-radius: 16px;
-    border: none;
-    cursor: pointer;
-    padding: 7px 18px;
-    font-weight: 700;
-    backdrop-filter: saturate(180%) blur(15px);
-    background: rgba(255,255,255,0.25);
-    color: #eee;
-    transition: background-color 0.3s ease;
-    user-select: none;
-  }
-  .toggle-btn:hover { background: rgba(255,255,255,0.45); }
-  .widget-content {
-    padding: 16px 24px 24px 24px;
-    display: none;
-    flex-direction: column;
-    gap: 14px;
-  }
-  label {
-    font-size: 0.9rem;
-    color: #b7b7b7;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 8px;
-  }
-  input {
-    font-size: 1rem;
-    border-radius: 16px;
-    border: none;
-    padding: 8px 14px;
-    background: rgba(255,255,255,0.15);
-    color: #eee;
-    width: 100%;
-    transition: background-color 0.3s ease;
-  }
-  input:focus {
-    outline: 2px solid rgba(255,255,255,0.45);
-    background: rgba(255,255,255,0.3);
-  }
-  .flex-row {
-    display: flex;
-    gap: 14px;
-  }
-  .flex-row > div { flex: 1; }
-  #mohammad_countdown #countdown {
-    font-size: 1.5rem;
-    margin-top: 14px;
-    text-align: center;
-    text-shadow: 0 0 6px rgba(255,255,255,0.8);
-    user-select: none;
-    color: #eee;
-  }
-  #mohammad_countdown .action-btn {
-    font-size: 1rem;
-    border-radius: 16px;
-    border: none;
-    cursor: pointer;
-    padding: 12px 16px;
-    font-weight: 700;
-    backdrop-filter: saturate(180%) blur(12px);
-    background: rgba(255,255,255,0.25);
-    color: #eee;
-    transition: background-color 0.3s ease;
-    user-select: none;
-  }
-  #mohammad_countdown .action-btn:hover {
-    background: rgba(255,255,255,0.45);
-  }
-  #delhi_widget .clock {
-    background: rgba(255,255,255,0.12);
-    border-radius: 18px;
-    padding: 14px;
-    text-align: center;
-    margin-bottom: 16px;
-    color: #eee;
-  }
-  #delhi_widget .city {
-    font-weight: 800;
-    font-size: 1.5rem;
-  }
-  #delhi_widget .time {
-    font-size: 2rem;
-  }
-  #delhi_widget .date {
-    font-size: 1.1rem;
-    opacity: 0.75;
-  }
-  #delhi_widget #tasks {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-  #delhi_widget #tasks h2 {
-    margin-top: 0;
-    font-weight: 800;
-    font-size: 1.45rem;
-    color: #eee;
-  }
-  #delhi_widget #tasksList {
-    list-style: none;
-    padding-left: 0;
-    max-height: 180px;
-    overflow-y: auto;
-  }
-  #delhi_widget #tasksList li {
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.12);
-    margin-bottom: 10px;
-    cursor: pointer;
-    user-select: none;
-    color: #eee;
-    transition: background-color 0.25s ease;
-  }
-  #delhi_widget #tasksList li:hover {
-    background: rgba(255,255,255,0.25);
-  }
-  #delhi_widget #tasksList li.completed {
-    text-decoration: line-through;
-    opacity: 0.6;
-    color: #bbb;
-  }
-  #delhi_widget .action-btn {
-    font-size: 1rem;
-    border-radius: 16px;
-    border: none;
-    cursor: pointer;
-    padding: 12px;
-    font-weight: 700;
-    backdrop-filter: saturate(180%) blur(12px);
-    background: rgba(255,255,255,0.25);
-    color: #eee;
-    transition: background-color 0.3s ease;
-    user-select: none;
-    margin-bottom: 12px;
-  }
-  #delhi_widget .action-btn:hover {
-    background: rgba(255,255,255,0.45);
-  }
-</style>
-
-<div class="widget-container">
-  <div id="mohammad_countdown" class="widget">
-    <div class="toggle-container">
-      <button id="countdownToggleBtn" class="toggle-btn">Show</button>
-    </div>
-    <div class="widget-content" id="countdownContent">
-      <strong style="font-size:1.3rem; font-weight:700;">Mohammad Countdown Timer</strong>
-      <div class="flex-row" style="margin-top:10px;">
-        <div>
-          <label for="addDays">Days</label>
-          <input type="number" id="addDays" min="0" value="0" />
-        </div>
-        <div>
-          <label for="addHours">Hours</label>
-          <input type="number" id="addHours" min="0" max="23" value="0" />
-        </div>
-        <div>
-          <label for="addMinutes">Minutes</label>
-          <input type="number" id="addMinutes" min="0" max="59" value="0" />
-        </div>
-      </div>
-      <div class="flex-row" style="margin-top:12px;">
-        <button id="applyOffset" class="action-btn">Apply</button>
-        <button id="startBtn" class="action-btn">Start</button>
-        <button id="pauseBtn" class="action-btn">Pause</button>
-        <button id="resetBtn" class="action-btn">Reset</button>
-      </div>
-      <div id="countdown">0d 0h 0m 0s</div>
-      <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-    </div>
+  <!-- Privacy Policy Links -->
+  <div style="text-align: center; padding: 10px; font-size: 0.85rem;">
+    <a href="https://www.iubenda.com/privacy-policy/12072372" target="_blank" style="color: #00bfff; text-decoration: none;">Privacy Policy</a> | 
+    <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" target="_blank" style="color: #00bfff; text-decoration: none;">Cookie Policy</a>
   </div>
 
-  <div id="delhi_widget" class="widget">
-    <div class="toggle-container">
-      <button id="delhiToggleBtn" class="toggle-btn">Show</button>
-    </div>
-    <div class="widget-content" id="delhiContent">
-      <div class="clock">
-        <div class="city">Delhi</div>
-        <div id="delhiTime" class="time">--:--:--</div>
-        <div id="delhiDate" class="date">--/--/----</div>
-      </div>
-      <div id="tasks">
-        <h2>Tasks</h2>
-        <input type="text" id="taskInput" placeholder="Task description" />
-        <input type="date" id="dateInput" />
-        <input type="time" id="timeInput" />
-        <button id="addTaskBtn" class="action-btn">Add Task</button>
-        <ul id="tasksList"></ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  const countdownToggleBtn = document.getElementById('countdownToggleBtn');
-  const countdownContent = document.getElementById('countdownContent');
-  const delhiToggleBtn = document.getElementById('delhiToggleBtn');
-  const delhiContent = document.getElementById('delhiContent');
-
-  countdownContent.style.display = 'none';
-  delhiContent.style.display = 'none';
-  countdownToggleBtn.textContent = 'Show';
-  delhiToggleBtn.textContent = 'Show';
-
-  countdownToggleBtn.addEventListener('click', () => {
-    if (countdownContent.style.display === 'none') {
-      countdownContent.style.display = 'flex';
-      countdownToggleBtn.textContent = 'Hide';
-    } else {
-      countdownContent.style.display = 'none';
-      countdownToggleBtn.textContent = 'Show';
-    }
-  });
-
-  delhiToggleBtn.addEventListener('click', () => {
-    if (delhiContent.style.display === 'none') {
-      delhiContent.style.display = 'flex';
-      delhiToggleBtn.textContent = 'Hide';
-    } else {
-      delhiContent.style.display = 'none';
-      delhiToggleBtn.textContent = 'Show';
-    }
-  });
-
-  // Countdown Timer Logic
-  let timerInterval = null;
-  const countdownEl = document.getElementById('countdown');
-  const beepSound = document.getElementById('beepSound');
-
-  const targetDateOrig = new Date(2025, 11, 31, 23, 59, 59).getTime();
-  let targetDate = targetDateOrig;
-
-  let paused = false;
-  let pauseTime = null;
-  let useOriginalTarget = true;
-
-  const addDaysInput = document.getElementById('addDays');
-  const addHoursInput = document.getElementById('addHours');
-  const addMinutesInput = document.getElementById('addMinutes');
-  const applyOffsetBtn = document.getElementById('applyOffset');
-  const startBtn = document.getElementById('startBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const resetBtn = document.getElementById('resetBtn');
-
-  function updateCountdown() {
-    const now = new Date().getTime();
-    const diff = targetDate - now;
-
-    if (diff <= 0) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      countdownEl.textContent = "Time's up!";
-      beepSound.play();
-      return;
+  <!-- Main Scripts -->
+  <script>
+    // Terminal Log Function
+    function addTerminalLog(message, color = '#00bfff') {
+      console.log(`%c${message}`, `color: ${color}; font-weight: bold;`);
     }
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-  }
-
-  function startTimer() {
-    if (!timerInterval) {
-      if (paused && pauseTime) {
-        const pauseDuration = new Date().getTime() - pauseTime;
-        targetDate += pauseDuration;
-        paused = false;
-        pauseTime = null;
-      }
-      timerInterval = setInterval(updateCountdown, 1000);
-      updateCountdown();
-    }
-  }
-
-  function pauseTimer() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      paused = true;
-      pauseTime = new Date().getTime();
-    }
-  }
-
-  function resetTimer() {
-    clearInterval(timerInterval);
-    timerInterval = null;
-    paused = false;
-    pauseTime = null;
-    targetDate = new Date().getTime();
-    addDaysInput.value = 0;
-    addHoursInput.value = 0;
-    addMinutesInput.value = 0;
-    useOriginalTarget = false;
-    countdownEl.textContent = '0d 0h 0m 0s';
-  }
-
-  function applyOffset() {
-    clearInterval(timerInterval);
-    timerInterval = null;
-    paused = false;
-    pauseTime = null;
-    const baseTime = useOriginalTarget ? targetDateOrig : new Date().getTime();
-    const addDays = Math.max(0, parseInt(addDaysInput.value) || 0);
-    const addHours = Math.min(23, Math.max(0, parseInt(addHoursInput.value) || 0));
-    const addMinutes = Math.min(59, Math.max(0, parseInt(addMinutesInput.value) || 0));
-    const offsetMs = addDays * 24 * 60 * 60 * 1000 +
-                     addHours * 60 * 60 * 1000 +
-                     addMinutes * 60 * 1000;
-    targetDate = baseTime + offsetMs;
-    updateCountdown();
-  }
-
-  applyOffsetBtn.addEventListener('click', applyOffset);
-  startBtn.addEventListener('click', startTimer);
-  pauseBtn.addEventListener('click', pauseTimer);
-  resetBtn.addEventListener('click', resetTimer);
-
-  // Delhi Widget Logic
-  const delhiTimeEl = document.getElementById('delhiTime');
-  const delhiDateEl = document.getElementById('delhiDate');
-  const tasksListEl = document.getElementById('tasksList');
-
-  function updateDelhiClock() {
-    const now = new Date();
-    const delhiStrTime = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour12: false });
-    const delhiStrDate = now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
-    delhiTimeEl.textContent = delhiStrTime;
-    delhiDateEl.textContent = delhiStrDate;
-  }
-  setInterval(updateDelhiClock, 1000);
-  updateDelhiClock();
-
-  const taskInput = document.getElementById('taskInput');
-  const dateInput = document.getElementById('dateInput');
-  const timeInput = document.getElementById('timeInput');
-  const addTaskBtn = document.getElementById('addTaskBtn');
-
-  function loadTasks() {
-    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-    tasksListEl.innerHTML = '';
-    const nowTimestamp = Date.now();
-
-    tasks.forEach(({desc, datetime}, i) => {
-      const li = document.createElement('li');
-      li.textContent = `${desc} (${new Date(datetime).toLocaleString()})`;
-
-      if (datetime && datetime <= nowTimestamp) li.classList.add('completed');
-      li.onclick = () => {
-        tasks.splice(i, 1);
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-        loadTasks();
-      };
-      tasksListEl.appendChild(li);
-    });
-  }
-
-  addTaskBtn.onclick = () => {
-    const desc = taskInput.value.trim();
-    const date = dateInput.value;
-    const time = timeInput.value;
-    if (!desc || !date || !time) {
-      alert('Please enter task description, date, and time.');
-      return;
-    }
-    const datetime = new Date(date + 'T' + time + ':00').getTime();
-    if (isNaN(datetime)) {
-      alert('Invalid date/time');
-      return;
-    }
-    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-    tasks.push({desc, datetime});
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    taskInput.value = '';
-    dateInput.value = '';
-    timeInput.value = '';
-    loadTasks();
-  };
-
-  loadTasks();
-</script>
-<a href="https://www.iubenda.com/privacy-policy/12072372" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script><br>
-  <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Cookie Policy ">Cookie Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src="https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script><br>
-
-    <script>
-    // Matrix animation code
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
-    const fontSize = 20;
-    const columns = Math.floor(canvas.width / fontSize);
-    const drops = new Array(columns).fill(0);
-
-    function draw() {
-      ctx.fillStyle = 'rgba(0, 0, 16, 0.1)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.font = fontSize + 'px monospace';
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = characters.charAt(Math.floor(Math.random() * characters.length));
-        ctx.fillStyle = (i % 2 === 0) ? '#00bfff' : '#e0f7ff';
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
+    // Uplink Navigation Function
+    function initiateUplink(event, target) {
+      event.preventDefault();
+      addTerminalLog(`[UPLINK] Establishing connection to ${target}...`, "#00ff88");
+      
+      setTimeout(() => {
+        window.open(target, '_blank');
+      }, 1500);
+      
+      return false;
     }
 
-    setInterval(draw, 50);
-
-    window.addEventListener('resize', () => {
+    // Matrix Background Animation
+    function initializeMatrix() {
+      const canvas = document.getElementById('matrix');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-    });
-  </script>
 
-  <script src="https://www.google.com/recaptcha/api.js?render=reCAPTCHA_site_key"></script>
-     <script>
-      function onClick(e) {
-        e.preventDefault();
-        grecaptcha.ready(function() {
-          grecaptcha.execute('reCAPTCHA_site_key', {action: 'submit'}).then(function(token) {
-              // Add your logic to submit to your backend server here.
-          });
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
+      const fontSize = 20;
+      const columns = Math.floor(canvas.width / fontSize);
+      const drops = new Array(columns).fill(0);
+
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 16, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < drops.length; i++) {
+          const text = characters.charAt(Math.floor(Math.random() * characters.length));
+          ctx.fillStyle = (i % 2 === 0) ? '#00bfff' : '#e0f7ff';
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+
+      const matrixInterval = setInterval(draw, 50);
+
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      return matrixInterval;
+    }
+
+    // Calculator Logic
+    function initializeCalculator() {
+      const display = document.getElementById('display');
+      const toggleBtn = document.getElementById('toggle-calc');
+      const calcContent = document.getElementById('calc-content');
+      let currentValue = '0';
+      let previousValue = '';
+      let operation = null;
+      let shouldResetDisplay = false;
+
+      toggleBtn.addEventListener('click', () => {
+        calcContent.style.display = calcContent.style.display === 'none' ? 'block' : 'none';
+      });
+
+      document.querySelectorAll('.calc-btn.number').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const num = btn.dataset.num;
+          if (shouldResetDisplay) {
+            currentValue = num;
+            shouldResetDisplay = false;
+          } else {
+            currentValue = currentValue === '0' ? num : currentValue + num;
+          }
+          display.textContent = currentValue;
+        });
+      });
+
+      document.querySelectorAll('.calc-btn.operator').forEach(btn => {
+        btn.addEventListener('click', () => {
+          operation = btn.dataset.op;
+          previousValue = currentValue;
+          shouldResetDisplay = true;
+        });
+      });
+
+      document.querySelector('.calc-btn.clear').addEventListener('click', () => {
+        currentValue = '0';
+        previousValue = '';
+        operation = null;
+        shouldResetDisplay = false;
+        display.textContent = currentValue;
+      });
+
+      document.getElementById('backspace').addEventListener('click', () => {
+        currentValue = currentValue.slice(0, -1) || '0';
+        display.textContent = currentValue;
+      });
+
+      document.querySelector('.calc-btn.equal').addEventListener('click', () => {
+        if (operation && previousValue !== '') {
+          let result;
+          const prev = parseFloat(previousValue);
+          const current = parseFloat(currentValue);
+          
+          switch(operation) {
+            case '+': result = prev + current; break;
+            case '-': result = prev - current; break;
+            case '*': result = prev * current; break;
+            case '/': result = current !== 0 ? prev / current : 'Error'; break;
+            case '%': result = prev % current; break;
+            default: result = current;
+          }
+          
+          currentValue = result.toString();
+          display.textContent = currentValue;
+          previousValue = '';
+          operation = null;
+          shouldResetDisplay = true;
+        }
+      });
+    }
+
+    // Countdown Timer Logic
+    function initializeCountdown() {
+      const countdownEl = document.getElementById('countdown');
+      const beepSound = document.getElementById('beepSound');
+      const countdownToggleBtn = document.getElementById('countdownToggleBtn');
+      const countdownContent = document.getElementById('countdownContent');
+
+      let timerInterval = null;
+      const targetDateOrig = new Date(2025, 11, 31, 23, 59, 59).getTime();
+      let targetDate = targetDateOrig;
+      let paused = false;
+      let pauseTime = null;
+      let useOriginalTarget = true;
+
+      const addDaysInput = document.getElementById('addDays');
+      const addHoursInput = document.getElementById('addHours');
+      const addMinutesInput = document.getElementById('addMinutes');
+      const applyOffsetBtn = document.getElementById('applyOffset');
+      const startBtn = document.getElementById('startBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      countdownContent.style.display = 'none';
+      countdownToggleBtn.textContent = 'Show';
+
+      countdownToggleBtn.addEventListener('click', () => {
+        if (countdownContent.style.display === 'none') {
+          countdownContent.style.display = 'flex';
+          countdownToggleBtn.textContent = 'Hide';
+        } else {
+          countdownContent.style.display = 'none';
+          countdownToggleBtn.textContent = 'Show';
+        }
+      });
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          countdownEl.textContent = "Time's up!";
+          beepSound.play().catch(e => console.log('Beep sound play failed:', e));
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+
+      function startTimer() {
+        if (!timerInterval) {
+          if (paused && pauseTime) {
+            const pauseDuration = new Date().getTime() - pauseTime;
+            targetDate += pauseDuration;
+            paused = false;
+            pauseTime = null;
+          }
+          timerInterval = setInterval(updateCountdown, 1000);
+          updateCountdown();
+        }
+      }
+
+      function pauseTimer() {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          paused = true;
+          pauseTime = new Date().getTime();
+        }
+      }
+
+      function resetTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        paused = false;
+        pauseTime = null;
+        targetDate = new Date().getTime();
+        addDaysInput.value = 0;
+        addHoursInput.value = 0;
+        addMinutesInput.value = 0;
+        useOriginalTarget = false;
+        countdownEl.textContent = '0d 0h 0m 0s';
+      }
+
+      function applyOffset() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        paused = false;
+        pauseTime = null;
+        const baseTime = useOriginalTarget ? targetDateOrig : new Date().getTime();
+        const addDays = Math.max(0, parseInt(addDaysInput.value) || 0);
+        const addHours = Math.min(23, Math.max(0, parseInt(addHoursInput.value) || 0));
+        const addMinutes = Math.min(59, Math.max(0, parseInt(addMinutesInput.value) || 0));
+        const offsetMs = addDays * 24 * 60 * 60 * 1000 +
+                         addHours * 60 * 60 * 1000 +
+                         addMinutes * 60 * 1000;
+        targetDate = baseTime + offsetMs;
+        updateCountdown();
+      }
+
+      applyOffsetBtn.addEventListener('click', applyOffset);
+      startBtn.addEventListener('click', startTimer);
+      pauseBtn.addEventListener('click', pauseTimer);
+      resetBtn.addEventListener('click', resetTimer);
+    }
+
+    // Delhi Widget Logic
+    function initializeDelhiWidget() {
+      const delhiToggleBtn = document.getElementById('delhiToggleBtn');
+      const delhiContent = document.getElementById('delhiContent');
+      const delhiTimeEl = document.getElementById('delhiTime');
+      const delhiDateEl = document.getElementById('delhiDate');
+      const tasksListEl = document.getElementById('tasksList');
+      const taskInput = document.getElementById('taskInput');
+      const dateInput = document.getElementById('dateInput');
+      const timeInput = document.getElementById('timeInput');
+      const addTaskBtn = document.getElementById('addTaskBtn');
+
+      delhiContent.style.display = 'none';
+      delhiToggleBtn.textContent = 'Show';
+
+      delhiToggleBtn.addEventListener('click', () => {
+        if (delhiContent.style.display === 'none') {
+          delhiContent.style.display = 'flex';
+          delhiToggleBtn.textContent = 'Hide';
+        } else {
+          delhiContent.style.display = 'none';
+          delhiToggleBtn.textContent = 'Show';
+        }
+      });
+
+      function updateDelhiClock() {
+        const now = new Date();
+        const delhiStrTime = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour12: false });
+        const delhiStrDate = now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
+        delhiTimeEl.textContent = delhiStrTime;
+        delhiDateEl.textContent = delhiStrDate;
+      }
+
+      setInterval(updateDelhiClock, 1000);
+      updateDelhiClock();
+
+      function loadTasks() {
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        tasksListEl.innerHTML = '';
+        const nowTimestamp = Date.now();
+
+        tasks.forEach(({desc, datetime}, i) => {
+          const li = document.createElement('li');
+          li.textContent = `${desc} (${new Date(datetime).toLocaleString()})`;
+
+          if (datetime && datetime <= nowTimestamp) li.classList.add('completed');
+          li.onclick = () => {
+            tasks.splice(i, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            loadTasks();
+          };
+          tasksListEl.appendChild(li);
         });
       }
-  </script>
 
-  <script>
-  function onClick(e) {
-    e.preventDefault();
-    grecaptcha.enterprise.ready(async () => {
-      const token = await grecaptcha.enterprise.execute('reCAPTCHA_site_key', {action: 'LOGIN'});
-    });
-  }
-</script>
+      addTaskBtn.onclick = () => {
+        const desc = taskInput.value.trim();
+        const date = dateInput.value;
+        const time = timeInput.value;
+        if (!desc || !date || !time) {
+          alert('Please enter task description, date, and time.');
+          return;
+        }
+        const datetime = new Date(date + 'T' + time + ':00').getTime();
+        if (isNaN(datetime)) {
+          alert('Invalid date/time');
+          return;
+        }
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        tasks.push({desc, datetime});
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        taskInput.value = '';
+        dateInput.value = '';
+        timeInput.value = '';
+        loadTasks();
+      };
 
-  <script>
-    import com.google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseServiceClient;
-import com.google.recaptchaenterprise.v1.Assessment;
-import com.google.recaptchaenterprise.v1.CreateAssessmentRequest;
-import com.google.recaptchaenterprise.v1.Event;
-import com.google.recaptchaenterprise.v1.ProjectName;
-import com.google.recaptchaenterprise.v1.RiskAnalysis.ClassificationReason;
-import java.io.IOException;
-
-public class CreateAssessment {
-
-  public static void main(String[] args) throws IOException {
-    // TO-DO: Replace the token and reCAPTCHA action variables before running the sample.
-    String projectID = "fluted-agency-468912-d7";
-    String recaptchaKey = "reCAPTCHA_site_key";
-    String token = "action-token";
-    String recaptchaAction = "action-name";
-
-    createAssessment(projectID, recaptchaKey, token, recaptchaAction);
-  }
-
-  /**
-   * Create an assessment to analyse the risk of a UI action.
-   *
-   * @param projectID : MY_STUFF
-   * @param recaptchaKey : The reCAPTCHA key associated with the site/app
-   * @param token : The generated token obtained from the client.
-   * @param recaptchaAction : Action name corresponding to the token.
-   */
-  public static void createAssessment(
-      String projectID, String recaptchaKey, String token, String recaptchaAction)
-      throws IOException {
-    // Create the reCAPTCHA client.
-    // TODO: Cache the client generation code (recommended) or call client.close() before exiting the method.
-    try (RecaptchaEnterpriseServiceClient client = RecaptchaEnterpriseServiceClient.create()) {
-
-      // Set the properties of the event to be tracked.
-      Event event = Event.newBuilder().setSiteKey(recaptchaKey).setToken(token).build();
-
-      // Build the assessment request.
-      CreateAssessmentRequest createAssessmentRequest =
-          CreateAssessmentRequest.newBuilder()
-              .setParent(ProjectName.of(projectID).toString())
-              .setAssessment(Assessment.newBuilder().setEvent(event).build())
-              .build();
-
-      Assessment response = client.createAssessment(createAssessmentRequest);
-
-      // Check if the token is valid.
-      if (!response.getTokenProperties().getValid()) {
-        System.out.println(
-            "The CreateAssessment call failed because the token was: "
-                + response.getTokenProperties().getInvalidReason().name());
-        return;
-      }
-
-      // Check if the expected action was executed.
-      if (!response.getTokenProperties().getAction().equals(recaptchaAction)) {
-        System.out.println(
-            "The action attribute in reCAPTCHA tag is: "
-                + response.getTokenProperties().getAction());
-        System.out.println(
-            "The action attribute in the reCAPTCHA tag "
-                + "does not match the action ("
-                + recaptchaAction
-                + ") you are expecting to score");
-        return;
-      }
-
-      // Get the risk score and the reason(s).
-      // For more information on interpreting the assessment, see:
-      // https://cloud.google.com/recaptcha-enterprise/docs/interpret-assessment
-      for (ClassificationReason reason : response.getRiskAnalysis().getReasonsList()) {
-        System.out.println(reason);
-      }
-
-      float recaptchaScore = response.getRiskAnalysis().getScore();
-      System.out.println("The reCAPTCHA score is: " + recaptchaScore);
-
-      // Get the assessment name (ID). Use this to annotate the assessment.
-      String assessmentName = response.getName();
-      System.out.println(
-          "Assessment name: " + assessmentName.substring(assessmentName.lastIndexOf("/") + 1));
+      loadTasks();
     }
-  }
-}
+
+    // Initialize all scripts when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeMatrix();
+      initializeCalculator();
+      initializeCountdown();
+      initializeDelhiWidget();
+    });
   </script>
-
-  <script>
-
-    function initiateUplink(event, target) {
-    // Cyberpunk loading effect
-    addTerminalLog(`[UPLINK] Establishing connection to ${target}...`, "#00ff88");
-    
-    // Visual feedback
-    document.getElementById('pulseNode').style.backgroundColor = "#00ff88";
-    document.getElementById('statusLabel').innerText = "STATUS: UPLINKING";
-    
-    // Allow navigation after 1.5s (or instantly)
-    setTimeout(() => {
-        window.open(target, '_blank'); // Open in new tab
-    }, 1500);
-    
-    // Prevent default navigation during animation
-    event.preventDefault();
-    return false;
-}
-
-  </script>
-
-
 </body>
 </html>
