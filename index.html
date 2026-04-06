@@ -1,213 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688"
-     crossorigin="anonymous"></script>
-  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Security Headers (best-effort via meta; use real HTTP headers in production) -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!--
+    Content Security Policy:
+    'unsafe-inline' is required because scripts are inline in this single file.
+    For production: move all JS/CSS to external files and remove 'unsafe-inline'
+    to gain full XSS mitigation from CSP.
+    NOTE: For clickjacking protection, send HTTP headers from your server:
+      X-Frame-Options: SAMEORIGIN
+      Content-Security-Policy: frame-ancestors 'self';
+  -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             script-src 'self' 'unsafe-inline'
+               https://pagead2.googlesyndication.com
+               https://www.googletagmanager.com;
+             frame-src 'self' https://www.google.com https://www.youtube.com;
+             connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com;
+             style-src 'self' 'unsafe-inline';
+             img-src 'self' data: https:;
+             media-src https://actions.google.com;
+             font-src 'self';
+             object-src 'none';
+             base-uri 'self';
+             form-action 'self';" />
+
+  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
   <title>MY_STUFF</title>
-  
+
   <style>
-    /* Matrix animated background canvas style */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     #matrix {
       position: fixed;
       top: 0; left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       z-index: -1;
       background: #000010;
       display: block;
-    }
-
-    /* Box container style for categories */
-    .categories-box {
-      max-width: 400px;
-      margin: 30px auto;
-      background: rgba(0, 0, 20, 0.1);
-      border: 2px solid #00bfff;
-      border-radius: 10px;
-      padding: 20px 30px;
-      color: white;
-      font-family: monospace, monospace;
-      box-shadow: 0 0 15px rgba(0, 191, 255, 0.9);
-      overflow-wrap: break-word;
-    }
-
-    .categories-box a {
-      color: #00bfff;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .categories-box a:hover {
-      text-decoration: underline;
-    }
-
-    .categories-box pre {
-      white-space: pre-wrap;
-      margin: 0;
-    }
-
-    .page-container {
-      display: flex;
-      justify-content: space-between;
-      max-width: 1200px;
-      margin: 30px auto;
-      gap: 20px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .transparent-panel {
-      flex: 0 0 48%;
-      background: rgba(0, 0, 20, 0.8);
-      padding: 20px;
-      box-shadow: 0 0 25px rgba(0,191,255,0.5);
-      font-family: monospace, monospace;
-      min-height: 200px;
-      overflow: auto;
-      color: #00bfff;
-      text-decoration: underline;
-      font-weight: bold;
-      border-radius: 10px;
-      overflow-wrap: break-word;
-      border: 1.5px solid #00bfff;
-    }
-
-    .transparent-panel::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    .transparent-panel::-webkit-scrollbar-thumb {
-      background-color: rgba(0,191,255,0.6);
-      border-radius: 10px;
-    }
-
-    .google-maps-container {
-      position: relative;
-      width: 100%;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,191,255,0.5);
-    }
-
-    .google-maps-container iframe {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100% !important;
-      height: 100% !important;
-      border: 0;
-      border-radius: 12px;
     }
 
     .page-title {
       text-align: center;
       color: #00eaff;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 3em;
+      font-size: 2.2rem;
       text-transform: uppercase;
       letter-spacing: 4px;
-      margin-top: 30px;
-      margin-bottom: 20px;
+      margin-top: 20px;
+      margin-bottom: 16px;
+      padding: 0 16px;
       user-select: none;
       text-shadow:
-        0 0 1px #f1f3f3,
-        0 0 2px #fafafa,
-        0 0 3px #f8fafa,
-        0 0 5px #f9fbfb,
-        0 0 8px #f2f4f5,
-        0 0 10px #f9fbfb,
-        0 0 15px #f4f5f6;
+        0 0 1px #f1f3f3, 0 0 2px #fafafa, 0 0 3px #f8fafa,
+        0 0 5px #f9fbfb, 0 0 8px #f2f4f5, 0 0 10px #f9fbfb, 0 0 15px #f4f5f6;
+    }
+
+    .categories-box {
+      max-width: 420px;
+      margin: 16px auto;
+      background: rgba(0, 0, 20, 0.1);
+      border: 2px solid #00bfff;
+      border-radius: 10px;
+      padding: 20px 24px;
+      color: white;
+      font-family: monospace;
+      box-shadow: 0 0 15px rgba(0, 191, 255, 0.9);
+      overflow-wrap: break-word;
+    }
+    .categories-box h3 { margin-bottom: 10px; }
+    .categories-box a {
+      color: #00bfff;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      padding: 4px 0;
+    }
+    .categories-box a:hover { text-decoration: underline; }
+    .categories-box pre {
+      white-space: pre-wrap;
+      margin: 0;
+      line-height: 1.8;
+    }
+
+    .page-container {
+      display: flex;
+      justify-content: center;
+      max-width: 1200px;
+      margin: 20px auto;
+      gap: 20px;
+      padding: 0 16px;
+      position: relative;
+      z-index: 1;
     }
 
     #left-panel {
-      flex: 0 0 190px;
+      flex: 0 0 220px;
       background: rgba(0, 0, 0, 0.3);
       border-radius: 12px;
       padding: 20px;
       box-shadow: 0 0 25px rgba(0, 191, 255, 0.1);
       overflow: auto;
-      min-height: 200px;
+      min-height: 160px;
     }
-
     #left-panel h5 {
       margin-bottom: 15px;
       color: #00bfff;
       font-weight: 600;
+      font-size: 1rem;
     }
-
-    #left-panel p {
-      margin-bottom: 15px;
-      line-height: 1.4;
-    }
-
+    #left-panel p { margin-bottom: 12px; line-height: 1.4; font-size: 0.95rem; }
     #left-panel a {
       color: #ffffff;
       font-weight: bold;
       text-decoration: none;
       transition: color 0.3s ease;
     }
-
-    #left-panel a:hover {
-      color: #00e5ff;
-      text-decoration: underline;
-    }
-
-    #left-panel small {
-      color: #bbbbff;
-      font-weight: normal;
-      font-style: italic;
-    }
+    #left-panel a:hover { color: #00e5ff; text-decoration: underline; }
+    #left-panel small { color: #bbbbff; font-weight: normal; font-style: italic; font-size: 0.82rem; }
 
     .site-footer {
       background-color: rgba(0, 0, 0, 0.6);
       color: #ccc;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       text-align: center;
-      padding: 15px 10px;
+      padding: 14px 10px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      position: relative;
-      bottom: 0;
-      width: 100%;
+      margin-top: 40px;
       user-select: none;
       box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
     }
+    .site-footer small { display: inline-block; letter-spacing: 1px; }
 
-    .site-footer small {
-      display: inline-block;
-      letter-spacing: 1px;
+    .policy-links {
+      text-align: center;
+      padding: 10px;
+      font-size: 0.82rem;
     }
+    .policy-links a { color: #00bfff; text-decoration: none; }
+    .policy-links a:hover { text-decoration: underline; }
 
-    /* Widget container styles */
-    .widget-container {
+    /* Floating Action Button (mobile) */
+    #fab {
+      display: none;
       position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 320px;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00bfff, #0080ff);
+      border: none;
+      color: white;
+      font-size: 1.6rem;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(0, 191, 255, 0.6);
+      z-index: 10001;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      line-height: 56px;
+      text-align: center;
+    }
+    #fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 24px rgba(0, 191, 255, 0.8);
+    }
+    #fab:active { transform: scale(0.95); }
+
+    /* Mobile Slide Panel */
+    #mobile-panel-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 10002;
+    }
+    #mobile-panel-overlay.active { display: block; }
+
+    #mobile-panel {
+      position: fixed;
+      top: 0; right: -100%;
+      width: 88vw;
+      max-width: 360px;
+      height: 100vh;
+      background: rgba(0, 5, 25, 0.97);
+      z-index: 10003;
+      overflow-y: auto;
+      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 20px 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+    #mobile-panel.open { right: 0; }
+
+    #mobile-panel-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 9999;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      align-items: center;
+      justify-content: center;
     }
 
+    /* Widget Shared Styles */
     .widget {
       border-radius: 24px;
-      padding: 0;
       background: rgba(255,255,255,0.12);
-      box-shadow:
-        0 8px 32px rgba(255,255,255,0.20),
-        inset 0 0 40px rgba(255,255,255,0.12);
+      box-shadow: 0 8px 32px rgba(255,255,255,0.20), inset 0 0 40px rgba(255,255,255,0.12);
       backdrop-filter: saturate(180%) blur(18px);
       -webkit-backdrop-filter: saturate(180%) blur(18px);
       border: 1.5px solid rgba(255,255,255,0.25);
       color: white;
       user-select: none;
       overflow: hidden;
-      flex-direction: column;
+      margin-bottom: 16px;
     }
 
     .toggle-container {
@@ -215,7 +233,6 @@
       padding: 12px 22px;
       cursor: pointer;
       background: rgba(255,255,255,0.10);
-      user-select: none;
       border-radius: 24px 24px 0 0;
       border-bottom: 1px solid rgba(255,255,255,0.15);
     }
@@ -231,12 +248,8 @@
       background: rgba(255,255,255,0.25);
       color: #eee;
       transition: background-color 0.3s ease;
-      user-select: none;
     }
-
-    .toggle-btn:hover { 
-      background: rgba(255,255,255,0.45); 
-    }
+    .toggle-btn:hover { background: rgba(255,255,255,0.45); }
 
     .widget-content {
       padding: 16px 24px 24px 24px;
@@ -265,48 +278,40 @@
       color: #eee;
       width: 100%;
       transition: background-color 0.3s ease;
+      -webkit-appearance: none;
     }
-
     input:focus {
       outline: 2px solid rgba(255,255,255,0.45);
       background: rgba(255,255,255,0.3);
     }
 
-    .flex-row {
-      display: flex;
-      gap: 14px;
-    }
+    .flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .flex-row > div { flex: 1; min-width: 70px; }
 
-    .flex-row > div { 
-      flex: 1; 
-    }
-
-    #countdown {
+    #countdown, #countdownMobile {
       font-size: 1.5rem;
       margin-top: 14px;
       text-align: center;
       text-shadow: 0 0 6px rgba(255,255,255,0.8);
       user-select: none;
       color: #eee;
+      word-break: break-all;
     }
 
     .action-btn {
-      font-size: 1rem;
+      font-size: 0.85rem;
       border-radius: 16px;
       border: none;
       cursor: pointer;
-      padding: 12px 16px;
+      padding: 10px 14px;
       font-weight: 700;
       backdrop-filter: saturate(180%) blur(12px);
       background: rgba(255,255,255,0.25);
       color: #eee;
       transition: background-color 0.3s ease;
-      user-select: none;
+      white-space: nowrap;
     }
-
-    .action-btn:hover {
-      background: rgba(255,255,255,0.45);
-    }
+    .action-btn:hover { background: rgba(255,255,255,0.45); }
 
     .clock {
       background: rgba(255,255,255,0.12);
@@ -316,41 +321,19 @@
       margin-bottom: 16px;
       color: #eee;
     }
+    .city { font-weight: 800; font-size: 1.5rem; }
+    .time { font-size: 2rem; }
+    .date { font-size: 1.1rem; opacity: 0.75; }
 
-    .city {
-      font-weight: 800;
-      font-size: 1.5rem;
-    }
-
-    .time {
-      font-size: 2rem;
-    }
-
-    .date {
-      font-size: 1.1rem;
-      opacity: 0.75;
-    }
-
-    #tasks {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    #tasks h2 {
-      margin-top: 0;
-      font-weight: 800;
-      font-size: 1.45rem;
-      color: #eee;
-    }
-
-    #tasksList {
+    #tasks, #tasksMobile { max-height: 400px; overflow-y: auto; }
+    #tasks h2, #tasksMobile h2 { margin-top: 0; font-weight: 800; font-size: 1.3rem; color: #eee; }
+    #tasksList, #tasksListMobile {
       list-style: none;
       padding-left: 0;
-      max-height: 180px;
+      max-height: 200px;
       overflow-y: auto;
     }
-
-    #tasksList li {
+    #tasksList li, #tasksListMobile li {
       padding: 10px 12px;
       border-radius: 14px;
       background: rgba(255,255,255,0.12);
@@ -359,50 +342,23 @@
       user-select: none;
       color: #eee;
       transition: background-color 0.25s ease;
+      word-break: break-word;
+      font-size: 0.9rem;
     }
-
-    #tasksList li:hover {
-      background: rgba(255,255,255,0.25);
-    }
-
-    #tasksList li.completed {
+    #tasksList li:hover, #tasksListMobile li:hover { background: rgba(255,255,255,0.25); }
+    #tasksList li.completed, #tasksListMobile li.completed {
       text-decoration: line-through;
       opacity: 0.6;
       color: #bbb;
     }
 
-    #calc-widget {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 280px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      border-radius: 12px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      z-index: 9998;
-      background: white;
-    }
-
-    #calc-widget button {
-      width: 100%;
-      background: #344e86;
-      color: white;
-      border: none;
-      border-radius: 12px 12px 0 0;
-      padding: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    #calc-content {
+    /* Calculator */
+    #calc-content, #calc-content-mobile {
       display: none;
-      background: #f9fafb;
-      border-radius: 0 0 12px 12px;
-      padding: 12px;
+      padding: 16px 24px 24px 24px;
     }
-
-    #display {
-      background: #344e86;
+    #display, #display-mobile {
+      background: rgba(52, 78, 134, 0.8);
       color: white;
       font-size: 2rem;
       padding: 12px 15px;
@@ -410,38 +366,85 @@
       text-align: right;
       min-height: 50px;
       user-select: none;
+      word-break: break-all;
     }
-
     .calc-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       margin-top: 12px;
     }
-
     .calc-btn {
-      background: #e3e8f7;
+      background: rgba(227, 232, 247, 0.9);
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      padding: 10px 0;
+      padding: 12px 0;
       font-weight: 600;
+      font-size: 1rem;
+      color: #222;
+      transition: background 0.2s ease;
+    }
+    .calc-btn:active { transform: scale(0.95); }
+    .calc-btn.operator { background: rgba(90, 115, 244, 0.9); color: white; }
+    .calc-btn.clear { background: rgba(245, 98, 98, 0.9); color: white; }
+    .calc-btn.equal { background: rgba(80, 120, 225, 0.9); color: white; }
+
+    /* Desktop Widget Container */
+    .widget-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 9999;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .calc-btn.operator {
-      background: #5a73f4;
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(245, 98, 98, 0.95);
       color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 0.9rem;
+      z-index: 99999;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      max-width: 90vw;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-title { font-size: 1.5rem; letter-spacing: 2px; margin-top: 14px; }
+      .categories-box { margin: 12px 16px; padding: 14px 16px; }
+      .categories-box pre { font-size: 0.9rem; }
+      .page-container { flex-direction: column; align-items: center; padding: 0 12px; }
+      #left-panel { flex: none; width: 100%; }
+      .site-footer { font-size: 0.78rem; padding: 12px 8px; }
+      .widget-container { display: none !important; }
+      #fab { display: block; }
+      .widget { border-radius: 18px; }
+      .toggle-container { border-radius: 18px 18px 0 0; padding: 10px 18px; }
+      .widget-content { padding: 14px 18px 20px 18px; }
+      #countdown, #countdownMobile { font-size: 1.3rem; }
+      .time { font-size: 1.6rem; }
+      .city { font-size: 1.2rem; }
     }
 
-    .calc-btn.clear {
-      background: #f56262;
-      color: white;
-    }
-
-    .calc-btn.equal {
-      background: #5078e1;
-      color: white;
-      font-weight: 600;
+    @media (min-width: 769px) {
+      #fab { display: none !important; }
+      #mobile-panel, #mobile-panel-overlay { display: none !important; }
     }
   </style>
 
@@ -458,21 +461,24 @@
 
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688" crossorigin="anonymous"></script>
-
-  <!-- reCAPTCHA -->
-  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LeqFLUrAAAAAOdqFseYKrhyENDkl7FKmOWqcykD"></script>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
+  <canvas id="matrix" aria-hidden="true"></canvas>
   <h1 class="page-title">MY_STUFF</h1>
+
+  <!-- Toast for validation messages (replaces alert()) -->
+  <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
 
   <div class="categories-box">
     <h3>Categories</h3>
     <pre>
-      <a href="Activity 3">Activity 3</a> <br> 
-      <a href="music.html" style="color:#00bfff;">My_Music</a> <br>
-      <a href="radio.html" style="color:#00bfff;">Live Radio</a> <br>
-      <a href="https://mohammad3230.github.io/Games-More-.../" onclick="initiateUplink(event, 'https://mohammad3230.github.io/Games-More-.../')">MY_STUFF_AIO v2.0</a>
+<a href="Activity 3">Activity 3</a>
+<a href="music.html">My_Music</a>
+<a href="radio.html">Live Radio</a>
+<a href="https://mohammad3230.github.io/Games-More-.../"
+   onclick="initiateUplink(event, this.href)"
+   rel="noopener noreferrer"
+   target="_blank">MY_STUFF_AIO v2.0</a>
     </pre>
   </div>
 
@@ -480,65 +486,157 @@
     <div id="left-panel">
       <h5>Search Engines for more</h5>
       <p>
-        <a href="https://www.google.com" target="_blank">Google</a><br>
+        <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Google</a><br>
         <small>Google will Track You</small>
       </p>
       <p>
-        <a href="https://www.startpage.com" target="_blank">Start page</a><br>
+        <a href="https://www.startpage.com" target="_blank" rel="noopener noreferrer">Start page</a><br>
         <small>Most Private search Engine</small>
       </p>
       <p>
-        <a href="https://www.ecosia.org" target="_blank">Ecosia</a><br>
+        <a href="https://www.ecosia.org" target="_blank" rel="noopener noreferrer">Ecosia</a><br>
         <small>Save Trees</small>
       </p>
     </div>
   </div>
 
-  <!-- Calculator Widget -->
-  <div id="calc-widget">
-    <button id="toggle-calc" aria-label="Toggle Calculator">Calculator ▼</button>
-    <div id="calc-content">
-      <div id="display">0</div>
-      <div class="calc-grid">
-        <button class="calc-btn clear">C</button>
-        <button id="backspace" class="calc-btn">←</button>
-        <button class="calc-btn operator" data-op="%">%</button>
-        <button class="calc-btn operator" data-op="/">÷</button>
+  <!-- Floating Action Button (mobile only) -->
+  <button id="fab" type="button" aria-label="Open widgets panel">&#9881;</button>
 
-        <button class="calc-btn number" data-num="7">7</button>
-        <button class="calc-btn number" data-num="8">8</button>
-        <button class="calc-btn number" data-num="9">9</button>
-        <button class="calc-btn operator" data-op="*">×</button>
+  <!-- Mobile slide-in panel -->
+  <div id="mobile-panel-overlay" aria-hidden="true"></div>
+  <div id="mobile-panel" role="dialog" aria-label="Widgets">
+    <button id="mobile-panel-close" type="button" aria-label="Close widgets panel">&times;</button>
 
-        <button class="calc-btn number" data-num="4">4</button>
-        <button class="calc-btn number" data-num="5">5</button>
-        <button class="calc-btn number" data-num="6">6</button>
-        <button class="calc-btn operator" data-op="-">−</button>
+    <!-- Calculator (mobile) -->
+    <div class="widget">
+      <div class="toggle-container">
+        <button class="toggle-btn" type="button" data-target="calc-content-mobile" aria-expanded="false">Calculator</button>
+      </div>
+      <div id="calc-content-mobile" class="widget-content" style="display:none;">
+        <div id="display-mobile" aria-live="polite">0</div>
+        <div class="calc-grid" data-calc="mobile">
+          <button class="calc-btn clear" type="button">C</button>
+          <button class="calc-btn backspace" type="button">&larr;</button>
+          <button class="calc-btn operator" data-op="%" type="button">%</button>
+          <button class="calc-btn operator" data-op="/" type="button">&divide;</button>
+          <button class="calc-btn number" data-num="7" type="button">7</button>
+          <button class="calc-btn number" data-num="8" type="button">8</button>
+          <button class="calc-btn number" data-num="9" type="button">9</button>
+          <button class="calc-btn operator" data-op="*" type="button">&times;</button>
+          <button class="calc-btn number" data-num="4" type="button">4</button>
+          <button class="calc-btn number" data-num="5" type="button">5</button>
+          <button class="calc-btn number" data-num="6" type="button">6</button>
+          <button class="calc-btn operator" data-op="-" type="button">&minus;</button>
+          <button class="calc-btn number" data-num="1" type="button">1</button>
+          <button class="calc-btn number" data-num="2" type="button">2</button>
+          <button class="calc-btn number" data-num="3" type="button">3</button>
+          <button class="calc-btn operator" data-op="+" type="button">+</button>
+          <button class="calc-btn number" data-num="0" type="button" style="grid-column: span 2;">0</button>
+          <button class="calc-btn number" data-num="." type="button">.</button>
+          <button class="calc-btn equal" type="button">=</button>
+        </div>
+      </div>
+    </div>
 
-        <button class="calc-btn number" data-num="1">1</button>
-        <button class="calc-btn number" data-num="2">2</button>
-        <button class="calc-btn number" data-num="3">3</button>
-        <button class="calc-btn operator" data-op="+">+</button>
+    <!-- Countdown (mobile) -->
+    <div class="widget">
+      <div class="toggle-container">
+        <button class="toggle-btn" type="button" data-target="countdownContentMobile" aria-expanded="false">Countdown</button>
+      </div>
+      <div class="widget-content" id="countdownContentMobile" style="display:none;">
+        <strong style="font-size:1.2rem; font-weight:700;">Mohammad Countdown Timer</strong>
+        <div class="flex-row" style="margin-top:10px;">
+          <div>
+            <label for="addDaysMobile">Days</label>
+            <input type="number" id="addDaysMobile" min="0" max="365" value="0" />
+          </div>
+          <div>
+            <label for="addHoursMobile">Hours</label>
+            <input type="number" id="addHoursMobile" min="0" max="23" value="0" />
+          </div>
+          <div>
+            <label for="addMinutesMobile">Minutes</label>
+            <input type="number" id="addMinutesMobile" min="0" max="59" value="0" />
+          </div>
+        </div>
+        <div class="flex-row" style="margin-top:12px;">
+          <button class="action-btn countdown-apply" type="button" data-calc-id="mobile">Apply</button>
+          <button class="action-btn countdown-start" type="button" data-calc-id="mobile">Start</button>
+          <button class="action-btn countdown-pause" type="button" data-calc-id="mobile">Pause</button>
+          <button class="action-btn countdown-reset" type="button" data-calc-id="mobile">Reset</button>
+        </div>
+        <div id="countdownMobile" aria-live="polite">0d 0h 0m 0s</div>
+      </div>
+    </div>
 
-        <button class="calc-btn number" data-num="0" style="grid-column: span 2;">0</button>
-        <button class="calc-btn number" data-num=".">.</button>
-        <button class="calc-btn equal">=</button>
+    <!-- Delhi Widget (mobile) -->
+    <div class="widget">
+      <div class="toggle-container">
+        <button class="toggle-btn" type="button" data-target="delhiContentMobile" aria-expanded="false">Delhi Clock & Tasks</button>
+      </div>
+      <div class="widget-content" id="delhiContentMobile" style="display:none;">
+        <div class="clock">
+          <div class="city">Delhi</div>
+          <div id="delhiTimeMobile" class="time">--:--:--</div>
+          <div id="delhiDateMobile" class="date">--/--/----</div>
+        </div>
+        <div id="tasksMobile">
+          <h2>Tasks</h2>
+          <input type="text" id="taskInputMobile" placeholder="Task description" maxlength="120" autocomplete="off" />
+          <input type="date" id="dateInputMobile" />
+          <input type="time" id="timeInputMobile" />
+          <button class="action-btn task-add" type="button" data-panel="mobile">Add Task</button>
+          <ul id="tasksListMobile"></ul>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Widgets Container -->
-  <div class="widget-container">
+  <!-- ===== Desktop Widgets ===== -->
+  <div class="widget-container" aria-label="Desktop widgets">
+    <!-- Calculator (desktop) -->
+    <div id="calc-widget" class="widget">
+      <div class="toggle-container">
+        <button class="toggle-btn" type="button" data-target="calc-content" aria-expanded="false">Calculator</button>
+      </div>
+      <div id="calc-content" class="widget-content" style="display:none;">
+        <div id="display" aria-live="polite">0</div>
+        <div class="calc-grid" data-calc="desktop">
+          <button class="calc-btn clear" type="button">C</button>
+          <button class="calc-btn backspace" type="button">&larr;</button>
+          <button class="calc-btn operator" data-op="%" type="button">%</button>
+          <button class="calc-btn operator" data-op="/" type="button">&divide;</button>
+          <button class="calc-btn number" data-num="7" type="button">7</button>
+          <button class="calc-btn number" data-num="8" type="button">8</button>
+          <button class="calc-btn number" data-num="9" type="button">9</button>
+          <button class="calc-btn operator" data-op="*" type="button">&times;</button>
+          <button class="calc-btn number" data-num="4" type="button">4</button>
+          <button class="calc-btn number" data-num="5" type="button">5</button>
+          <button class="calc-btn number" data-num="6" type="button">6</button>
+          <button class="calc-btn operator" data-op="-" type="button">&minus;</button>
+          <button class="calc-btn number" data-num="1" type="button">1</button>
+          <button class="calc-btn number" data-num="2" type="button">2</button>
+          <button class="calc-btn number" data-num="3" type="button">3</button>
+          <button class="calc-btn operator" data-op="+" type="button">+</button>
+          <button class="calc-btn number" data-num="0" type="button" style="grid-column: span 2;">0</button>
+          <button class="calc-btn number" data-num="." type="button">.</button>
+          <button class="calc-btn equal" type="button">=</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdown (desktop) -->
     <div id="mohammad_countdown" class="widget">
       <div class="toggle-container">
-        <button id="countdownToggleBtn" class="toggle-btn">Show</button>
+        <button class="toggle-btn" type="button" data-target="countdownContent" aria-expanded="false">Countdown</button>
       </div>
-      <div class="widget-content" id="countdownContent">
+      <div class="widget-content" id="countdownContent" style="display:none;">
         <strong style="font-size:1.3rem; font-weight:700;">Mohammad Countdown Timer</strong>
         <div class="flex-row" style="margin-top:10px;">
           <div>
             <label for="addDays">Days</label>
-            <input type="number" id="addDays" min="0" value="0" />
+            <input type="number" id="addDays" min="0" max="365" value="0" />
           </div>
           <div>
             <label for="addHours">Hours</label>
@@ -550,21 +648,22 @@
           </div>
         </div>
         <div class="flex-row" style="margin-top:12px;">
-          <button id="applyOffset" class="action-btn">Apply</button>
-          <button id="startBtn" class="action-btn">Start</button>
-          <button id="pauseBtn" class="action-btn">Pause</button>
-          <button id="resetBtn" class="action-btn">Reset</button>
+          <button class="action-btn countdown-apply" type="button" data-calc-id="desktop">Apply</button>
+          <button class="action-btn countdown-start" type="button" data-calc-id="desktop">Start</button>
+          <button class="action-btn countdown-pause" type="button" data-calc-id="desktop">Pause</button>
+          <button class="action-btn countdown-reset" type="button" data-calc-id="desktop">Reset</button>
         </div>
-        <div id="countdown">0d 0h 0m 0s</div>
+        <div id="countdown" aria-live="polite">0d 0h 0m 0s</div>
         <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
       </div>
     </div>
 
+    <!-- Delhi Widget (desktop) -->
     <div id="delhi_widget" class="widget">
       <div class="toggle-container">
-        <button id="delhiToggleBtn" class="toggle-btn">Show</button>
+        <button class="toggle-btn" type="button" data-target="delhiContent" aria-expanded="false">Delhi Clock & Tasks</button>
       </div>
-      <div class="widget-content" id="delhiContent">
+      <div class="widget-content" id="delhiContent" style="display:none;">
         <div class="clock">
           <div class="city">Delhi</div>
           <div id="delhiTime" class="time">--:--:--</div>
@@ -572,10 +671,10 @@
         </div>
         <div id="tasks">
           <h2>Tasks</h2>
-          <input type="text" id="taskInput" placeholder="Task description" />
+          <input type="text" id="taskInput" placeholder="Task description" maxlength="120" autocomplete="off" />
           <input type="date" id="dateInput" />
           <input type="time" id="timeInput" />
-          <button id="addTaskBtn" class="action-btn">Add Task</button>
+          <button class="action-btn task-add" type="button" data-panel="desktop">Add Task</button>
           <ul id="tasksList"></ul>
         </div>
       </div>
@@ -583,60 +682,128 @@
   </div>
 
   <footer class="site-footer">
-    <small>Copyright © 2023-2026 All rights reserved</small>
+    <small>Copyright &copy; 2023-2026 All rights reserved</small>
   </footer>
 
-  <!-- Privacy Policy Links -->
-  <div style="text-align: center; padding: 10px; font-size: 0.85rem;">
-    <a href="https://www.iubenda.com/privacy-policy/12072372" target="_blank" style="color: #00bfff; text-decoration: none;">Privacy Policy</a> | 
-    <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" target="_blank" style="color: #00bfff; text-decoration: none;">Cookie Policy</a>
+  <div class="policy-links">
+    <a href="https://www.iubenda.com/privacy-policy/12072372" target="_blank" rel="noopener noreferrer">Privacy Policy</a> |
+    <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a>
   </div>
 
-  <!-- Main Scripts -->
   <script>
-    // Terminal Log Function
-    function addTerminalLog(message, color = '#00bfff') {
-      console.log(`%c${message}`, `color: ${color}; font-weight: bold;`);
+    /* ================================================================
+       SECURITY UTILITIES
+       ================================================================ */
+
+    /** Escape HTML entities — defense-in-depth for any user-string rendering */
+    function escapeHTML(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
     }
 
-    // Uplink Navigation Function
+    /** Validate URL scheme — blocks javascript:, data:, vbscript: open-redirect vectors */
+    function isSafeURL(url) {
+      if (typeof url !== 'string') return false;
+      try {
+        var parsed = new URL(url, window.location.origin);
+        return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    /** Safely parse JSON from localStorage with structure + type validation */
+    function safeParseTasks(raw) {
+      if (!raw) return [];
+      try {
+        var parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(function(t) {
+          return (
+            t !== null &&
+            typeof t === 'object' &&
+            typeof t.desc === 'string' &&
+            typeof t.datetime === 'number' &&
+            t.desc.length <= 120 &&
+            isFinite(t.datetime)
+          );
+        }).map(function(t) {
+          return { desc: t.desc.substring(0, 120), datetime: Number(t.datetime) };
+        });
+      } catch (e) {
+        console.warn('[Security] Corrupted tasks data cleared.');
+        localStorage.removeItem('tasks');
+        return [];
+      }
+    }
+
+    /** Non-blocking toast (replaces alert()) */
+    function showToast(msg, duration) {
+      duration = duration || 3000;
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._t);
+      el._t = setTimeout(function() { el.classList.remove('show'); }, duration);
+    }
+
+    /** Clamp integer between min and max */
+    function clamp(val, min, max) {
+      var n = parseInt(val, 10);
+      if (isNaN(n)) return min;
+      return Math.min(max, Math.max(min, n));
+    }
+
+    /* ================================================================
+       SAFE NAVIGATION (open-redirect protection)
+       ================================================================ */
     function initiateUplink(event, target) {
       event.preventDefault();
-      addTerminalLog(`[UPLINK] Establishing connection to ${target}...`, "#00ff88");
-      
-      setTimeout(() => {
-        window.open(target, '_blank');
+      if (!isSafeURL(target)) {
+        showToast('Blocked: unsafe URL detected.');
+        return false;
+      }
+      console.log('%c[UPLINK] Connecting to ' + target, 'color:#00ff88;font-weight:bold');
+      setTimeout(function() {
+        window.open(target, '_blank', 'noopener,noreferrer');
       }, 1500);
-      
       return false;
     }
 
-    // Matrix Background Animation
+    /* ================================================================
+       MATRIX BACKGROUND
+       ================================================================ */
     function initializeMatrix() {
-      const canvas = document.getElementById('matrix');
+      var canvas = document.getElementById('matrix');
       if (!canvas) return;
-      
-      const ctx = canvas.getContext('2d');
+      var ctx = canvas.getContext('2d');
       if (!ctx) return;
-      
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
 
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
-      const fontSize = 20;
-      const columns = Math.floor(canvas.width / fontSize);
-      const drops = new Array(columns).fill(0);
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+
+      var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
+      var fontSize = 20;
+      var columns, drops;
+
+      function buildDrops() {
+        columns = Math.floor(canvas.width / fontSize);
+        drops = new Array(columns).fill(0);
+      }
+      buildDrops();
 
       function draw() {
         ctx.fillStyle = 'rgba(0, 0, 16, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.font = fontSize + 'px monospace';
-
-        for (let i = 0; i < drops.length; i++) {
-          const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        for (var i = 0; i < drops.length; i++) {
+          var text = chars.charAt(Math.floor(Math.random() * chars.length));
           ctx.fillStyle = (i % 2 === 0) ? '#00bfff' : '#e0f7ff';
           ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
           if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
             drops[i] = 0;
           }
@@ -644,286 +811,348 @@
         }
       }
 
-      const matrixInterval = setInterval(draw, 50);
+      setInterval(draw, 50);
 
-      window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+      var rt;
+      window.addEventListener('resize', function() {
+        clearTimeout(rt);
+        rt = setTimeout(function() { resize(); buildDrops(); }, 200);
       });
-
-      return matrixInterval;
     }
 
-    // Calculator Logic
-    function initializeCalculator() {
-      const display = document.getElementById('display');
-      const toggleBtn = document.getElementById('toggle-calc');
-      const calcContent = document.getElementById('calc-content');
-      let currentValue = '0';
-      let previousValue = '';
-      let operation = null;
-      let shouldResetDisplay = false;
+    /* ================================================================
+       CALCULATOR (reusable for desktop + mobile)
+       ================================================================ */
+    function createCalculator(gridEl, displayEl) {
+      var current = '0', prev = '', op = null, resetNext = false;
 
-      toggleBtn.addEventListener('click', () => {
-        calcContent.style.display = calcContent.style.display === 'none' ? 'block' : 'none';
-      });
+      gridEl.addEventListener('click', function(e) {
+        var btn = e.target.closest('.calc-btn');
+        if (!btn) return;
 
-      document.querySelectorAll('.calc-btn.number').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const num = btn.dataset.num;
-          if (shouldResetDisplay) {
-            currentValue = num;
-            shouldResetDisplay = false;
-          } else {
-            currentValue = currentValue === '0' ? num : currentValue + num;
+        if (btn.classList.contains('number')) {
+          var num = btn.dataset.num;
+          if (num === undefined) return;
+          if (resetNext) { current = num; resetNext = false; }
+          else {
+            if (num === '.' && current.indexOf('.') !== -1) return;
+            current = (current === '0' && num !== '.') ? num : current + num;
           }
-          display.textContent = currentValue;
-        });
-      });
+          if (current.length > 20) current = current.substring(0, 20);
+          displayEl.textContent = current;
 
-      document.querySelectorAll('.calc-btn.operator').forEach(btn => {
-        btn.addEventListener('click', () => {
-          operation = btn.dataset.op;
-          previousValue = currentValue;
-          shouldResetDisplay = true;
-        });
-      });
+        } else if (btn.classList.contains('operator')) {
+          op = btn.dataset.op;
+          prev = current;
+          resetNext = true;
 
-      document.querySelector('.calc-btn.clear').addEventListener('click', () => {
-        currentValue = '0';
-        previousValue = '';
-        operation = null;
-        shouldResetDisplay = false;
-        display.textContent = currentValue;
-      });
+        } else if (btn.classList.contains('clear')) {
+          current = '0'; prev = ''; op = null; resetNext = false;
+          displayEl.textContent = '0';
 
-      document.getElementById('backspace').addEventListener('click', () => {
-        currentValue = currentValue.slice(0, -1) || '0';
-        display.textContent = currentValue;
-      });
+        } else if (btn.classList.contains('backspace')) {
+          if (resetNext) return;
+          current = current.slice(0, -1) || '0';
+          displayEl.textContent = current;
 
-      document.querySelector('.calc-btn.equal').addEventListener('click', () => {
-        if (operation && previousValue !== '') {
-          let result;
-          const prev = parseFloat(previousValue);
-          const current = parseFloat(currentValue);
-          
-          switch(operation) {
-            case '+': result = prev + current; break;
-            case '-': result = prev - current; break;
-            case '*': result = prev * current; break;
-            case '/': result = current !== 0 ? prev / current : 'Error'; break;
-            case '%': result = prev % current; break;
-            default: result = current;
+        } else if (btn.classList.contains('equal')) {
+          if (op && prev !== '') {
+            var a = parseFloat(prev), b = parseFloat(current), r;
+            switch (op) {
+              case '+': r = a + b; break;
+              case '-': r = a - b; break;
+              case '*': r = a * b; break;
+              case '/': case '%':
+                if (b === 0) {
+                  displayEl.textContent = 'Error';
+                  current = '0'; prev = ''; op = null; resetNext = true;
+                  return;
+                }
+                r = op === '/' ? a / b : a % b;
+                break;
+              default: r = b;
+            }
+            if (!isFinite(r) || isNaN(r)) {
+              displayEl.textContent = 'Error'; current = '0';
+            } else {
+              r = Math.round(r * 1e12) / 1e12;
+              current = String(r);
+              displayEl.textContent = current;
+            }
+            prev = ''; op = null; resetNext = true;
           }
-          
-          currentValue = result.toString();
-          display.textContent = currentValue;
-          previousValue = '';
-          operation = null;
-          shouldResetDisplay = true;
         }
       });
     }
 
-    // Countdown Timer Logic
-    function initializeCountdown() {
-      const countdownEl = document.getElementById('countdown');
-      const beepSound = document.getElementById('beepSound');
-      const countdownToggleBtn = document.getElementById('countdownToggleBtn');
-      const countdownContent = document.getElementById('countdownContent');
+    /* ================================================================
+       COUNTDOWN TIMER (reusable)
+       ================================================================ */
+    function createCountdown(cfg) {
+      var el = document.getElementById(cfg.displayId);
+      var dIn = document.getElementById(cfg.daysId);
+      var hIn = document.getElementById(cfg.hoursId);
+      var mIn = document.getElementById(cfg.minutesId);
+      var beep = document.getElementById('beepSound');
 
-      let timerInterval = null;
-      const targetDateOrig = new Date(2025, 11, 31, 23, 59, 59).getTime();
-      let targetDate = targetDateOrig;
-      let paused = false;
-      let pauseTime = null;
-      let useOriginalTarget = true;
+      var origTarget = new Date(2025, 11, 31, 23, 59, 59).getTime();
+      var target = origTarget;
+      var interval = null, paused = false, pauseTime = null, useOrig = true;
 
-      const addDaysInput = document.getElementById('addDays');
-      const addHoursInput = document.getElementById('addHours');
-      const addMinutesInput = document.getElementById('addMinutes');
-      const applyOffsetBtn = document.getElementById('applyOffset');
-      const startBtn = document.getElementById('startBtn');
-      const pauseBtn = document.getElementById('pauseBtn');
-      const resetBtn = document.getElementById('resetBtn');
-
-      countdownContent.style.display = 'none';
-      countdownToggleBtn.textContent = 'Show';
-
-      countdownToggleBtn.addEventListener('click', () => {
-        if (countdownContent.style.display === 'none') {
-          countdownContent.style.display = 'flex';
-          countdownToggleBtn.textContent = 'Hide';
-        } else {
-          countdownContent.style.display = 'none';
-          countdownToggleBtn.textContent = 'Show';
-        }
-      });
-
-      function updateCountdown() {
-        const now = new Date().getTime();
-        const diff = targetDate - now;
-
+      function update() {
+        var diff = target - Date.now();
         if (diff <= 0) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-          countdownEl.textContent = "Time's up!";
-          beepSound.play().catch(e => console.log('Beep sound play failed:', e));
+          clearInterval(interval); interval = null;
+          el.textContent = "Time's up!";
+          if (beep) beep.play().catch(function(){});
           return;
         }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor((diff % 86400000) / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+        el.textContent = d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
       }
 
-      function startTimer() {
-        if (!timerInterval) {
-          if (paused && pauseTime) {
-            const pauseDuration = new Date().getTime() - pauseTime;
-            targetDate += pauseDuration;
-            paused = false;
-            pauseTime = null;
+      return {
+        start: function() {
+          if (!interval) {
+            if (paused && pauseTime) {
+              target += Date.now() - pauseTime;
+              paused = false; pauseTime = null;
+            }
+            interval = setInterval(update, 1000);
+            update();
           }
-          timerInterval = setInterval(updateCountdown, 1000);
-          updateCountdown();
+        },
+        pause: function() {
+          if (interval) {
+            clearInterval(interval); interval = null;
+            paused = true; pauseTime = Date.now();
+          }
+        },
+        reset: function() {
+          clearInterval(interval); interval = null;
+          paused = false; pauseTime = null;
+          target = Date.now(); useOrig = false;
+          dIn.value = 0; hIn.value = 0; mIn.value = 0;
+          el.textContent = '0d 0h 0m 0s';
+        },
+        apply: function() {
+          clearInterval(interval); interval = null;
+          paused = false; pauseTime = null;
+          var d = clamp(dIn.value, 0, 365);
+          var h = clamp(hIn.value, 0, 23);
+          var m = clamp(mIn.value, 0, 59);
+          dIn.value = d; hIn.value = h; mIn.value = m;
+          var base = useOrig ? origTarget : Date.now();
+          target = base + d * 86400000 + h * 3600000 + m * 60000;
+          update();
         }
-      }
-
-      function pauseTimer() {
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-          paused = true;
-          pauseTime = new Date().getTime();
-        }
-      }
-
-      function resetTimer() {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        paused = false;
-        pauseTime = null;
-        targetDate = new Date().getTime();
-        addDaysInput.value = 0;
-        addHoursInput.value = 0;
-        addMinutesInput.value = 0;
-        useOriginalTarget = false;
-        countdownEl.textContent = '0d 0h 0m 0s';
-      }
-
-      function applyOffset() {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        paused = false;
-        pauseTime = null;
-        const baseTime = useOriginalTarget ? targetDateOrig : new Date().getTime();
-        const addDays = Math.max(0, parseInt(addDaysInput.value) || 0);
-        const addHours = Math.min(23, Math.max(0, parseInt(addHoursInput.value) || 0));
-        const addMinutes = Math.min(59, Math.max(0, parseInt(addMinutesInput.value) || 0));
-        const offsetMs = addDays * 24 * 60 * 60 * 1000 +
-                         addHours * 60 * 60 * 1000 +
-                         addMinutes * 60 * 1000;
-        targetDate = baseTime + offsetMs;
-        updateCountdown();
-      }
-
-      applyOffsetBtn.addEventListener('click', applyOffset);
-      startBtn.addEventListener('click', startTimer);
-      pauseBtn.addEventListener('click', pauseTimer);
-      resetBtn.addEventListener('click', resetTimer);
+      };
     }
 
-    // Delhi Widget Logic
-    function initializeDelhiWidget() {
-      const delhiToggleBtn = document.getElementById('delhiToggleBtn');
-      const delhiContent = document.getElementById('delhiContent');
-      const delhiTimeEl = document.getElementById('delhiTime');
-      const delhiDateEl = document.getElementById('delhiDate');
-      const tasksListEl = document.getElementById('tasksList');
-      const taskInput = document.getElementById('taskInput');
-      const dateInput = document.getElementById('dateInput');
-      const timeInput = document.getElementById('timeInput');
-      const addTaskBtn = document.getElementById('addTaskBtn');
-
-      delhiContent.style.display = 'none';
-      delhiToggleBtn.textContent = 'Show';
-
-      delhiToggleBtn.addEventListener('click', () => {
-        if (delhiContent.style.display === 'none') {
-          delhiContent.style.display = 'flex';
-          delhiToggleBtn.textContent = 'Hide';
-        } else {
-          delhiContent.style.display = 'none';
-          delhiToggleBtn.textContent = 'Show';
-        }
-      });
-
-      function updateDelhiClock() {
-        const now = new Date();
-        const delhiStrTime = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour12: false });
-        const delhiStrDate = now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
-        delhiTimeEl.textContent = delhiStrTime;
-        delhiDateEl.textContent = delhiStrDate;
+    /* ================================================================
+       DELHI CLOCK (reusable)
+       ================================================================ */
+    function startDelhiClock(timeEl, dateEl) {
+      function tick() {
+        var now = new Date();
+        timeEl.textContent = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour12: false });
+        dateEl.textContent = now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
       }
+      tick();
+      setInterval(tick, 1000);
+    }
 
-      setInterval(updateDelhiClock, 1000);
-      updateDelhiClock();
+    /* ================================================================
+       TASK MANAGER (reusable, localStorage-backed)
+       ================================================================ */
+    function createTaskManager(cfg) {
+      var inputEl = document.getElementById(cfg.inputId);
+      var dateEl = document.getElementById(cfg.dateId);
+      var timeEl = document.getElementById(cfg.timeId);
+      var listEl = document.getElementById(cfg.listId);
 
-      function loadTasks() {
-        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        tasksListEl.innerHTML = '';
-        const nowTimestamp = Date.now();
+      function load() {
+        var tasks = safeParseTasks(localStorage.getItem('tasks'));
+        listEl.innerHTML = '';
+        var now = Date.now();
+        tasks.forEach(function(task, i) {
+          var li = document.createElement('li');
+          /* textContent — immune to XSS even if localStorage was tampered with */
+          li.textContent = task.desc + ' (' + new Date(task.datetime).toLocaleString() + ')';
+          li.setAttribute('role', 'button');
+          li.setAttribute('tabindex', '0');
+          if (task.datetime <= now) li.classList.add('completed');
 
-        tasks.forEach(({desc, datetime}, i) => {
-          const li = document.createElement('li');
-          li.textContent = `${desc} (${new Date(datetime).toLocaleString()})`;
-
-          if (datetime && datetime <= nowTimestamp) li.classList.add('completed');
-          li.onclick = () => {
+          function remove() {
             tasks.splice(i, 1);
             localStorage.setItem('tasks', JSON.stringify(tasks));
-            loadTasks();
-          };
-          tasksListEl.appendChild(li);
+            load();
+          }
+          li.addEventListener('click', remove);
+          li.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); remove(); }
+          });
+          listEl.appendChild(li);
         });
       }
 
-      addTaskBtn.onclick = () => {
-        const desc = taskInput.value.trim();
-        const date = dateInput.value;
-        const time = timeInput.value;
-        if (!desc || !date || !time) {
-          alert('Please enter task description, date, and time.');
-          return;
-        }
-        const datetime = new Date(date + 'T' + time + ':00').getTime();
-        if (isNaN(datetime)) {
-          alert('Invalid date/time');
-          return;
-        }
-        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        tasks.push({desc, datetime});
+      function add() {
+        var desc = inputEl.value.trim();
+        var date = dateEl.value;
+        var time = timeEl.value;
+        if (!desc) { showToast('Please enter a task description.'); return; }
+        if (!date) { showToast('Please select a date.'); return; }
+        if (!time) { showToast('Please select a time.'); return; }
+        var dt = new Date(date + 'T' + time + ':00').getTime();
+        if (!isFinite(dt)) { showToast('Invalid date or time value.'); return; }
+        var tasks = safeParseTasks(localStorage.getItem('tasks'));
+        tasks.push({ desc: desc, datetime: dt });
         localStorage.setItem('tasks', JSON.stringify(tasks));
-        taskInput.value = '';
-        dateInput.value = '';
-        timeInput.value = '';
-        loadTasks();
-      };
+        inputEl.value = ''; dateEl.value = ''; timeEl.value = '';
+        load();
+      }
 
-      loadTasks();
+      return { load: load, add: add };
     }
 
-    // Initialize all scripts when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
+    /* ================================================================
+       WIDGET TOGGLES (unified)
+       ================================================================ */
+    function initToggles() {
+      document.querySelectorAll('.toggle-btn[data-target]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var t = document.getElementById(btn.getAttribute('data-target'));
+          if (!t) return;
+          var open = t.style.display === 'flex';
+          t.style.display = open ? 'none' : 'flex';
+          btn.textContent = open ? 'Show' : 'Hide';
+          btn.setAttribute('aria-expanded', String(!open));
+        });
+      });
+    }
+
+    /* ================================================================
+       MOBILE PANEL
+       ================================================================ */
+    function initMobilePanel() {
+      var fab = document.getElementById('fab');
+      var panel = document.getElementById('mobile-panel');
+      var overlay = document.getElementById('mobile-panel-overlay');
+      var closeBtn = document.getElementById('mobile-panel-close');
+
+      function open() {
+        panel.classList.add('open');
+        overlay.classList.add('active');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+      function close() {
+        panel.classList.remove('open');
+        overlay.classList.remove('active');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      fab.addEventListener('click', open);
+      closeBtn.addEventListener('click', close);
+      overlay.addEventListener('click', close);
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && panel.classList.contains('open')) close();
+      });
+    }
+
+    /* ================================================================
+       BOOT
+       ================================================================ */
+    document.addEventListener('DOMContentLoaded', function() {
       initializeMatrix();
-      initializeCalculator();
-      initializeCountdown();
-      initializeDelhiWidget();
+      initToggles();
+      initMobilePanel();
+
+      /* Desktop calculator */
+      var dg = document.querySelector('.calc-grid[data-calc="desktop"]');
+      var dd = document.getElementById('display');
+      if (dg && dd) createCalculator(dg, dd);
+
+      /* Mobile calculator */
+      var mg = document.querySelector('.calc-grid[data-calc="mobile"]');
+      var md = document.getElementById('display-mobile');
+      if (mg && md) createCalculator(mg, md);
+
+      /* Desktop countdown */
+      var dc = createCountdown({
+        displayId: 'countdown',
+        daysId: 'addDays',
+        hoursId: 'addHours',
+        minutesId: 'addMinutes'
+      });
+
+      /* Mobile countdown */
+      var mc = createCountdown({
+        displayId: 'countdownMobile',
+        daysId: 'addDaysMobile',
+        hoursId: 'addHoursMobile',
+        minutesId: 'addMinutesMobile'
+      });
+
+      /* Wire countdown buttons */
+      document.querySelectorAll('.countdown-apply').forEach(function(b) {
+        b.addEventListener('click', function() {
+          b.dataset.calcId === 'desktop' ? dc.apply() : mc.apply();
+        });
+      });
+      document.querySelectorAll('.countdown-start').forEach(function(b) {
+        b.addEventListener('click', function() {
+          b.dataset.calcId === 'desktop' ? dc.start() : mc.start();
+        });
+      });
+      document.querySelectorAll('.countdown-pause').forEach(function(b) {
+        b.addEventListener('click', function() {
+          b.dataset.calcId === 'desktop' ? dc.pause() : mc.pause();
+        });
+      });
+      document.querySelectorAll('.countdown-reset').forEach(function(b) {
+        b.addEventListener('click', function() {
+          b.dataset.calcId === 'desktop' ? dc.reset() : mc.reset();
+        });
+      });
+
+      /* Delhi clocks (desktop + mobile) */
+      startDelhiClock(
+        document.getElementById('delhiTime'),
+        document.getElementById('delhiDate')
+      );
+      startDelhiClock(
+        document.getElementById('delhiTimeMobile'),
+        document.getElementById('delhiDateMobile')
+      );
+
+      /* Task managers (desktop + mobile, shared localStorage) */
+      var dt = createTaskManager({
+        inputId: 'taskInput',
+        dateId: 'dateInput',
+        timeId: 'timeInput',
+        listId: 'tasksList'
+      });
+      dt.load();
+
+      var mt = createTaskManager({
+        inputId: 'taskInputMobile',
+        dateId: 'dateInputMobile',
+        timeId: 'timeInputMobile',
+        listId: 'tasksListMobile'
+      });
+      mt.load();
+
+      /* Wire task add buttons */
+      document.querySelectorAll('.task-add').forEach(function(b) {
+        b.addEventListener('click', function() {
+          b.dataset.panel === 'desktop' ? dt.add() : mt.add();
+        });
+      });
     });
   </script>
 </body>
