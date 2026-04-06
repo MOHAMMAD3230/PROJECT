@@ -1,0 +1,38 @@
+name: Lint & Security Check
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  super-linter:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      # This allows the bot to leave comments on your Pull Requests
+      pull-requests: write 
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Super-linter needs the full git history to check properly
+          fetch-depth: 0
+
+      - name: Run Super-Linter
+        uses: github/super-linter/slim@v7
+        env:
+          # Turn on checks for your specific languages
+          VALIDATE_HTML: true
+          VALIDATE_CSS: true
+          VALIDATE_JAVASCRIPT_ES: true
+          
+          # Ignore folders that shouldn't be checked
+          FILTER_REGEX_EXCLUDE: ".*(node_modules|dist|build|vendor).*"
+          
+          # Tells it what your default branch is
+          DEFAULT_BRANCH: main
