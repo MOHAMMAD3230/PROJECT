@@ -1,127 +1,66 @@
 // ===== DEPENDENCIES =====
-const express = require('express');
-const helmet = require('helmet');
-const path = require('path');
-const fs = require('fs');
-const fetch = require('node-fetch');
-const cron = require('node-cron');
+const express    = require('express');
+const helmet     = require('helmet');
+const cors       = require('cors');
+const crypto     = require('crypto');
+const path       = require('path');
+const fs         = require('fs');
+const fetch      = require('node-fetch');
+const cron       = require('node-cron');
+const rateLimit  = require('express-rate-limit');
 const { google } = require('googleapis');
 
-// ===== CONFIG =====
-const API_KEY = "30cbe4bc30msh5fdcf92c4fd37b1p1c022fjsncc0f1842bb0a"; // <<< Replace with your RapidAPI Key
+// ===== CONFIG (secrets from environment ONLY — never hardcode) =====
+const API_KEY         = process.env.RAPIDAPI_KEY;
+const AUTH_TOKEN      = process.env.BACKEND_AUTH_TOKEN;
+const PORT            = process.env.PORT || 3000;
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',').map(s => s.trim());
+
+// Fail fast if secrets are missing
+if (!API_KEY) {
+  console.error('FATAL: RAPIDAPI_KEY environment variable is not set.');
+  process.exit(1);
+}
+if (!AUTH_TOKEN) {
+  console.error('FATAL: BACKEND_AUTH_TOKEN environment variable is not set.');
+  console.error('   Generate one: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+  process.exit(1);
+}
+
+const SERVICE_ACCOUNT_PATH = path.join(__dirname, 'service_account.json');
+if (!fs.existsSync(SERVICE_ACCOUNT_PATH)) {
+  console.error('FATAL: ' + SERVICE_ACCOUNT_PATH + ' not found. See README.');
+  process.exit(1);
+}
+
+// ===== IN-MEMORY STATE =====
 let backendWatchlist = [];
-let backendAlerts = {};
+let backendAlerts    = {};
+let isJobRunning     = false; // prevents parallel cron runs
 
 // ===== GOOGLE DRIVE AUTH =====
 const auth = new google.auth.GoogleAuth({
-  keyFile: 'service_account.json', // <<< Your service account key file
+  keyFile: SERVICE_ACCOUNT_PATH,
   scopes: ['https://www.googleapis.com/auth/drive.file']
 });
 const driveService = google.drive({ version: 'v3', auth });
 
 // ===== EXPRESS APP =====
 const app = express();
-app.use(helmet());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.set('trust proxy', 1);
 
-// Receive updated watchlist + alerts from frontend
-app.post('/update-watchlist', (req, res) => {
-  backendWatchlist = req.body.watchlist || [];
-  backendAlerts = req.body.alerts || {};
-  console.log(`✅ Watchlist Updated:`, backendWatchlist);
-  console.log(`✅ Alerts Updated:`, backendAlerts);
-  res.json({ status: 'ok' });
-});
+// Security headers (relaxed CSP since this is an API, not serving HTML views)
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: { policy: 'same-site' },
+  originAgentCluster: false
+}));
 
-// Endpoint to view the current backend watchlist (for debugging)
-app.get('/watchlist.json', (req, res) => {
-  res.json({ watchlist: backendWatchlist, alerts: backendAlerts });
-});
-
-// Start server
-app.listen(3000, () => console.log(`🚀 Server running at http://localhost:3000`));
-
-
-// ===== API FETCH FUNCTION =====
-async function fetchStockPrice(symbol) {
-  const region = symbol.endsWith(".NS") ? "IN" : "US";
-  const url = `https://yh-finance.p.rapidapi.com/stock/v2/get-summary?symbol=${symbol}&region=${region}`;
-
-  console.log(`🔍 [Backend] Fetching price for ${symbol} | Region: ${region}`);
-  console.log(`URL: ${url}`);
-
-  try {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'X-RapidAPI-Key': API_KEY,
-        'X-RapidAPI-Host': 'yh-finance.p.rapidapi.com'
-      }
-    });
-
-    console.log(`[Backend] HTTP Status: ${res.status}`);
-    const data = await res.json();
-
-    return data.price?.regularMarketPrice?.raw ?? "N/A";
-  } catch (err) {
-    console.error("[Backend] Error fetching %s:", symbol, err);
-    return "Error";
-  }
-}
-
-
-// ===== CSV GENERATION =====
-async function generateCSV() {
-  let csv = `Exported At,${new Date().toLocaleString()}\n`;
-  csv += "Symbol,Price,Alert\n";
-
-  for (let symbol of backendWatchlist) {
-    const price = await fetchStockPrice(symbol);
-    const alertVal = backendAlerts[symbol] || "";
-    csv += `${symbol},${price},${alertVal}\n`;
-  }
-  return csv;
-}
-
-
-// ===== GOOGLE DRIVE UPLOAD =====
-async function uploadToDrive(fileName, content) {
-  const fileMetadata = { name: fileName, mimeType: 'text/csv' };
-  const media = { mimeType: 'text/csv', body: Buffer.from(content, 'utf-8') };
-
-  try {
-    const res = await driveService.files.create({
-      resource: fileMetadata,
-      media,
-      fields: 'id'
-    });
-    console.log(`☁ Uploaded to Google Drive: ${fileName} (ID: ${res.data.id})`);
-  } catch (err) {
-    console.error("❌ Error uploading to Google Drive:", err);
-  }
-}
-
-
-// ===== NIGHTLY JOB =====
-async function job() {
-  if (backendWatchlist.length === 0) {
-    console.log("⚠ No watchlist data yet — skipping nightly export.");
-    return;
-  }
-
-  console.log("⌛ Generating nightly CSV for:", backendWatchlist);
-  const csvContent = await generateCSV();
-  const dateStr = new Date().toISOString().slice(0, 10);
-  const fileName = `stocks_${dateStr}.csv`;
-
-  // Save locally
-  fs.writeFileSync(fileName, csvContent);
-  console.log(`💾 Saved locally: ${fileName}`);
-
-  // Upload to drive
-  await uploadToDrive(fileName, csvContent);
-}
-
-// Schedule job for 5 minutes past midnight every day
-cron.schedule('5 0 * * *', job);
+// CORS — explicit allowlist, reject everything else
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser (curl, Postman)
+    if (ALLOWED_ORIGINS.indexOf(origin) !== -1) return callback(null, true);
+    var err = new Error('CORS: Origin not allowed');
