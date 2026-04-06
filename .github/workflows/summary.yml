@@ -14,14 +14,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Get LLM Summary
+           - name: Get LLM Summary
         id: inference
+        env:
+          # 1. PASS UNTRUSTED INPUT THROUGH ENV VARIABLES
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
-          ISSUE_TITLE="${{ github.event.issue.title }}"
-          ISSUE_BODY="${{ github.event.issue.body }}"
+          # 2. REFERENCE THEM SAFELY USING DOUBLE QUOTES
+          echo "Read title: $ISSUE_TITLE"
+          echo "Read body: $ISSUE_BODY"
           
           # Replace this mock output with your actual LLM API call
-          LLM_OUTPUT="This is a summary of the issue. Even if the LLM accidentally outputs shell code like \$(whoami), it is safe now."
+          # (Make sure to use "$ISSUE_TITLE" and "$ISSUE_BODY" when sending to your LLM API!)
+          LLM_OUTPUT="This is a summary of the issue."
           
           # Use EOF to safely pass multiline LLM responses to GITHUB_OUTPUT
           echo "response<<EOF" >> "$GITHUB_OUTPUT"
