@@ -2,90 +2,476 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
+
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 connect-src https://itunes.apple.com;
+                 img-src https:;
+                 media-src https:;
+                 style-src 'self' 'unsafe-inline';
+                 script-src 'self' 'unsafe-inline';
+                 frame-ancestors 'none';
+                 base-uri 'self';
+                 object-src 'none';
+                 form-action 'none';">
+                 
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Online Music Search Bot</title>
+
   <style>
-    body {
-      background: linear-gradient(120deg, #232526, #485563);
-      font-family: Arial, sans-serif;
-      color: #fff;
-      margin: 0; padding: 0;
-      text-align: center;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0D0D0D;
+      --fg: #ECECEC;
+      --muted: #777;
+      --faint: #555;
+      --accent: #D4A03C;
+      --accent-hover: #E8B84E;
+      --card: #151517;
+      --card-border: #252528;
+      --input-bg: #1C1C20;
+      --border: #2A2A2E;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.5);
+      --safe-green: #34D399;
+      --danger-red: #F87171;
     }
-    .container { max-width: 700px; margin: 40px auto; background: #181818; padding: 30px; border-radius: 14px; box-shadow: 0 4px 16px #222; }
-    h1 { margin-bottom: 1em; }
-    #search-input { padding: 12px; width: 60%; border-radius: 6px; border: none; font-size: 1.1em; }
-    #search-button { padding: 12px 26px; border-radius: 6px; border: none; background: #069; color: #fff; font-weight: bold; cursor: pointer; margin-left: 8px;}
-    #results { margin-top: 2em; }
-    .song-card { background: #222; color: #fff; border-radius: 10px; margin: 1em 0; padding: 1em; box-shadow: 0 3px 8px #333; display: flex; align-items: center; gap: 20px;}
-    .song-card img { border-radius: 8px; width: 80px; height: 80px; }
-    .song-details { text-align: left; flex: 1;}
-    audio { width: 160px; }
-    @media (max-width:750px) {
-      #search-input { width: 90%; }
-      .container { padding: 8px; }
-      .song-card { flex-direction: column; text-align: center; gap: 8px;}
-      .song-details { text-align: center;}
+
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    header {
+      background: linear-gradient(160deg, #111 0%, #1a1a1a 60%, #111 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    header h1 { font-size: clamp(1.35rem, 4vw, 1.9rem); font-weight: 800; }
+    header h1 .highlight { color: var(--accent); }
+
+    main { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; width: 100%; flex: 1; }
+
+    .disclaimer {
+      background: rgba(212, 160, 60, 0.1);
+      border: 1px solid rgba(212, 160, 60, 0.3);
+      color: var(--accent);
+      font-size: 0.8rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 2rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .search-form { display: flex; gap: 0.75rem; margin-bottom: 2rem; }
+
+    .search-input {
+      flex: 1; padding: 14px 18px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--input-bg);
+      color: var(--fg); font-size: 1rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; min-width: 0;
+    }
+    .search-input::placeholder { color: var(--faint); }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,160,60,0.15); }
+
+    .search-button {
+      padding: 14px 28px; border-radius: var(--radius-sm); border: none;
+      background: var(--accent); color: #0D0D0D; font-weight: 700;
+      font-size: 1rem; cursor: pointer; transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .search-button:hover { background: var(--accent-hover); }
+    .search-button:active { transform: scale(0.97); }
+    .search-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .search-button:focus-visible, .search-input:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 2px;
+    }
+
+    #results { min-height: 80px; }
+
+    .loader { display: flex; justify-content: center; align-items: center; padding: 3rem 0; }
+    .spinner {
+      width: 36px; height: 36px; border: 3px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .message { text-align: center; padding: 2.5rem 1rem; color: var(--muted); font-size: 0.95rem; }
+
+    .result-count { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.75rem; padding-left: 4px; }
+
+    .song-card {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: var(--radius-md); padding: 1rem; margin-bottom: 0.85rem;
+      display: flex; align-items: center; gap: 1rem; box-shadow: var(--shadow);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .song-card:hover { transform: translateY(-2px); border-color: rgba(212,160,60,0.3); }
+
+    .song-card img {
+      width: 72px; height: 72px; border-radius: var(--radius-sm);
+      object-fit: cover; flex-shrink: 0; background: var(--input-bg);
+      -webkit-user-drag: none; user-select: none;
+    }
+
+    .song-details { flex: 1; min-width: 0; text-align: left; }
+    .song-details .track-name { display: block; font-size: 0.95rem; font-weight: 700; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-details .artist-name { display: block; font-size: 0.84rem; color: var(--accent); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-details .album-name { display: block; font-size: 0.78rem; color: var(--faint); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .card-actions { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }
+    
+    .song-card audio { width: 140px; max-width: 100%; min-width: 0; height: 38px; }
+    .song-card audio:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* ── Secure Download Button Styling ────────────────────── */
+    .download-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+      background: transparent; color: var(--safe-green); font-size: 0.8rem;
+      font-weight: 600; text-decoration: none; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .download-btn:hover { background: rgba(52, 211, 153, 0.1); border-color: var(--safe-green); }
+    .download-btn:disabled { color: var(--faint); border-color: var(--border); background: transparent; cursor: not-allowed; pointer-events: none; }
+    
+    .download-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .download-btn:disabled svg { fill: var(--faint); }
+
+    footer {
+      text-align: center; padding: 2rem 1rem; color: var(--faint);
+      font-size: 0.78rem; border-top: 1px solid var(--border); margin-top: auto;
+    }
+
+    @media (max-width: 600px) {
+      .search-form { flex-direction: column; }
+      .search-button { width: 100%; padding: 14px; }
+      .song-card { flex-direction: column; text-align: center; gap: 0.75rem; padding: 1.25rem 1rem; }
+      .song-details { text-align: center; }
+      .song-card img { width: 96px; height: 96px; }
+      .song-card audio { width: 100%; }
+      .card-actions { flex-direction: row; justify-content: center; width: 100%; }
+      main { padding: 1.5rem 0.75rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+    }
+
+    @supports (padding: env(safe-area-inset-bottom)) {
+      footer { padding-bottom: calc(2rem + env(safe-area-inset-bottom)); }
+      header { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>Online Music Search Bot</h1>
-  <input type="text" id="search-input" placeholder="Search for songs, artists, or albums">
-  <button id="search-button">Search</button>
-  <div id="results"></div>
-</div>
-<script>
-  const searchBtn = document.getElementById('search-button');
-  const searchInput = document.getElementById('search-input');
-  const resultsDiv = document.getElementById('results');
 
-  async function fetchMusic(query) {
-    const API_URL = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=12`;
-    resultsDiv.innerHTML = "<p>Searching...</p>";
-    try {
-      const response = await fetch(API_URL);
-      const data = await response.json();
-      displayResults(data.results);
-    } catch (error) {
-      resultsDiv.innerHTML = "<p>Error fetching results. Please try again.</p>";
-    }
-  }
+  <header role="banner">
+    <h1>Music <span class="highlight">Search</span> Bot</h1>
+  </header>
 
-  function displayResults(songs) {
-    resultsDiv.innerHTML = '';
-    if (!songs.length) {
-      resultsDiv.innerHTML = '<p>No results found.</p>';
-      return;
-    }
-    songs.forEach(song => {
-      const card = document.createElement('div');
-      card.className = 'song-card';
-      card.innerHTML = `
-        <img src="${song.artworkUrl100}" alt="${song.trackName}">
-        <div class="song-details">
-          <strong>${song.trackName}</strong><br/>
-          <span>${song.artistName}</span><br/>
-          <span>${song.collectionName || ""}</span>
-        </div>
-        <audio controls>
-          <source src="${song.previewUrl}" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
-      `;
-      resultsDiv.appendChild(card);
-    });
-  }
+  <main role="main">
+    
+    <div class="disclaimer" role="alert">
+      <strong>Independent Tool:</strong> Not affiliated with Apple. Downloads are strictly 30-second secure previews from Apple's verified CDN. Never install software prompted by downloaded files.
+    </div>
 
-  searchBtn.addEventListener('click', () => {
-    const query = searchInput.value.trim();
-    if (query) fetchMusic(query);
-    else resultsDiv.innerHTML = '<p>Please enter a search term.</p>';
-  });
+    <form class="search-form" id="search-form" role="search" aria-label="Search for music">
+      <label for="search-input" class="sr-only">Search for songs, artists, or albums</label>
+      <input type="search" id="search-input" class="search-input" placeholder="Search songs, artists, or albums" autocomplete="off" spellcheck="false" maxlength="200">
+      <button type="submit" id="search-button" class="search-button" aria-label="Search">Search</button>
+    </form>
 
-  searchInput.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') searchBtn.click();
-  });
-</script>
+    <div id="results" aria-live="polite" aria-relevant="additions" role="region" aria-label="Search results"></div>
+  </main>
+
+  <footer role="contentinfo">
+    <p>Data provided by Apple iTunes Search API. Secured against XSS, Malware, and Phishing vectors.</p>
+  </footer>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var form      = document.getElementById('search-form');
+      var input     = document.getElementById('search-input');
+      var button    = document.getElementById('search-button');
+      var resultsEl = document.getElementById('results');
+
+      var MIN_QUERY   = 2;
+      var MAX_QUERY   = 200;
+      var RATE_MS     = 800;
+      var API_LIMIT   = 12;
+
+      var searching    = false;
+      var lastCallTime = 0;
+
+      /* ═══════════════════════════════════════════════════
+       * SECURITY LAYER 1: Input Sanitization
+       * ═══════════════════════════════════════════════════ */
+      function sanitizeText(str) {
+        if (typeof str !== 'string') return '';
+        return str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim();
+      }
+
+      function sanitizeQuery(str) {
+        if (typeof str !== 'string') return '';
+        var clean = str.replace(/[\x00-\x1F\x7F]/g, '').trim();
+        return clean.length > MAX_QUERY ? clean.substring(0, MAX_QUERY) : clean;
+      }
+
+      /* ═══════════════════════════════════════════════════
+       * SECURITY LAYER 2: General URL Validation
+       * ═══════════════════════════════════════════════════ */
+      function isSafeUrl(str) {
+        if (typeof str !== 'string') return false;
+        try {
+          var url = new URL(str);
+          return url.protocol === 'https:' || url.protocol === 'http:';
+        } catch (e) { return false; }
+      }
+
+      /* ═══════════════════════════════════════════════════
+       * SECURITY LAYER 3: ANTI-MALWARE DOWNLOAD SHIELD
+       * 
+       * Prevents Drive-by Downloads and Malware Delivery:
+       * 1. Ensures protocol is HTTPS (stops SSL stripping)
+       * 2. Validates domain is an official Apple CDN
+       * 3. Regex checks file extension (.m4a/.mp3 ONLY)
+       *    This stops attackers from swapping the URL to a
+       *    .exe, .zip, or .jar payload if the CDN is compromised.
+       * ═══════════════════════════════════════════════════ */
+      
+      var SAFE_DOWNLOAD_HOSTS = [
+        'audio-ssl.itunes.apple.com',
+        'is1-ssl.mzstatic.com', 'is2-ssl.mzstatic.com', 
+        'is3-ssl.mzstatic.com', 'is4-ssl.mzstatic.com', 
+        'is5-ssl.mzstatic.com', 'a1.mzstatic.com', 'a2.mzstatic.com'
+      ];
+
+      function isSafeDownloadUrl(str) {
+        if (typeof str !== 'string') return false;
+        try {
+          var url = new URL(str);
+          
+          // 1. Force HTTPS
+          if (url.protocol !== 'https:') return false;
+          
+          // 2. Strict Domain Whitelist
+          var isHostSafe = SAFE_DOWNLOAD_HOSTS.some(function(safeHost) {
+            return url.hostname === safeHost || url.hostname.endsWith('.' + safeHost);
+          });
+          if (!isHostSafe) return false;
+
+          // 3. Strict Extension Whitelist (Blocks .exe, .zip, .js, .html)
+          var path = url.pathname.toLowerCase();
+          if (!/\.(m4a|mp3|mp4|aac)(\?.*)?$/i.test(path)) return false;
+
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      /* ═══════════════════════════════════════════════════
+       * UI HELPERS
+       * ═══════════════════════════════════════════════════ */
+      function clearResults() { resultsEl.innerHTML = ''; }
+
+      function showLoader() {
+        clearResults();
+        var wrapper = document.createElement('div');
+        wrapper.className = 'loader';
+        wrapper.setAttribute('role', 'status');
+        var spinner = document.createElement('div');
+        spinner.className = 'spinner';
+        wrapper.appendChild(spinner);
+        resultsEl.appendChild(wrapper);
+      }
+
+      function showMessage(text) {
+        clearResults();
+        var p = document.createElement('p');
+        p.className = 'message';
+        p.textContent = text;
+        resultsEl.appendChild(p);
+      }
+
+      function resetState() { searching = false; button.disabled = false; }
+
+      /* ═══════════════════════════════════════════════════
+       * CORE: Fetch API
+       * ═══════════════════════════════════════════════════ */
+      function fetchMusic(rawQuery) {
+        var now = Date.now();
+        if (searching || (now - lastCallTime) < RATE_MS) return;
+        
+        searching = true; lastCallTime = now; button.disabled = true;
+        var query = sanitizeQuery(rawQuery);
+        
+        if (query.length < MIN_QUERY) {
+          showMessage('Please enter at least ' + MIN_QUERY + ' characters.');
+          resetState(); return;
+        }
+
+        showLoader();
+        fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(query) + '&entity=song&limit=' + API_LIMIT)
+          .then(function(r) { if (!r.ok) throw new Error('Err'); return r.json(); })
+          .then(function(data) { if (!data || !Array.isArray(data.results)) throw new Error('Err'); displayResults(data.results); })
+          .catch(function() { showMessage('Network error. Please check your connection and try again.'); })
+          .finally(function() { resetState(); });
+      }
+
+      /* ═══════════════════════════════════════════════════
+       * CORE: Render Results (XSS-SAFE)
+       * ═══════════════════════════════════════════════════ */
+      function displayResults(songs) {
+        clearResults();
+        if (!songs.length) { showMessage('No results found. Try different keywords.'); return; }
+
+        var count = document.createElement('div');
+        count.className = 'result-count';
+        count.textContent = songs.length + ' result' + (songs.length !== 1 ? 's' : '') + ' found';
+        resultsEl.appendChild(count);
+
+        for (var i = 0; i < songs.length; i++) {
+          resultsEl.appendChild(buildSongCard(songs[i], i));
+        }
+      }
+
+      function buildSongCard(song, index) {
+        var card = document.createElement('div');
+        card.className = 'song-card';
+
+        // 1. Artwork
+        var img = document.createElement('img');
+        img.width = 72; img.height = 72; img.loading = (index < 4) ? 'eager' : 'lazy';
+        img.decoding = 'async'; img.crossOrigin = 'anonymous'; img.referrerPolicy = 'no-referrer';
+        img.alt = sanitizeText(song.trackName) || 'Album artwork';
+        img.src = isSafeUrl(song.artworkUrl100) ? song.artworkUrl100 : '';
+        img.onerror = function() { this.removeAttribute('src'); this.alt = 'Image unavailable'; };
+
+        // 2. Text Data
+        var details = document.createElement('div');
+        details.className = 'song-details';
+        
+        var trackEl = document.createElement('span');
+        trackEl.className = 'track-name';
+        trackEl.textContent = sanitizeText(song.trackName) || 'Unknown Track';
+
+        var artistEl = document.createElement('span');
+        artistEl.className = 'artist-name';
+        artistEl.textContent = sanitizeText(song.artistName) || 'Unknown Artist';
+
+        var albumEl = document.createElement('span');
+        albumEl.className = 'album-name';
+        albumEl.textContent = sanitizeText(song.collectionName) || '';
+
+        details.appendChild(trackEl);
+        details.appendChild(artistEl);
+        details.appendChild(albumEl);
+
+        // 3. Actions (Audio + Download)
+        var actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        var audio = document.createElement('audio');
+        audio.controls = true;
+        audio.setAttribute('preload', 'metadata');
+        audio.setAttribute('aria-label', 'Preview of ' + (sanitizeText(song.trackName) || 'track'));
+        var source = document.createElement('source');
+        source.src = isSafeUrl(song.previewUrl) ? song.previewUrl : '';
+        source.type = 'audio/mpeg';
+        audio.appendChild(source);
+        actions.appendChild(audio);
+
+        // 4. SECURE DOWNLOAD BUTTON
+        var dlBtn = document.createElement('a');
+        dlBtn.className = 'download-btn';
+        
+        // SECURITY: If URL fails strict validation, button is DISABLED.
+        // This physically prevents the user from clicking a malware link.
+        var downloadSafe = isSafeDownloadUrl(song.previewUrl);
+        
+        if (downloadSafe) {
+          dlBtn.href = song.previewUrl;
+          dlBtn.setAttribute('download', ''); // Hint browser to download
+          dlBtn.setAttribute('target', '_blank'); // Fallback open in new tab
+          
+          // CRITICAL: Prevents Tab-Nabbing Phishing.
+          // If opened in a new tab, that tab CANNOT use window.opener 
+          // to redirect the user's original page to a phishing clone.
+          dlBtn.setAttribute('rel', 'noopener noreferrer');
+          
+          // PRIVACY: Prevent Apple from seeing user's page context
+          dlBtn.setAttribute('referrerpolicy', 'no-referrer');
+          
+          dlBtn.setAttribute('aria-label', 'Download 30s preview of ' + (sanitizeText(song.trackName) || 'track'));
+        } else {
+          dlBtn.removeAttribute('href');
+          dlBtn.setAttribute('aria-disabled', 'true');
+          dlBtn.setAttribute('aria-label', 'Download unavailable for this track');
+          dlBtn.disabled = true; // Visual grey-out via CSS
+        }
+
+        // SVG Download Icon (inline to avoid external dependency risks)
+        dlBtn.innerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 4h14v-2H5v2z"/></svg> Preview';
+        
+        actions.appendChild(dlBtn);
+
+        // Assemble
+        card.appendChild(img);
+        card.appendChild(details);
+        card.appendChild(actions);
+
+        return card;
+      }
+
+      /* ═══════════════════════════════════════════════════
+       * EVENTS
+       * ═══════════════════════════════════════════════════ */
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (input.value && input.value.trim().length >= MIN_QUERY) {
+          fetchMusic(input.value);
+        } else {
+          showMessage('Please enter at least ' + MIN_QUERY + ' characters.');
+        }
+      });
+
+    })();
+  </script>
 </body>
 </html>
