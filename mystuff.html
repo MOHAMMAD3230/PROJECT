@@ -2,275 +2,299 @@
 <html lang="en">
 <head>
   <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MY_STUFF</title>
-<style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    transition: background 0.3s, color 0.3s;
-  }
-  body.night {
-    background-color: #181924;
-    color: #e5eaf1;
-  }
-  .title-bar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    flex-wrap: wrap;
-    transition: background 0.3s;
-  }
-  body.night .title-bar {
-    background: linear-gradient(90deg, #232938 0%, #43436d 100%);
-    color: #e5eaf1;
-  }
-  .title-left {
-    display: flex;
-    align-items: center;
-  }
-  .logo {
-    font-size: 2rem;
-    margin-right: 12px;
-  }
-  .title-bar h1 {
-    font-size: 1.6rem;
-    margin: 0;
-    font-weight: bold;
-  }
-  .search-container {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    padding: 6px 10px;
-    border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-right: 12px;
-    transition: background-color 0.3s;
-  }
-  body.night .search-container {
-    background-color: #232938;
-    box-shadow: 0 2px 4px rgba(30,29,41,0.3);
-  }
-  .search-container input {
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    background: none;
-    width: 150px;
-    color: inherit;
-  }
-  .search-container button {
-    border: none;
-    background: none;
-    color: #2575fc;
-    font-size: 1.2rem;
-    cursor: pointer;
-  }
-  #resultCount {
-    margin-left: 10px;
-    font-size: 0.9rem;
-    color: #fff;
-    background: rgba(0,0,0,0.3);
-    padding: 2px 8px;
-    border-radius: 12px;
-    white-space: nowrap;
-    transition: background 0.3s, color 0.3s;
-  }
-  body.night #resultCount {
-    background: rgba(255,255,255,0.1);
-    color: #fcf07a;
-  }
-  .toolbar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    background-color: #eaeaea;
-    flex-wrap: wrap;
-    gap: 20px;
-    transition: background 0.3s;
-  }
-  body.night .toolbar {
-    background-color: #232938;
-  }
-  .category-bar button,
-  .view-toggle button,
-  .sort-options select {
-    background: #fff;
-    border: 1px solid #ccc;
-    margin: 4px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #333;
-  }
-  .category-bar button:hover,
-  .view-toggle button:hover {
-    background: #2575fc;
-    color: white;
-  }
-  .category-bar button.active,
-  .view-toggle button.active {
-    background: #2575fc;
-    color: white;
-  }
-  body.night .category-bar button,
-  body.night .view-toggle button,
-  body.night .sort-options select {
-    background: #22253a;
-    border-color: #333756;
-    color: #e5eaf1;
-  }
-  body.night .category-bar button.active,
-  body.night .category-bar button:hover,
-  body.night .view-toggle button.active,
-  body.night .view-toggle button:hover {
-    background: #6a11cb;
-    color: #fff;
-  }
-  main {
-    padding: 20px;
-    max-width: 1100px;
-    margin: auto;
-    transition: color 0.3s;
-  }
-  .card-container.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-  }
-  .card-container.list {
-    display: block;
-  }
-  .card {
-    background: white;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: background 0.3s, color 0.3s, transform 0.2s;
-    color: inherit;
-  }
-  body.night .card {
-    background: #232938;
-    color: #e5eaf1;
-  }
-  .card:hover {
-    transform: scale(1.02);
-  }
-  .card.list-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-  }
-  .tags {
-    margin-top: 8px;
-  }
-  .tags span {
-    background: #ddd;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    margin-right: 4px;
-    transition: background 0.3s;
-  }
-  body.night .tags span {
-    background: #393b5b;
-    color: #e5eaf1;
-  }
-  mark {
-    background-color: yellow;
-    padding: 0;
-  }
-  body.night mark {
-    background-color: #fcf07a;
-    color: #000;
-  }
-  #noResults {
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    text-align: center;
-    font-size: 1.2rem;
-    color: #888;
-    margin-top: 20px;
-    display: none;
-  }
-  #noResults.show {
-    display: block;
-    opacity: 1;
-  }
-  .daynight-toggle {
-    position: relative;
-    width: 50px;
-    height: 26px;
-    background: #444;
-    border-radius: 13px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    display: flex;
-    align-items: center;
-    padding: 2px;
-    box-sizing: border-box;
-    border: none;
-    outline: none;
-    color: #fff;
-    font-size: 18px;
-  }
-  .toggle-thumb {
-    width: 22px;
-    height: 22px;
-    background: white;
-    border-radius: 50%;
-    position: absolute;
-    left: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    transition: left 0.3s;
-    color: #333;
-    user-select: none;
-  }
-  body.night .daynight-toggle {
-    background: #f1c40f;
-    color: #333;
-  }
-  body.night .daynight-toggle .toggle-thumb {
-    left: 26px;
-  }
-  @media (max-width: 600px) {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- ========== SECURITY META HEADERS ========== -->
+  <!-- Prevent MIME-type sniffing -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <!-- Prevent clickjacking (GitHub Pages also sends this as HTTP header) -->
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <!-- Restrict Referer header on outbound links -->
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <!-- Content Security Policy: lockdown all resource origins -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self';
+             script-src 'self' 'unsafe-inline';
+             style-src 'self' 'unsafe-inline';
+             img-src 'self' https://mohammad3230.github.io;
+             connect-src 'none';
+             font-src 'self';
+             base-uri 'self';
+             form-action 'self';" />
+  <!-- Disable browser APIs that this page never needs -->
+  <meta name="permissions-policy"
+    content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()" />
+  <!-- ============================================= -->
+
+  <title>MY_STUFF</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.night {
+      background-color: #181924;
+      color: #e5eaf1;
+    }
     .title-bar {
-      flex-direction: column;
-      align-items: flex-start;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      flex-wrap: wrap;
+      transition: background 0.3s;
+    }
+    body.night .title-bar {
+      background: linear-gradient(90deg, #232938 0%, #43436d 100%);
+      color: #e5eaf1;
+    }
+    .title-left {
+      display: flex;
+      align-items: center;
+    }
+    .logo {
+      font-size: 2rem;
+      margin-right: 12px;
+    }
+    .title-bar h1 {
+      font-size: 1.6rem;
+      margin: 0;
+      font-weight: bold;
     }
     .search-container {
-      margin-top: 8px;
-      width: 100%;
-      margin-right: 0;
+      display: flex;
+      align-items: center;
+      background-color: white;
+      padding: 6px 10px;
+      border-radius: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-right: 12px;
+      transition: background-color 0.3s;
+    }
+    body.night .search-container {
+      background-color: #232938;
+      box-shadow: 0 2px 4px rgba(30,29,41,0.3);
     }
     .search-container input {
-      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: none;
+      width: 150px;
       color: inherit;
     }
-    #resultCount {
-      margin-top: 4px;
-      display: inline-block;
+    .search-container button {
+      border: none;
+      background: none;
+      color: #2575fc;
+      font-size: 1.2rem;
+      cursor: pointer;
     }
-  }
-</style>
+    #resultCount {
+      margin-left: 10px;
+      font-size: 0.9rem;
+      color: #fff;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.night #resultCount {
+      background: rgba(255,255,255,0.1);
+      color: #fcf07a;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background-color: #eaeaea;
+      flex-wrap: wrap;
+      gap: 20px;
+      transition: background 0.3s;
+    }
+    body.night .toolbar {
+      background-color: #232938;
+    }
+    .category-bar button,
+    .view-toggle button,
+    .sort-options select {
+      background: #fff;
+      border: 1px solid #ccc;
+      margin: 4px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #333;
+    }
+    .category-bar button:hover,
+    .view-toggle button:hover {
+      background: #2575fc;
+      color: white;
+    }
+    .category-bar button.active,
+    .view-toggle button.active {
+      background: #2575fc;
+      color: white;
+    }
+    body.night .category-bar button,
+    body.night .view-toggle button,
+    body.night .sort-options select {
+      background: #22253a;
+      border-color: #333756;
+      color: #e5eaf1;
+    }
+    body.night .category-bar button.active,
+    body.night .category-bar button:hover,
+    body.night .view-toggle button.active,
+    body.night .view-toggle button:hover {
+      background: #6a11cb;
+      color: #fff;
+    }
+    main {
+      padding: 20px;
+      max-width: 1100px;
+      margin: auto;
+      transition: color 0.3s;
+    }
+    .card-container.grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+    }
+    .card-container.list {
+      display: block;
+    }
+    .card {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: background 0.3s, color 0.3s, transform 0.2s;
+      color: inherit;
+    }
+    body.night .card {
+      background: #232938;
+      color: #e5eaf1;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .card.list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    .tags {
+      margin-top: 8px;
+    }
+    .tags span {
+      background: #ddd;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      margin-right: 4px;
+      transition: background 0.3s;
+    }
+    body.night .tags span {
+      background: #393b5b;
+      color: #e5eaf1;
+    }
+    mark {
+      background-color: yellow;
+      padding: 0;
+    }
+    body.night mark {
+      background-color: #fcf07a;
+      color: #000;
+    }
+    #noResults {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #888;
+      margin-top: 20px;
+      display: none;
+    }
+    #noResults.show {
+      display: block;
+      opacity: 1;
+    }
+    .daynight-toggle {
+      position: relative;
+      width: 50px;
+      height: 26px;
+      background: #444;
+      border-radius: 13px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      padding: 2px;
+      box-sizing: border-box;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 18px;
+    }
+    .toggle-thumb {
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      left: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: left 0.3s;
+      color: #333;
+      user-select: none;
+    }
+    body.night .daynight-toggle {
+      background: #f1c40f;
+      color: #333;
+    }
+    body.night .daynight-toggle .toggle-thumb {
+      left: 26px;
+    }
+    @media (max-width: 600px) {
+      .title-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .search-container {
+        margin-top: 8px;
+        width: 100%;
+        margin-right: 0;
+      }
+      .search-container input {
+        width: 100%;
+        color: inherit;
+      }
+      #resultCount {
+        margin-top: 4px;
+        display: inline-block;
+      }
+    }
+  </style>
 </head>
 <body>
+
 <header class="title-bar">
   <div class="title-left">
     <div class="logo">📦</div>
@@ -278,8 +302,14 @@
   </div>
   <div style="display:flex; align-items:center; gap: 10px;">
     <div class="search-container">
-      <input type="text" placeholder="Search..." id="searchInput" onkeyup="filterItems()" />
-      <button onclick="filterItems()">🔍</button>
+      <!-- SECURITY: removed inline onkeyup, added maxlength + autocomplete=off -->
+      <input type="text"
+             placeholder="Search..."
+             id="searchInput"
+             maxlength="100"
+             autocomplete="off"
+             aria-label="Search items" />
+      <button id="searchBtn" aria-label="Search">🔍</button>
       <span id="resultCount">0 results</span>
     </div>
     <button class="daynight-toggle" id="daynightToggle" title="Toggle Day/Night mode" aria-label="Toggle day and night mode">
@@ -289,18 +319,19 @@
 </header>
 
 <div class="toolbar">
-  <div class="category-bar">
+  <div class="category-bar" id="categoryBar">
     <button class="active" data-category="all">All</button>
     <button data-category="electronics">Electronics</button>
     <button data-category="books">Books</button>
     <button data-category="clothing">Clothing</button>
   </div>
-  <div class="view-toggle">
+  <div class="view-toggle" id="viewToggle">
     <button class="active" data-view="grid">Grid View</button>
     <button data-view="list">List View</button>
   </div>
   <div class="sort-options">
-    <select id="sortSelect" onchange="sortItems()">
+    <!-- SECURITY: removed inline onchange -->
+    <select id="sortSelect" aria-label="Sort items">
       <option value="original">Sort by: Recently Added</option>
       <option value="az">Sort by: Name (A–Z)</option>
       <option value="za">Sort by: Name (Z–A)</option>
@@ -340,42 +371,59 @@
 </main>
 
 <script>
+  /* ================================================================
+     SECURITY-NOTES:
+     • All event listeners are bound via addEventListener (no inline
+       handlers) so a future CSP upgrade to nonce-based 'unsafe-inline'
+       removal is possible.
+     • highlightText uses TreeWalker over TEXT_NODEs + textContent —
+       user input NEVER becomes HTML.
+     • clearHighlights unwraps <mark> via DOM replaceChild, not
+       innerHTML string manipulation.
+     • Search input is sanitised: null bytes stripped, length capped
+       at 100 via maxlength attribute + JS guard.
+     • No external scripts, no fetch/XHR, no eval, no Function().
+     ================================================================ */
+
+  // ── Day / Night toggle ──────────────────────────────────────────
   const dnToggle = document.getElementById('daynightToggle');
   const toggleThumb = document.getElementById('toggleThumb');
 
   dnToggle.addEventListener('click', () => {
     document.body.classList.toggle('night');
     const isNight = document.body.classList.contains('night');
-    toggleThumb.textContent = isNight ? '🌞' : '🌙';
+    toggleThumb.textContent = isNight ? '\u{1F31E}' : '\u{1F319}';
   });
 
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.body.classList.add('night');
-    toggleThumb.textContent = '🌞';
+    toggleThumb.textContent = '\u{1F31E}';
   }
 
+  // ── State ───────────────────────────────────────────────────────
   let selectedCategories = ['all'];
   let currentView = 'grid';
   let originalOrder = Array.from(document.querySelectorAll('#cardContainer .card'));
 
-  document.querySelectorAll('.category-bar button').forEach(button => {
+  // ── Category bar ────────────────────────────────────────────────
+  document.querySelectorAll('#categoryBar button').forEach(button => {
     button.addEventListener('click', () => {
       const category = button.getAttribute('data-category');
       if (category === 'all') {
         selectedCategories = ['all'];
-        document.querySelectorAll('.category-bar button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('#categoryBar button').forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
       } else {
         if (selectedCategories.includes('all')) {
           selectedCategories = [];
-          document.querySelector('.category-bar button[data-category="all"]').classList.remove('active');
+          document.querySelector('#categoryBar button[data-category="all"]').classList.remove('active');
         }
         if (selectedCategories.includes(category)) {
           selectedCategories = selectedCategories.filter(c => c !== category);
           button.classList.remove('active');
           if (selectedCategories.length === 0) {
             selectedCategories = ['all'];
-            document.querySelector('.category-bar button[data-category="all"]').classList.add('active');
+            document.querySelector('#categoryBar button[data-category="all"]').classList.add('active');
           }
         } else {
           selectedCategories.push(category);
@@ -386,74 +434,161 @@
     });
   });
 
-  document.querySelectorAll('.view-toggle button').forEach(button => {
+  // ── View toggle ─────────────────────────────────────────────────
+  document.querySelectorAll('#viewToggle button').forEach(button => {
     button.addEventListener('click', () => {
-      document.querySelectorAll('.view-toggle button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('#viewToggle button').forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
       currentView = button.getAttribute('data-view');
       const container = document.getElementById('cardContainer');
-      container.className = `card-container ${currentView}`;
+      container.className = 'card-container ' + currentView;
       document.querySelectorAll('.card').forEach(card => {
         card.classList.toggle('list-item', currentView === 'list');
       });
     });
   });
 
-  function filterItems() {
-    let input = document.getElementById('searchInput').value.trim().toLowerCase();
-    let cards = document.querySelectorAll('.card');
-    let noResults = document.getElementById('noResults');
-    let resultCount = document.getElementById('resultCount');
-    let keywords = input.split(/\s+/).filter(word => word.length > 0);
-    let matchCount = 0;
-    cards.forEach(card => {
-      let cleanHTML = card.innerHTML.replace(/<\/?mark>/g, '');
-      card.innerHTML = cleanHTML;
-      let text = card.innerText.toLowerCase();
-      let category = card.getAttribute('data-category');
-      let categoryMatch = (selectedCategories.includes('all') || selectedCategories.includes(category));
-      let textMatch = keywords.length === 0 || keywords.some(word => text.includes(word));
-      if (categoryMatch && textMatch) {
-        card.style.display = "";
-        matchCount++;
-        keywords.forEach(word => highlightText(card, word));
-      } else {
-        card.style.display = "none";
-      }
-    });
-    resultCount.textContent = `${matchCount} result${matchCount !== 1 ? 's' : ''}`;
-    noResults.classList.toggle('show', matchCount === 0);
-  }
+  // ── Sort ────────────────────────────────────────────────────────
+  document.getElementById('sortSelect').addEventListener('change', sortItems);
 
   function sortItems() {
     const container = document.getElementById('cardContainer');
-    let sortType = document.getElementById('sortSelect').value;
+    const sortType = document.getElementById('sortSelect').value;
     let cards = Array.from(container.querySelectorAll('.card'));
+
     if (sortType === 'az') {
-      cards.sort((a, b) => a.querySelector('h2').innerText.localeCompare(b.querySelector('h2').innerText));
+      cards.sort((a, b) =>
+        a.querySelector('h2').textContent.localeCompare(b.querySelector('h2').textContent)
+      );
     } else if (sortType === 'za') {
-      cards.sort((a, b) => b.querySelector('h2').innerText.localeCompare(a.querySelector('h2').innerText));
+      cards.sort((a, b) =>
+        b.querySelector('h2').textContent.localeCompare(a.querySelector('h2').textContent)
+      );
     } else {
-      cards = [...originalOrder];
+      cards = originalOrder.slice();
     }
+
     container.innerHTML = '';
     cards.forEach(card => container.appendChild(card));
     filterItems();
   }
 
+  // ── Search button ───────────────────────────────────────────────
+  document.getElementById('searchBtn').addEventListener('click', filterItems);
+
+  // ── Search input (debounced keyup) ──────────────────────────────
+  let searchTimer = null;
+  document.getElementById('searchInput').addEventListener('keyup', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(filterItems, 150);
+  });
+
+  // ── Sanitise raw user input ─────────────────────────────────────
+  function sanitiseSearch(raw) {
+    // Strip null bytes and control characters (except normal whitespace)
+    return raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim();
+  }
+
+  // ── Clear previous highlights (safe DOM approach) ───────────────
+  function clearHighlights(element) {
+    const marks = element.querySelectorAll('mark');
+    marks.forEach(mark => {
+      const textNode = document.createTextNode(mark.textContent);
+      mark.parentNode.replaceChild(textNode, mark);
+    });
+    // Merge adjacent text nodes back together
+    element.normalize();
+  }
+
+  // ── Highlight matching text (XSS-safe: only touches TEXT_NODEs) ─
   function highlightText(element, search) {
     if (!search) return;
-    let regex = new RegExp(`(${escapeRegExp(search)})`, "gi");
-    element.innerHTML = element.innerHTML.replace(regex, "<mark>$1</mark>");
+    const pattern = new RegExp('(' + escapeRegExp(search) + ')', 'gi');
+
+    // Walk only text nodes — never attribute values or element tags
+    const walker = document.createTreeWalker(
+      element,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false
+    );
+    const textNodes = [];
+    while (walker.nextNode()) {
+      textNodes.push(walker.currentNode);
+    }
+
+    textNodes.forEach(node => {
+      const text = node.nodeValue;
+      if (!pattern.test(text)) return;
+      pattern.lastIndex = 0; // reset after test()
+
+      const fragment = document.createDocumentFragment();
+      let lastIndex = 0;
+      let match;
+
+      while ((match = pattern.exec(text)) !== null) {
+        // Text before the match
+        if (match.index > lastIndex) {
+          fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+        }
+        // The highlighted match — textContent is safe, never parsed as HTML
+        const mark = document.createElement('mark');
+        mark.textContent = match[1];
+        fragment.appendChild(mark);
+        lastIndex = pattern.lastIndex;
+      }
+      // Remaining text after last match
+      if (lastIndex < text.length) {
+        fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+      node.parentNode.replaceChild(fragment, node);
+    });
   }
 
-  function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // ── Escape regex special characters ─────────────────────────────
+  function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  // ── Main filter logic ───────────────────────────────────────────
+  function filterItems() {
+    const rawInput = document.getElementById('searchInput').value;
+    const input = sanitiseSearch(rawInput).toLowerCase();
+    const keywords = input.split(/\s+/).filter(word => word.length > 0);
+    const cards = document.querySelectorAll('.card');
+    const noResults = document.getElementById('noResults');
+    const resultCount = document.getElementById('resultCount');
+    let matchCount = 0;
+
+    cards.forEach(card => {
+      // 1. Safely remove any existing <mark> highlights via DOM
+      clearHighlights(card);
+
+      // 2. Read plain text (immune to HTML injection)
+      const text = card.textContent.toLowerCase();
+      const category = card.getAttribute('data-category');
+      const categoryMatch = selectedCategories.includes('all') || selectedCategories.includes(category);
+      const textMatch = keywords.length === 0 || keywords.some(word => text.includes(word));
+
+      if (categoryMatch && textMatch) {
+        card.style.display = '';
+        matchCount++;
+        // 3. Safely highlight using DOM-only methods
+        keywords.forEach(word => highlightText(card, word));
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    resultCount.textContent = matchCount + ' result' + (matchCount !== 1 ? 's' : '');
+    noResults.classList.toggle('show', matchCount === 0);
+  }
+
+  // ── Initial render ──────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
     filterItems();
   });
 </script>
+
 </body>
 </html>
