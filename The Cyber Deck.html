@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- 1. CONTENT SECURITY POLICY (CSP) -->
+    <!-- This prevents malicious scripts from running unless they are from trusted sources -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com;">
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688"
+     crossorigin="anonymous"></script>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GT-NC6T5LRJ');
+    </script>
+    
     <link rel="icon" href="https://mohammad3230.github.io/Games-More-.../favicon.png" type="image/png" sizes="32x32" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>MY_STUFF_AIO</title>
+    
     <style>
-        /* Matrix animated background canvas style */
+        /* --- GLOBAL & MATRIX STYLES --- */
+        html, body { margin: 0; padding: 0; height: 100%; overflow-x: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
         #matrix {
             position: fixed;
             top: 0; left: 0;
@@ -15,9 +34,99 @@
             z-index: -1;
             background: #000010;
             display: block;
+            transition: opacity 1s ease;
         }
 
-        /* Top-left container for categories */
+        .page-title {
+            text-align: center; color: #00eaff; font-family: 'Segoe UI', sans-serif; font-size: 3em;
+            text-transform: uppercase; letter-spacing: 4px; margin-top: 30px; margin-bottom: 20px; user-select: none;
+            text-shadow: 0 0 5px #f9fbfb, 0 0 15px #f4f5f6;
+            padding: 0 80px; 
+        }
+
+        .page-title .version { font-size: 0.55em; color: #00e5ff; letter-spacing: 1px; margin-left: 8px; font-weight: 400; }
+
+        /* --- GENERIC LEVER STYLES --- */
+        .lever-container {
+            width: 70px;
+            height: 160px;
+            background: rgba(10, 10, 25, 0.9);
+            border: 2px solid #333;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 10px #000;
+            z-index: 100;
+            cursor: pointer;
+            transition: border-color 0.4s;
+        }
+
+        .lever-label { 
+            font-size: 0.65em; 
+            color: #555; 
+            font-family: monospace; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            pointer-events: none; 
+        }
+
+        .lever-track {
+            width: 16px;
+            height: 90px;
+            background: #050505;
+            border-radius: 8px;
+            position: relative;
+            border: 1px solid #222;
+        }
+
+        .lever-handle {
+            width: 34px;
+            height: 44px;
+            background: linear-gradient(145deg, #555, #111);
+            border: 1px solid #777;
+            border-radius: 6px;
+            position: absolute;
+            left: -10px;
+            top: 0; /* UP Position */
+            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+        }
+
+        /* --- RIGHT SIDE LEVERS --- */
+
+        /* 1. MATRIX LEVER (Rightmost) */
+        #lever-matrix {
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+        }
+        #lever-matrix.active { border-color: #00bfff; box-shadow: 0 0 25px rgba(0, 191, 255, 0.4); }
+        #lever-matrix.active .lever-handle {
+            top: 46px;
+            background: linear-gradient(145deg, #00bfff, #005f7f);
+            box-shadow: 0 0 15px #00bfff;
+            border-color: #e0f7ff;
+        }
+
+        /* 2. SECURITY LEVER (Next to Matrix) */
+        #lever-security {
+            position: fixed;
+            top: 50%;
+            right: 130px; 
+            transform: translateY(-50%);
+        }
+        #lever-security.active { border-color: #ff0055; box-shadow: 0 0 25px rgba(255, 0, 85, 0.4); }
+        #lever-security.active .lever-handle {
+            top: 46px;
+            background: linear-gradient(145deg, #ff0055, #80002a);
+            box-shadow: 0 0 15px #ff0055;
+            border-color: #ffe0e7;
+        }
+
+        /* --- UI PANELS --- */
         .top-left-container {
             position: fixed;
             top: 30px;
@@ -25,7 +134,6 @@
             z-index: 10;
         }
 
-        /* BOTTOM LEFT & RIGHT PANELS */
         .bottom-left-panel {
             position: fixed;
             bottom: 30px;
@@ -44,22 +152,24 @@
         .bottom-right-panel {
             position: fixed;
             bottom: 30px;
-            right: 30px;
-            width: 200px; /* Adjusted for Cyber Deck content */
-            height: 300px;
-            min-height: 380px;
+            right: 230px; 
+            width: 220px;
+            height: 40px; 
             background: rgba(0, 0, 0, 0.7);
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px 20px;
             box-shadow: 0 0 25px rgba(255, 165, 0, 0.5);
             border: 1px solid rgba(0, 240, 255, 0.2);
             color: white;
             font-family: monospace, monospace;
             z-index: 5;
-            transition: box-shadow 0.5s ease, border 0.5s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
-        /* === CATEGORIES PANEL === */
+        .bottom-right-panel.expanded { height: 520px; }
+
+        /* Categories Panel */
         .categories-panel {
             width: 180px;
             height: 100px;
@@ -125,65 +235,109 @@
         .main-category .main-link { color: #00e5ff; font-weight: bold; padding: 10px 12px; display: block; border-bottom: 1px solid rgba(0, 191, 255, 0.2); }
         .main-category .submenu a { color: #bbbbff; padding: 8px 20px; display: block; font-size: 0.85em; }
 
-        html, body { margin: 0; padding: 0; height: 100%; overflow-x: hidden; }
-        
-        .page-title {
-            text-align: center; color: #00eaff; font-family: 'Segoe UI', sans-serif; font-size: 3em;
-            text-transform: uppercase; letter-spacing: 4px; margin-top: 30px; margin-bottom: 20px; user-select: none;
-            text-shadow: 0 0 5px #f9fbfb, 0 0 15px #f4f5f6;
+        .site-footer {
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #e0f7ff;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 3px 7px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            user-select: none;
+            box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(0, 191, 255, 0.3);
+            z-index: 10;
         }
 
-         .site-footer {
-  background-color: rgba(0, 0, 0, 0.1);
-  color: #e0f7ff;
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 3px 7px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  position: fixed;        /* keeps it at bottom even when scrolling */
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  user-select: none;
-  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(0, 191, 255, 0.3);
-  z-index: 10;            /* above canvas and panels */
-}
-
-.site-footer small {
-  display: inline-block;
-  letter-spacing: 1px;
-  color: #00e5ff;
-}
-
-        .page-title .version { font-size: 0.55em; color: #00e5ff; letter-spacing: 1px; margin-left: 8px; font-weight: 400; }
+        .site-footer small { display: inline-block; letter-spacing: 1px; color: #00e5ff; }
 
         /* Cyber Deck Specifics */
         .network-pulse { width: 8px; height: 8px; border-radius: 50%; background-color: #00f0ff; box-shadow: 0 0 8px #00f0ff; }
         #terminalLog { display: flex; flex-direction: column-reverse; overflow-y: hidden; }
         #graphSvg { overflow: visible !important; }
+
+        /* Custom UI Power Switch */
+        .power-switch {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            background: #ff4444;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        .power-switch.on {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+            color: #000;
+        }
+
+        /* Hidden class for HUD toggle */
+        .hud-element { transition: opacity 0.3s; }
+        .hud-hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
   
    <canvas id="matrix"></canvas>
+  
   <h1 class="page-title">
   MY_STUFF_AIO
-  <span class="version">v2.0</span>
+  <span class="version">v2.0 [SECURE]</span>
 </h1>
-                                           
 
-  <!-- FIXED CATEGORIES PANEL (TOP LEFT) -->
+  <!-- LEVER 2: SECURITY / HUD (Right Side, Inner) -->
+  <div id="lever-security" class="lever-container" onclick="toggleHUD()">
+      <span class="lever-label">HUD</span>
+      <div class="lever-track">
+          <div class="lever-handle"></div>
+      </div>
+      <span class="lever-label">SEC</span>
+  </div>
+
+  <!-- LEVER 1: MATRIX (Right Side, Outer) -->
+  <div id="lever-matrix" class="lever-container" onclick="toggleMatrix()">
+      <span class="lever-label">OFF</span>
+      <div class="lever-track">
+          <div class="lever-handle"></div>
+      </div>
+      <span class="lever-label">MATRIX</span>
+  </div>
+
   <div class="top-left-container">
     <div class="categories-panel" id="categoriesPanel">
       <h3>Categories</h3>
       <div class="dropdown">
         <button onclick="toggleCategoryPanel()" class="dropbtn">☰ Filter Categories</button>
         <div id="categoryDropdown" class="dropdown-content filter-container">
+          <input type="text" id="categoryFilter" placeholder="🔍 Search categories..." onkeyup="filterCategories()" autocomplete="off">
+           
+            <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 Food</a>
+            <div class="submenu" style="display: none;">
+              <a href="USDA FOOD SEARCH cyberpunk oldstyle.html">USDA FOOD SEARCH</a>
+            </div>
+          </div>
 
-          <input type="text" id="categoryFilter" placeholder="🔍 Search categories..." onkeyup="filterCategories()">
+             <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 HEALTH</a>
+            <div class="submenu" style="display: none;">
+              <a href="Health scanner & Guidance.html">Health scanner & Guidance</a>
+            </div>
+          </div>
 
-          <!-- Main option with sub‑options -->
+            <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 Messages</a>
+            <div class="submenu" style="display: none;">
+              <a href="messages receives and responds.html">Message Receiver</a>
+            </div>
+          </div>
+
           <div class="main-category">
             <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 MY_STUFF v1.0</a>
             <div class="submenu" style="display: none;">
@@ -191,21 +345,60 @@
             </div>
           </div>
 
+            <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 MY_STUFF v3.0</a>
+            <div class="submenu" style="display: none;">
+                <a href="https://mohammad3230.github.io/PROJECT/">MY_STUFF v1.0</a>
+                <a href="linux.html">GHOST_TAC_v80.8</a>
+            </div>
+          </div>
+
+            <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 News</a>
+            <div class="submenu" style="display: none;">
+                <a href="https://www.aljazeera.com/news/" target="_blank" rel="noopener noreferrer">Aljazeera News</a>
+                <a href="https://www.bbc.com/news" target="_blank" rel="noopener noreferrer">BBC</a>
+                <a href="https://news.google.com/home?hl=en-IN&gl=IN&ceid=IN%3Aen" target="_blank" rel="noopener noreferrer">Google News</a>
+                <a href="https://news.un.org/en/" target="_blank" rel="noopener noreferrer">UN Org</a>
+                <a href="https://www.thehindu.com/latest-news/" target="_blank" rel="noopener noreferrer">The Hindu</a>
+                <a href="https://timesofindia.indiatimes.com/" target="_blank" rel="noopener noreferrer">The Times of India</a>
+            </div>
+          </div>
+
+
+            <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 Omni-Deck</a>
+            <div class="submenu" style="display: none;">
+              <a href="OMNI-DECK.html">OMNi - DeCk</a>
+            </div>
+          </div>
+
           <div class="main-category">
             <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 Online Games</a>
             <div class="submenu" style="display: none;">
               <a href="snake.html">Snake Game</a>
-              <a href="#">API Docs</a>
-              <a href="#">Changelogs</a>
             </div>
           </div>
 
-        <div class="main-category">
-            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 News</a>
+              <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 Page Capture</a>
             <div class="submenu" style="display: none;">
-              <a href="https://timesofindia.indiatimes.com/">The Times of India</a>
-              <a href="https://www.thehindu.com/latest-news/">The Hindu</a>
-              <a href="#">Changelogs</a>
+              <a href="Page Capture.html">Page Capture</a>
+            </div>
+          </div>
+
+            <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 ToolHub</a>
+            <div class="submenu" style="display: none;">
+              <a href="Toolhub.html">ToOl_HuB</a>
+            </div>
+          </div>
+
+                <div class="main-category">
+            <a href="#" class="main-link" onclick="toggleSubmenu(event)">📁 Walkie Talkie</a>
+            <div class="submenu" style="display: none;">
+              <a href="testing.html">Testing</a>
+              <a href="receiver.html">Walkie Talkie Receiver</a>
             </div>
           </div>
 
@@ -218,10 +411,10 @@
             </div>
           </div>
 
-          <a href="https://in.pinterest.com/">📌 Pinterest</a>
           <a href="music.html">🎵 My_Music</a>
+          <a href="https://in.pinterest.com/" target="_blank" rel="noopener noreferrer">📌 Pinterest</a>
           <a href="radio.html">📡 Live Radio</a>
-        <a href="https://www.zedge.net/ringtones">🖼️ Zedge Wallpapers</a> 
+          <a href="https://www.zedge.net/ringtones" target="_blank" rel="noopener noreferrer">🖼️ Zedge Wallpapers</a> 
           <a href="#">⚙️ Settings</a>
           <a href="#">🎨 Templates</a>
           <a href="#">📤 Exports</a>
@@ -233,118 +426,135 @@
     </div>
   </div>
 
-    <div class="bottom-left-panel">
-        <h5>Search Engines</h5>
-        <p><a href="https://www.google.com" target="_blank">Google</a><br><small>Google will Track You</small></p>
-        <p><a href="https://www.startpage.com" target="_blank">Startpage</a><br><small>Most Private search Engine</small></p>
-        <p><a href="https://www.ecosia.org" target="_blank">Ecosia</a><br><small>Save Trees</small></p>
-    </div>
-
-    <div class="bottom-right-panel" id="systemPanel">
+    <div class="bottom-right-panel hud-element" id="systemPanel">
         <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px;">
-            <h5 style="font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #ffa500; margin: 0;">Cyber Deck</h5>
+            <h5 onclick="toggleDeckExpand()" style="font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #ffa500; margin: 0; cursor:pointer;" title="Minimize / Maximize Deck (Right click to purge stats)">Cyber Deck ⬍</h5>
             <div style="display: flex; gap: 8px; align-items: center;">
+                <span id="powerBtn" onclick="togglePower(event)" class="power-switch on">PWR: ON</span>
                 <span id="muteBtn" onclick="toggleMute()" style="cursor: pointer; font-size: 0.8em; color: #00f0ff; user-select: none;">🔊</span>
                 <span id="autoResponse" onclick="toggleAutoResponse()" style="cursor: pointer; font-size: 0.8em; color: #00ff88; user-select: none; margin-left: 5px;">AUTO: OFF</span>
-<span id="breachCount" style="font-size: 0.7em; color: #ff4444; font-weight: bold;">0</span>
-
+                <span id="breachCount" style="font-size: 0.7em; color: #ff4444; font-weight: bold;">0</span>
                 <span id="digitalClock" style="font-size: 0.8em; color: #00f0ff; font-weight: bold; font-family: monospace;">00:00:00</span>
             </div>
         </div>
         
-        <div style="font-size: 0.65em; color: #8888ff; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 165, 0, 0.2); padding-bottom: 5px;">
-            UPTIME: <span id="uptimeVar" style="color: #bbbbff; font-weight: bold;">00:00:00:00</span>
-        </div>
+        <div id="deckContent">
+            <div style="font-size: 0.65em; color: #8888ff; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 165, 0, 0.2); padding-bottom: 5px;">
+                UPTIME: <span id="uptimeVar" style="color: #bbbbff; font-weight: bold;">00:00:00:00</span>
+            </div>
 
-        <div style="margin-bottom: 12px; border-top: 1px solid rgba(255, 165, 0, 0.1); padding-top: 8px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.7em; margin-bottom: 4px;">
-                <span style="color: #bbbbff;">CORE_DECRYPTION:</span>
-                <span id="decryptVal" style="color: #00f0ff; font-weight: bold;">0%</span>
-            </div>
-            <div style="width: 100%; height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 2px; overflow: hidden;">
-                <div id="decryptBar" style="width: 0%; height: 100%; background: #00f0ff; transition: all 0.5s ease; box-shadow: 0 0 10px #00f0ff;"></div>
-            </div>
-        </div>
-        <div style="margin: 12px 0; border-top: 1px solid rgba(255, 0, 100, 0.3); padding-top: 8px;">
-    <div style="display: flex; justify-content: space-between; font-size: 0.7em; margin-bottom: 4px;">
-        <span style="color: #ff0080;">THREAT LEVEL:</span>
-        <span id="threatVal" style="color: #ff4444; font-weight: bold;">0%</span>
-    </div>
-    <div style="width: 100%; height: 4px; background: rgba(255, 0, 100, 0.1); border-radius: 2px; overflow: hidden;">
-        <div id="threatBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff0080, #ff4444); transition: all 0.5s ease; box-shadow: 0 0 8px #ff0080;"></div>
-    </div>
-</div>
-
-
-        <div style="margin-bottom: 12px; border-top: 1px solid rgba(0, 240, 255, 0.2); padding-top: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <small id="statusLabel" style="color: #00f0ff; letter-spacing: 1px; font-weight: bold; font-size: 0.7em;">STATUS: SECURE</small>
-                <div class="network-pulse" id="pulseNode"></div>
-            </div>
-            <div style="width: 100%; height: 40px; background: rgba(0, 240, 255, 0.05); border-radius: 4px; margin-bottom: 8px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.1); position: relative;">
-                <svg width="100%" height="100%" viewBox="0 0 200 40" preserveAspectRatio="none" id="graphSvg">
-                    <polyline id="graphLine" fill="none" stroke="#00f0ff" stroke-width="1.5" points="0,40 20,40 40,40 60,40 80,40 100,40 120,40 140,40 160,40 180,40 200,40" />
-                    <g id="particleGroup"></g>
-                </svg>
-            </div>
-            <div style="font-size: 0.7em; display: flex; flex-direction: column; gap: 4px;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: #bbbbff;">DOWNLINK:</span>
-                    <span><span id="downMB" style="color: #00f0ff; font-weight: bold;">0</span> <small>Mbps</small></span>
+            <div style="margin-bottom: 12px; border-top: 1px solid rgba(255, 165, 0, 0.1); padding-top: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.7em; margin-bottom: 4px;">
+                    <span style="color: #bbbbff;">CORE_DECRYPTION:</span>
+                    <span id="decryptVal" style="color: #00f0ff; font-weight: bold;">0%</span>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: #bbbbff;">UPLINK:</span>
-                    <span><span id="upMB" style="color: #00f0ff; font-weight: bold;">0</span> <small>Mbps</small></span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.9em; margin-top: 2px;">
-                    <span>PING: <span id="pingVal" style="color: #00f0ff;">20</span>ms</span>
-                    <span>LOSS: <span id="lossVal" style="color: #00f0ff;">0.00%</span></span>
+                <div style="width: 100%; height: 4px; background: rgba(255, 255, 255, 0.05); border-radius: 2px; overflow: hidden;">
+                    <div id="decryptBar" style="width: 0%; height: 100%; background: #00f0ff; transition: all 0.5s ease; box-shadow: 0 0 10px #00f0ff;"></div>
                 </div>
             </div>
-        </div>
-       
-        <div id="terminalLog" style="font-size: 0.65em; color: #ffa500; height: 60px; background: rgba(0,0,0,0.4); padding: 5px; border-radius: 4px; border: 1px solid rgba(255,165,0,0.1); line-height: 1.2;">
-            <div>> initializing_sys_v2.0...</div>
-        </div>
-       <audio id="alertSound" src="https://www.soundjay.com/misc/sounds/beep-07.wav" preload="auto"></audio>
+            <div style="margin: 12px 0; border-top: 1px solid rgba(255, 0, 100, 0.3); padding-top: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.7em; margin-bottom: 4px;">
+                    <span style="color: #ff0080;">THREAT LEVEL:</span>
+                    <span id="threatVal" style="color: #ff4444; font-weight: bold;">0%</span>
+                </div>
+                <div style="width: 100%; height: 4px; background: rgba(255, 0, 100, 0.1); border-radius: 2px; overflow: hidden;">
+                    <div id="threatBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff0080, #ff4444); transition: all 0.5s ease; box-shadow: 0 0 8px #ff0080;"></div>
+                </div>
+            </div>
 
+            <div style="margin-bottom: 12px; border-top: 1px solid rgba(0, 240, 255, 0.2); padding-top: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <small id="statusLabel" style="color: #00f0ff; letter-spacing: 1px; font-weight: bold; font-size: 0.7em;">STATUS: SECURE</small>
+                    <div class="network-pulse" id="pulseNode"></div>
+                </div>
+                <div style="width: 100%; height: 40px; background: rgba(0, 240, 255, 0.05); border-radius: 4px; margin-bottom: 8px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.1); position: relative;">
+                    <svg width="100%" height="100%" viewBox="0 0 200 40" preserveAspectRatio="none" id="graphSvg">
+                        <polyline id="graphLine" fill="none" stroke="#00f0ff" stroke-width="1.5" points="0,40 20,40 40,40 60,40 80,40 100,40 120,40 140,40 160,40 180,40 200,40" />
+                        <g id="particleGroup"></g>
+                    </svg>
+                </div>
+                <div style="font-size: 0.7em; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #bbbbff;">DOWNLINK:</span>
+                        <span><span id="downMB" style="color: #00f0ff; font-weight: bold;">0</span> <small>Mbps</small></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #bbbbff;">UPLINK:</span>
+                        <span><span id="upMB" style="color: #00f0ff; font-weight: bold;">0</span> <small>Mbps</small></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9em; margin-top: 2px;">
+                        <span>PING: <span id="pingVal" style="color: #00f0ff;">20</span>ms</span>
+                        <span>LOSS: <span id="lossVal" style="color: #00f0ff;">0.00%</span></span>
+                    </div>
+                </div>
+            </div>
+           
+            <div id="terminalLog" style="font-size: 0.65em; color: #ffa500; height: 60px; background: rgba(0,0,0,0.4); padding: 5px; border-radius: 4px; border: 1px solid rgba(255,165,0,0.1); line-height: 1.2;">
+                <div>> initializing_sys_v2.0...</div>
+            </div>
+        </div>
+        <audio id="alertSound" src="https://www.soundjay.com/misc/sounds/beep-07.wav" preload="auto"></audio>
     </div>
 
     <footer class="site-footer">
-    <small>Copyright © 2023 All rights reserved</small>
+    <small>Copyright © 2023-2026 All rights reserved</small>
   </footer>
 
  <script>
-    // Matrix animation
+    // ===== STATE MANAGEMENT =====
+    let matrixActive = false;
+    let hudActive = true;
+
+    // ===== MATRIX ANIMATION =====
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    
+    function resizeCanvas() { 
+        canvas.width = window.innerWidth; 
+        canvas.height = window.innerHeight; 
+    }
     resizeCanvas();
+    
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
     const fontSize = 20;
     let columns = Math.floor(canvas.width / fontSize);
     const drops = new Array(columns).fill(0);
+    let currentBg = { r: 0, g: 0, b: 16 };
 
-    // Track background state for pulses
-    let currentBg = { r: 0, g: 0, b: 16 }; 
-
-    function drawMatrix() {
-        // Apply dynamic background color
-        ctx.fillStyle = `rgba(${currentBg.r}, ${currentBg.g}, ${currentBg.b}, 0.1)`;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function toggleMatrix() {
+        matrixActive = !matrixActive;
+        const lever = document.getElementById('lever-matrix');
         
-        ctx.font = fontSize + 'px monospace';
-        for (let i = 0; i < drops.length; i++) {
-            const text = characters.charAt(Math.floor(Math.random() * characters.length));
-            // Matrix characters also shift slightly towards red as threat increases
-            const colorShift = currentBg.r > 20 ? '#ff5555' : (i % 2 === 0 ? '#00bfff' : '#e0f7ff');
-            ctx.fillStyle = colorShift;
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
+        if (matrixActive) {
+            lever.classList.add('active');
+        } else {
+            lever.classList.remove('active');
+            // Clear canvas immediately when turning off
+            ctx.fillStyle = '#000010';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
     }
+
+    function drawMatrix() {
+        // Fade effect for trails
+        ctx.fillStyle = `rgba(${currentBg.r}, ${currentBg.g}, ${currentBg.b}, 0.1)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = fontSize + 'px monospace';
+        
+        if (matrixActive) {
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                const colorShift = currentBg.r > 20 ? '#ff5555' : (i % 2 === 0 ? '#00bfff' : '#e0f7ff');
+                ctx.fillStyle = colorShift;
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+    }
+    
     setInterval(drawMatrix, 50);
+    
     window.addEventListener('resize', () => { 
         resizeCanvas(); 
         columns = Math.floor(canvas.width / fontSize); 
@@ -352,7 +562,22 @@
         drops.fill(0); 
     });
 
-    // UI Helpers
+    // ===== SECURITY LEVER (HUD TOGGLE) =====
+    function toggleHUD() {
+        hudActive = !hudActive;
+        const lever = document.getElementById('lever-security');
+        const hudElements = document.querySelectorAll('.hud-element');
+        
+        if (hudActive) {
+            lever.classList.add('active');
+            hudElements.forEach(el => el.classList.remove('hud-hidden'));
+        } else {
+            lever.classList.remove('active');
+            hudElements.forEach(el => el.classList.add('hud-hidden'));
+        }
+    }
+
+    // ===== UI HELPERS =====
     function toggleCategoryPanel() {
         document.getElementById('categoriesPanel').classList.toggle('expanded');
         document.getElementById('categoryDropdown').classList.toggle('show');
@@ -368,7 +593,10 @@
     }
 
     function filterCategories() {
-        const filter = document.getElementById("categoryFilter").value.toUpperCase();
+        const filterInput = document.getElementById("categoryFilter");
+        // Basic input sanitization to prevent HTML injection in attributes (though logic uses textContent)
+        const filter = filterInput.value.replace(/[<>]/g, "").toUpperCase();
+        
         const links = document.getElementById("categoryDropdown").querySelectorAll("a");
         links.forEach(el => {
             const txt = el.textContent || el.innerText;
@@ -376,164 +604,49 @@
         });
     }
 
-    // Cyber Deck Logic
-    let startTime = Date.now();
-    let graphPoints = [35, 30, 32, 28, 35, 30, 25, 30, 35, 38, 40];
-    let decryptPercent = 0;
-    let isMuted = false;
-    let lastBreachStatus = false;
-    let breachCount = 0;
-    let autoResponse = false;
-    const deckLogs = ["Decrypting block...", "RSA Key Found", "Bypassing Firewall", "Node link: Active", "Shifting Frequency"];
+    function toggleDeckExpand() {
+        document.getElementById('systemPanel').classList.toggle('expanded');
+    }
 
-    function updateDashboard() {
-        const now = new Date();
-        document.getElementById('digitalClock').innerText = now.toLocaleTimeString('en-GB');
-        let diff = Math.floor((Date.now() - startTime) / 1000) + 87200;
-        document.getElementById('uptimeVar').innerText = `${Math.floor(diff/86400).toString().padStart(2,'0')}:${Math.floor((diff%86400)/3600).toString().padStart(2,'0')}:${Math.floor((diff%3600)/60).toString().padStart(2,'0')}:${(diff%60).toString().padStart(2,'0')}`;
+    let isPoweredOn = true;
+    function togglePower(event) {
+        event.stopPropagation();
+        isPoweredOn = !isPoweredOn;
+        const btn = document.getElementById('powerBtn');
+        const content = document.getElementById('deckContent');
 
-        let dl = (Math.random() * 45 + 10).toFixed(1);
-        let ul = (Math.random() * 15 + 2).toFixed(1);
-        let lossNum = (Math.random() > 0.92) ? (Math.random() * 0.15) : (Math.random() * 0.01);
-        
-        if (autoResponse && lossNum > 0.05) {
-            lossNum = 0.00;
-            addTerminalLog("AUTO-RESPONSE: Threat neutralized", "#00ff88");
-        }
-
-        const isBreach = lossNum > 0.05;
-        const color = isBreach ? "#ff4444" : "#00f0ff";
-
-        if (isBreach) {
-            breachCount++;
-            document.getElementById('breachCount').innerText = breachCount;
-            if (!lastBreachStatus) {
-                if (!isMuted) document.getElementById('alertSound').play().catch(()=>{});
-                addTerminalLog("BREACH_DETECTED", "#ff4444");
-            }
-        }
-        
-        lastBreachStatus = isBreach;
-        document.getElementById('statusLabel').innerText = isBreach ? "STATUS: BREACH" : "STATUS: SECURE";
-        document.getElementById('statusLabel').style.color = color;
-        document.getElementById('pulseNode').style.backgroundColor = color;
-
-        document.getElementById('downMB').innerText = dl;
-        document.getElementById('upMB').innerText = ul;
-        document.getElementById('lossVal').innerText = lossNum.toFixed(2) + "%";
-
-        if (decryptPercent < 99.9) decryptPercent += Math.random() * 0.5;
-        else if (Math.random() > 0.98) decryptPercent = 0;
-        document.getElementById('decryptVal').innerText = decryptPercent.toFixed(1) + "%";
-        document.getElementById('decryptBar').style.width = decryptPercent + "%";
-
-        // Threat Level & Background Tint Logic
-        let threatLevel = Math.min(100, (lossNum * 2000) + (decryptPercent * 0.4));
-        document.getElementById('threatVal').innerText = threatLevel.toFixed(0) + '%';
-        document.getElementById('threatBar').style.width = threatLevel + '%';
-        document.getElementById('threatBar').style.boxShadow = `0 0 8px hsl(${120 - threatLevel}, 100%, 50%)`;
-
-        // Shift background to red if threat > 80%
-        if (threatLevel > 80) {
-            currentBg = { r: 40, g: 0, b: 0 }; // Dark Red alert
-            document.getElementById('systemPanel').style.boxShadow = "0 0 40px rgba(255, 0, 0, 0.6)";
+        if (isPoweredOn) {
+            btn.innerText = "PWR: ON";
+            btn.classList.add('on');
+            content.style.opacity = "1";
+            content.style.pointerEvents = "auto";
+            addTerminalLog("SYSTEM COLD BOOT SUCCESSFUL", "#00f0ff");
         } else {
-            currentBg = { r: 0, g: 0, b: 16 }; // Standard Blue/Black
-            document.getElementById('systemPanel').style.boxShadow = "0 0 25px rgba(255, 165, 0, 0.5)";
-        }
-
-        graphPoints.shift(); 
-        graphPoints.push(Math.floor(Math.random() * 30 + 5));
-        document.getElementById('graphLine').setAttribute("points", graphPoints.map((p, i) => `${i * 20},${p}`).join(" "));
-        
-        if (Math.random() > 0.85) addTerminalLog(deckLogs[Math.floor(Math.random() * deckLogs.length)], "#ffa500");
-    }
-
-    function addTerminalLog(msg, color) {
-        const t = document.getElementById('terminalLog');
-        const entry = document.createElement('div');
-        entry.style.color = color;
-        entry.textContent = "> " + msg;
-        t.prepend(entry);
-        if (t.childNodes.length > 5) t.removeChild(t.lastElementChild);
-    }
-
-    function toggleMute() {
-        isMuted = !isMuted;
-        document.getElementById('muteBtn').innerText = isMuted ? "🔇" : "🔊";
-    }
-
-    function toggleAutoResponse() {
-        autoResponse = !autoResponse;
-        const btn = document.getElementById('autoResponse');
-        btn.innerText = `AUTO: ${autoResponse ? 'ON' : 'OFF'}`;
-        btn.style.color = autoResponse ? '#00ff88' : '#8888ff';
-    }
-
-    // Hard Reset Logic
-    const deckHeader = document.querySelector('.bottom-right-panel h5');
-    deckHeader.style.cursor = "pointer";
-    deckHeader.title = "System Reset";
-    deckHeader.addEventListener('click', () => {
-        breachCount = 0;
-        decryptPercent = 0;
-        document.getElementById('breachCount').innerText = "0";
-        document.getElementById('terminalLog').innerHTML = "";
-        addTerminalLog("SYSTEM_RESET: OK", "#00f0ff");
-    });
-
-    setInterval(updateDashboard, 1000);
-</script>
-
-<script>
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    resizeCanvas();
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
-    const fontSize = 20;
-    let columns = Math.floor(canvas.width / fontSize);
-    const drops = new Array(columns).fill(0);
-    let currentBg = { r: 0, g: 0, b: 16 }; 
-
-    function drawMatrix() {
-        ctx.fillStyle = `rgba(${currentBg.r}, ${currentBg.g}, ${currentBg.b}, 0.1)`;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.font = fontSize + 'px monospace';
-        for (let i = 0; i < drops.length; i++) {
-            const text = characters.charAt(Math.floor(Math.random() * characters.length));
-            const colorShift = currentBg.r > 20 ? '#ff5555' : (i % 2 === 0 ? '#00bfff' : '#e0f7ff');
-            ctx.fillStyle = colorShift;
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
+            btn.innerText = "PWR: OFF";
+            btn.classList.remove('on');
+            content.style.opacity = "0.1";
+            content.style.pointerEvents = "none";
+            document.getElementById('downMB').innerText = "0";
+            document.getElementById('upMB').innerText = "0";
+            document.getElementById('lossVal').innerText = "0.00%";
+            document.getElementById('threatVal').innerText = "0%";
+            document.getElementById('threatBar').style.width = "0%";
+            document.getElementById('decryptVal').innerText = "0%";
+            document.getElementById('decryptBar').style.width = "0%";
         }
     }
-    setInterval(drawMatrix, 50);
-    window.addEventListener('resize', () => { resizeCanvas(); columns = Math.floor(canvas.width / fontSize); drops.length = columns; drops.fill(0); });
 
-    function toggleCategoryPanel() {
-        document.getElementById('categoriesPanel').classList.toggle('expanded');
-        document.getElementById('categoryDropdown').classList.toggle('show');
-    }
-
-    function toggleSubmenu(event) {
-        event.preventDefault();
-        const mainCategory = event.target.closest(".main-category");
-        if (!mainCategory) return;
-        const submenu = mainCategory.querySelector(".submenu");
-        if (submenu) submenu.style.display = submenu.style.display === "none" ? "block" : "none";
-    }
-
+    // ===== CYBER DECK LOGIC =====
     let startTime = Date.now();
     let graphPoints = [35, 30, 32, 28, 35, 30, 25, 30, 35, 38, 40];
     let decryptPercent = 0;
-    let tracePercent = 0;
     let isMuted = false;
     let lastBreachStatus = false;
     let breachCount = 0;
     let autoResponse = false;
     let isLockdown = false;
+    let tracePercent = 0;
+    
     const deckLogs = ["Decrypting block...", "RSA Key Found", "Bypassing Firewall", "Node link: Active", "Shifting Frequency"];
 
     function updateDashboard() {
@@ -541,6 +654,9 @@
 
         const now = new Date();
         document.getElementById('digitalClock').innerText = now.toLocaleTimeString('en-GB');
+
+        if (!isPoweredOn) return; 
+        
         let diff = Math.floor((Date.now() - startTime) / 1000) + 87200;
         document.getElementById('uptimeVar').innerText = `${Math.floor(diff/86400).toString().padStart(2,'0')}:${Math.floor((diff%86400)/3600).toString().padStart(2,'0')}:${Math.floor((diff%3600)/60).toString().padStart(2,'0')}:${(diff%60).toString().padStart(2,'0')}`;
 
@@ -556,22 +672,22 @@
         const isBreach = lossNum > 0.05;
         const color = isBreach ? "#ff4444" : "#00f0ff";
 
-        // Trace Logic
         if (isBreach) {
             tracePercent += 2.5; 
             breachCount++;
             document.getElementById('breachCount').innerText = breachCount;
             if (!lastBreachStatus) {
-                if (!isMuted) document.getElementById('alertSound').play().catch(()=>{});
+                if (!isMuted) {
+                    const sound = document.getElementById('alertSound');
+                    if(sound) sound.play().catch(()=>{});
+                }
                 addTerminalLog("BREACH_DETECTED", "#ff4444");
             }
         } else if (tracePercent > 0) {
-            tracePercent -= 0.5; // Trace slowly fades if secure
+            tracePercent -= 0.5;
         }
 
         tracePercent = Math.max(0, Math.min(100, tracePercent));
-        document.getElementById('traceVal').innerText = tracePercent.toFixed(0) + "%";
-        document.getElementById('traceBar').style.width = tracePercent + "%";
 
         if (tracePercent >= 100) {
             isLockdown = true;
@@ -615,8 +731,10 @@
 
     function addTerminalLog(msg, color) {
         const t = document.getElementById('terminalLog');
+        if(!t) return;
         const entry = document.createElement('div');
         entry.style.color = color;
+        // SECURITY: Use textContent to prevent XSS
         entry.textContent = "> " + msg;
         t.prepend(entry);
         if (t.childNodes.length > 5) t.removeChild(t.lastElementChild);
@@ -634,23 +752,23 @@
         btn.style.color = autoResponse ? '#00ff88' : '#8888ff';
     }
 
-    // Reset handles lockdown too
     const deckHeader = document.querySelector('.bottom-right-panel h5');
-    deckHeader.style.cursor = "pointer";
-    deckHeader.addEventListener('click', () => {
-        breachCount = 0;
-        decryptPercent = 0;
-        tracePercent = 0;
-        isLockdown = false;
-        document.body.style.filter = "none";
-        document.getElementById('breachCount').innerText = "0";
-        document.getElementById('terminalLog').innerHTML = "";
-        addTerminalLog("SYSTEM_PURGE: SUCCESSFUL", "#00f0ff");
-    });
+    if(deckHeader) {
+        deckHeader.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            breachCount = 0;
+            decryptPercent = 0;
+            tracePercent = 0;
+            isLockdown = false;
+            document.body.style.filter = "none";
+            document.getElementById('breachCount').innerText = "0";
+            document.getElementById('terminalLog').innerHTML = "";
+            addTerminalLog("SYSTEM_PURGE: SUCCESSFUL", "#00f0ff");
+        });
+    }
 
     setInterval(updateDashboard, 1000);
 </script>
 
-    
 </body>
 </html>
