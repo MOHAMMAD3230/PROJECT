@@ -2,10 +2,10 @@ name: Summarize Issue
 
 on:
   issues:
-    types: [opened, edited] # Adjust this to match your current trigger
+    types: [opened, edited]
 
 permissions:
-  issues: write # Required to post the comment
+  issues: write
 
 jobs:
   summarize:
@@ -17,19 +17,13 @@ jobs:
       - name: Get LLM Summary
         id: inference
         run: |
-          # ==========================================
-          # REPLACE THIS SECTION with your actual LLM API call.
-          # For example: calling OpenAI, Anthropic, or a local model.
-          # ==========================================
-          
           ISSUE_TITLE="${{ github.event.issue.title }}"
           ISSUE_BODY="${{ github.event.issue.body }}"
           
-          # Mocking an API response for demonstration purposes
+          # Replace this mock output with your actual LLM API call
           LLM_OUTPUT="This is a summary of the issue. Even if the LLM accidentally outputs shell code like \$(whoami), it is safe now."
           
-          # CRITICAL: Use EOF to safely pass multiline LLM responses to GITHUB_OUTPUT
-          # If you don't use EOF, newlines in the LLM response will break the workflow
+          # Use EOF to safely pass multiline LLM responses to GITHUB_OUTPUT
           echo "response<<EOF" >> "$GITHUB_OUTPUT"
           echo "$LLM_OUTPUT" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
@@ -37,9 +31,7 @@ jobs:
       - name: Post Comment to Issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 1. THE FIX: Capture the untrusted output in an environment variable
           LLM_RESPONSE: ${{ steps.inference.outputs.response }} 
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # 2. THE FIX: Reference it ONLY inside double quotes
           gh issue comment "$ISSUE_NUMBER" --body "$LLM_RESPONSE"
