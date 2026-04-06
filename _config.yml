@@ -1,4 +1,17 @@
 title: My Site
 theme: jekyll-theme-minimal
-baseurl: ""          # For user/organization sites leave empty
+baseurl: ""
 url: "https://mohammad3230.github.io"
+
+# Security: Ensure absolute URLs are forced to HTTPS
+# (GitHub Pages does this by default, but this ensures Jekyll doesn't render http:// links)
+timezone: UTC
+
+# Privacy: Disable Jekyll RSS feeds and sitemap if you don't need them
+# to prevent data aggregation bots from scraping your site structure
+plugins:
+  - jekyll-seo-tag
+
+# SEO & Social Engineering Protection
+description: "Personal website and projects."
+author: "Mohammad"
