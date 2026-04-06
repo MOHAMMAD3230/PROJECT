@@ -2,140 +2,424 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
+  <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  SECURITY HEADERS (meta-based — supplement server headers)  ║
+    ╚══════════════════════════════════════════════════════════════╝
+
+    CSP: Restricts all resource loading to prevent XSS, data injection,
+    and unauthorized third-party content.
+      - default-src 'self'       → block everything by default
+      - img-src 'self' https://images.unsplash.com → only trusted images
+      - media-src 'self' https:  → allow HTTPS audio streams only
+      - style-src 'self' 'unsafe-inline' → allow inline styles only
+      - frame-ancestors 'none'   → PREVENT CLICKJACKING (equivalent to X-Frame-Options DENY)
+      - form-action 'none'       → block all form submissions (no forms needed here)
+      - base-uri 'self'          → prevent <base> tag hijacking
+      - object-src 'none'        → block Flash/plugins (legacy attack vector)
+
+    NOTE: For production, set these as real HTTP headers, not meta tags.
+    Meta-tag CSP does NOT support frame-ancestors in all browsers.
+    Always pair with server-side headers:
+      X-Frame-Options: DENY
+      X-Content-Type-Options: nosniff
+      Referrer-Policy: no-referrer
+      Permissions-Policy: microphone=(), camera=(), geolocation=()
+  -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 img-src 'self' https://images.unsplash.com;
+                 media-src 'self' https:;
+                 style-src 'self' 'unsafe-inline';
+                 frame-ancestors 'none';
+                 form-action 'none';
+                 base-uri 'self';
+                 object-src 'none';">
+
+  <!-- Prevent browser from MIME-sniffing responses -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+  <!-- Prevent referrer leakage on all outbound links -->
+  <meta name="referrer" content="no-referrer">
+
+  <!-- Prevent search engine indexing if this is a private/internal page -->
+  <meta name="robots" content="noindex, nofollow">
+
   <title>Atmos Music Station</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
   <style>
-    body {
+    /* ── Reset & Base ──────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(120deg, #22316C 0%, #1076C3 100%);
-      color: #fff;
     }
+
+    :root {
+      --color-bg-primary: #22316C;
+      --color-bg-secondary: #1076C3;
+      --color-bg-card: rgba(0, 0, 0, 0.7);
+      --color-bg-header: rgba(0, 0, 0, 0.8);
+      --color-bg-radio: rgba(30, 44, 96, 0.85);
+      --color-accent: #055A8C;
+      --color-tag: #105a8e;
+      --color-text: #ffffff;
+      --color-text-muted: rgba(255, 255, 255, 0.7);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-pill: 20px;
+      --shadow-card: 0 6px 24px 0 rgba(0, 0, 0, 0.3);
+      --gap-albums: 2rem;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      background: linear-gradient(120deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+      background-attachment: fixed;
+      color: var(--color-text);
+      min-height: 100vh;
+      line-height: 1.6;
+      /* Prevent scroll-jacking attacks */
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Header ────────────────────────────────────────────────── */
     header {
-      background: rgba(0,0,0,0.8);
-      padding: 1em;
+      background: var(--color-bg-header);
+      padding: 1rem 1rem;
       text-align: center;
-      font-size: 2em;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
       letter-spacing: 2px;
       font-weight: bold;
-      border-bottom: 2px solid #055A8C;
+      border-bottom: 2px solid var(--color-accent);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
+
+    /* ── Albums Grid ───────────────────────────────────────────── */
     .albums {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 2em 1em;
-      gap: 2em;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+      justify-items: center;
+      padding: 2rem 1rem;
+      gap: var(--gap-albums);
+      max-width: 1200px;
+      margin: 0 auto;
     }
+
+    /* ── Album Card ────────────────────────────────────────────── */
     .album {
-      background: rgba(0,0,0,0.7);
-      padding: 1.5em;
-      border-radius: 8px;
-      width: 300px;
-      box-shadow: 0 6px 24px 0 rgba(0,0,0,0.3);
+      background: var(--color-bg-card);
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+      width: 100%;
+      max-width: 340px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+
+    .album:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.4);
+    }
+
     .album img {
       width: 100%;
-      border-radius: 6px;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
       margin-bottom: 1em;
+      display: block;
+      /* Security: prevent image from being dragged to other origins */
+      -webkit-user-drag: none;
+      user-select: none;
     }
+
     .album-title {
-      font-size: 1.2em;
+      font-size: 1.15rem;
       font-weight: bold;
       margin-bottom: 0.5em;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
+
     .album audio {
       width: 100%;
       margin-top: 1em;
+      border-radius: var(--radius-sm);
+      /* Ensure audio controls don't overflow on small screens */
+      max-width: 100%;
+      min-width: 0;
     }
+
+    /* ── Tag Badge ─────────────────────────────────────────────── */
     .tag-atmos {
       display: inline-block;
       padding: 0.2em 0.7em;
       margin: 0.4em 0;
-      border-radius: 20px;
-      font-size: 0.9em;
-      background: #105a8e;
-      color: #fff;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      background: var(--color-tag);
+      color: var(--color-text);
+      letter-spacing: 1px;
+      user-select: none;
+    }
+
+    /* ── Radio Section ─────────────────────────────────────────── */
+    .radio-section {
+      margin: 1rem auto 3rem;
+      text-align: center;
+      padding: 0 1rem;
+      max-width: 1200px;
+    }
+
+    .radio-section h2 {
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      margin-bottom: 1.5rem;
       letter-spacing: 1px;
     }
-    .radio-section {
-      margin: 2em 0;
-      text-align: center;
+
+    .radio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+      gap: 1.5rem;
+      justify-items: center;
     }
+
     .radio-player {
-      margin: 1.5em auto;
-      background: rgba(30,44,96,0.85);
-      padding: 1em;
-      border-radius: 12px;
-      width: 340px;
+      background: var(--color-bg-radio);
+      padding: 1.2rem;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 360px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.2s ease;
     }
+
+    .radio-player:hover {
+      transform: translateY(-2px);
+    }
+
     .radio-title {
-      font-size: 1.1em;
-      margin-bottom: 0.6em;
+      font-size: 1.05rem;
+      margin-bottom: 0.8rem;
       font-weight: bold;
       letter-spacing: 1px;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
-    @media (max-width: 700px) {
+
+    .radio-player audio {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ── Footer ────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 1rem;
+    }
+
+    /* ── Responsive: Small phones (< 400px) ────────────────────── */
+    @media (max-width: 400px) {
       .albums {
-        flex-direction: column;
-        align-items: center;
+        padding: 1rem 0.5rem;
+        gap: 1rem;
       }
-      .album, .radio-player { width: 98%; }
+      .album {
+        padding: 1rem;
+        max-width: 100%;
+      }
+      .radio-player {
+        padding: 0.8rem;
+      }
+    }
+
+    /* ── Responsive: Tablets (400px – 768px) ──────────────────── */
+    @media (min-width: 401px) and (max-width: 768px) {
+      .albums {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+      .album {
+        max-width: 100%;
+      }
+      .radio-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* ── Responsive: Desktop (> 768px) ─────────────────────────── */
+    @media (min-width: 769px) {
+      .albums {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .radio-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* ── Accessibility: Reduced Motion ─────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ── Accessibility: Focus Visible ──────────────────────────── */
+    audio:focus-visible {
+      outline: 2px solid #4FC3F7;
+      outline-offset: 2px;
+    }
+
+    /* ── Safe Area (notched phones) ────────────────────────────── */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      footer {
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+      }
+      header {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
     }
   </style>
 </head>
 <body>
-  <header>
+
+  <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║                    SECURITY NOTES                           ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║ 1. No JavaScript = No DOM-based XSS possible                ║
+    ║ 2. No forms/inputs = No injection vectors                   ║
+    ║ 3. No iframes = No embedded content attacks                 ║
+    ║ 4. External images use:                                     ║
+    ║    - crossorigin="anonymous" (CORS sandboxing)              ║
+    ║    - referrerpolicy="no-referrer" (privacy)                ║
+    ║    - loading="lazy" (performance)                           ║
+    ║    - decoding="async" (non-blocking decode)                 ║
+    ║ 5. CSP blocks any future script injection attempts          ║
+    ║ 6. frame-ancestors 'none' prevents clickjacking             ║
+    ║ 7. base-uri 'self' prevents <base> tag hijacking            ║
+    ║ 8. object-src 'none' blocks Flash/plugin embedding          ║
+    ║ 9. form-action 'none' blocks form-based redirects           ║
+    ╚══════════════════════════════════════════════════════════════╝
+  -->
+
+  <header role="banner">
     Atmos Music Station 🎵
   </header>
 
-  <div class="albums">
-    <div class="album">
-      <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?fit=crop&w=400&q=80" alt="Album One Cover">
-      <div class="album-title">Synth Space Odyssey</div>
-      <span class="tag-atmos">Dolby Atmos 5.1</span>
-      <audio controls>
-        <source src="your-atmos-track-1.mp4" type="audio/mp4">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-    <div class="album">
-      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?fit=crop&w=400&q=80" alt="Album Two Cover">
-      <div class="album-title">Chill Beats Flow</div>
-      <span class="tag-atmos">Dolby Atmos 5.1</span>
-      <audio controls>
-        <source src="your-atmos-track-2.mp4" type="audio/mp4">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-    <div class="album">
-      <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?fit=crop&w=400&q=80" alt="Album Three Cover">
-      <div class="album-title">Classical Serenity</div>
-      <audio controls>
-        <source src="music-track-classical.mp3" type="audio/mp3">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-  </div>
+  <main role="main">
+    <section class="albums" aria-label="Album Collection">
 
-  <section class="radio-section">
-    <h2>Live Online Radio</h2>
-    <div class="radio-player">
-      <div class="radio-title">Electronic Vibe Radio</div>
-      <audio controls>
-        <source src="your-radio-stream-url" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-    <div class="radio-player">
-      <div class="radio-title">Classic Gold Hits</div>
-      <audio controls>
-        <source src="your-second-radio-stream-url" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
-  </section>
+      <article class="album">
+        <img
+          src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?fit=crop&w=400&q=80"
+          alt="Synth Space Odyssey album cover — abstract music visualization"
+          width="400"
+          height="300"
+          loading="lazy"
+          decoding="async"
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        >
+        <h2 class="album-title">Synth Space Odyssey</h2>
+        <span class="tag-atmos" aria-label="Dolby Atmos 5.1 surround sound">Dolby Atmos 5.1</span>
+        <audio controls preload="metadata" aria-label="Synth Space Odyssey audio player">
+          <source src="your-atmos-track-1.mp4" type="audio/mp4">
+          Your browser does not support the audio element.
+        </audio>
+      </article>
+
+      <article class="album">
+        <img
+          src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?fit=crop&w=400&q=80"
+          alt="Chill Beats Flow album cover — sunset landscape"
+          width="400"
+          height="300"
+          loading="lazy"
+          decoding="async"
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        >
+        <h2 class="album-title">Chill Beats Flow</h2>
+        <span class="tag-atmos" aria-label="Dolby Atmos 5.1 surround sound">Dolby Atmos 5.1</span>
+        <audio controls preload="metadata" aria-label="Chill Beats Flow audio player">
+          <source src="your-atmos-track-2.mp4" type="audio/mp4">
+          Your browser does not support the audio element.
+        </audio>
+      </article>
+
+      <article class="album">
+        <img
+          src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?fit=crop&w=400&q=80"
+          alt="Classical Serenity album cover — mountain scenery"
+          width="400"
+          height="300"
+          loading="lazy"
+          decoding="async"
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        >
+        <h2 class="album-title">Classical Serenity</h2>
+        <audio controls preload="metadata" aria-label="Classical Serenity audio player">
+          <source src="music-track-classical.mp3" type="audio/mp3">
+          Your browser does not support the audio element.
+        </audio>
+      </article>
+
+    </section>
+
+    <section class="radio-section" aria-label="Live Online Radio">
+      <h2>Live Online Radio</h2>
+      <div class="radio-grid">
+
+        <div class="radio-player" role="region" aria-label="Electronic Vibe Radio">
+          <div class="radio-title">Electronic Vibe Radio</div>
+          <audio controls preload="none" aria-label="Electronic Vibe Radio live stream">
+            <source src="your-radio-stream-url" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+
+        <div class="radio-player" role="region" aria-label="Classic Gold Hits">
+          <div class="radio-title">Classic Gold Hits</div>
+          <audio controls preload="none" aria-label="Classic Gold Hits live stream">
+            <source src="your-second-radio-stream-url" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2025 Atmos Music Station. All rights reserved.</p>
+  </footer>
+
 </body>
 </html>
