@@ -2,52 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <!-- Security Headers (best-effort via meta; use real HTTP headers in production) -->
+  <!-- ── Security Meta Tags ── -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
   <meta name="robots" content="noindex, nofollow" />
 
   <!--
-    Content Security Policy:
-    'unsafe-inline' is required because scripts are inline in this single file.
-    For production: move all JS/CSS to external files and remove 'unsafe-inline'
-    to gain full XSS mitigation from CSP.
-    NOTE: For clickjacking protection, send HTTP headers from your server:
-      X-Frame-Options: SAMEORIGIN
-      Content-Security-Policy: frame-ancestors 'self';
+    Content Security Policy (meta-tag — best-effort on GitHub Pages).
+    NOTE: frame-ancestors, sandbox, report-uri CANNOT be set via <meta> —
+          browsers silently ignore the ENTIRE policy if present.
+          Clickjacking is handled by the JS guard at the end of <body>.
+    NOTE: 'unsafe-inline' is unavoidable while JS/CSS live inside this file.
+          For full CSP XSS mitigation, move all JS/CSS to external files
+          and remove 'unsafe-inline'.
   -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self';
              script-src 'self' 'unsafe-inline'
                https://pagead2.googlesyndication.com
                https://www.googletagmanager.com;
-             frame-src 'self' https://www.google.com https://www.youtube.com;
-             connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com;
+             frame-src 'none';
+             connect-src 'self'
+               https://www.google-analytics.com
+               https://www.googletagmanager.com;
              style-src 'self' 'unsafe-inline';
              img-src 'self' data: https:;
              media-src https://actions.google.com;
              font-src 'self';
              object-src 'none';
              base-uri 'self';
-             form-action 'self';" />
+             form-action 'self';
+             upgrade-insecure-requests;" />
+
+  <!-- DNS Prefetch — reduces latency for third-party origins -->
+  <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+  <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
+  <link rel="dns-prefetch" href="//www.google-analytics.com" />
+  <link rel="dns-prefetch" href="//actions.google.com" />
 
   <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
   <title>MY_STUFF</title>
 
   <style>
+    /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      background: #000010;
+      color: #fff;
+    }
+
+    /* ── Skip Navigation (a11y) ── */
+    .skip-link {
+      position: absolute;
+      top: -200%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #00bfff;
+      color: #000;
+      padding: 10px 24px;
+      border-radius: 0 0 10px 10px;
+      z-index: 200000;
+      font-weight: 700;
+      text-decoration: none;
+      transition: top 0.2s ease;
+    }
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #fff;
+    }
+
+    /* ── Matrix Canvas ── */
     #matrix {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      z-index: -1;
+      z-index: 0;
       background: #000010;
       display: block;
     }
 
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      #matrix { display: none; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── Page Title ── */
     .page-title {
       text-align: center;
       color: #00eaff;
@@ -59,11 +109,14 @@
       margin-bottom: 16px;
       padding: 0 16px;
       user-select: none;
+      position: relative;
+      z-index: 1;
       text-shadow:
         0 0 1px #f1f3f3, 0 0 2px #fafafa, 0 0 3px #f8fafa,
         0 0 5px #f9fbfb, 0 0 8px #f2f4f5, 0 0 10px #f9fbfb, 0 0 15px #f4f5f6;
     }
 
+    /* ── Categories Box ── */
     .categories-box {
       max-width: 420px;
       margin: 16px auto;
@@ -75,6 +128,8 @@
       font-family: monospace;
       box-shadow: 0 0 15px rgba(0, 191, 255, 0.9);
       overflow-wrap: break-word;
+      position: relative;
+      z-index: 1;
     }
     .categories-box h3 { margin-bottom: 10px; }
     .categories-box a {
@@ -85,12 +140,18 @@
       padding: 4px 0;
     }
     .categories-box a:hover { text-decoration: underline; }
+    .categories-box a:focus-visible {
+      outline: 2px solid #00eaff;
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
     .categories-box pre {
       white-space: pre-wrap;
       margin: 0;
       line-height: 1.8;
     }
 
+    /* ── Main Content Layout ── */
     .page-container {
       display: flex;
       justify-content: center;
@@ -102,6 +163,7 @@
       z-index: 1;
     }
 
+    /* ── Left Panel ── */
     #left-panel {
       flex: 0 0 220px;
       background: rgba(0, 0, 0, 0.3);
@@ -125,34 +187,51 @@
       transition: color 0.3s ease;
     }
     #left-panel a:hover { color: #00e5ff; text-decoration: underline; }
+    #left-panel a:focus-visible {
+      outline: 2px solid #00eaff;
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
     #left-panel small { color: #bbbbff; font-weight: normal; font-style: italic; font-size: 0.82rem; }
 
+    /* ── Footer ── */
     .site-footer {
       background-color: rgba(0, 0, 0, 0.6);
       color: #ccc;
       font-size: 0.85rem;
       text-align: center;
       padding: 14px 10px;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin-top: 40px;
       user-select: none;
       box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+      position: relative;
+      z-index: 1;
     }
     .site-footer small { display: inline-block; letter-spacing: 1px; }
 
     .policy-links {
       text-align: center;
       padding: 10px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
       font-size: 0.82rem;
+      position: relative;
+      z-index: 1;
     }
     .policy-links a { color: #00bfff; text-decoration: none; }
     .policy-links a:hover { text-decoration: underline; }
+    .policy-links a:focus-visible {
+      outline: 2px solid #00eaff;
+      outline-offset: 2px;
+      border-radius: 3px;
+    }
 
-    /* Floating Action Button (mobile) */
+    /* ── Floating Action Button (mobile) ── */
     #fab {
       display: none;
       position: fixed;
-      bottom: 24px;
+      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
       right: 24px;
       width: 56px;
       height: 56px;
@@ -167,54 +246,81 @@
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       line-height: 56px;
       text-align: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     #fab:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 24px rgba(0, 191, 255, 0.8);
     }
     #fab:active { transform: scale(0.95); }
+    #fab:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 3px;
+    }
 
-    /* Mobile Slide Panel */
+    /* ── Mobile Panel Overlay ── */
     #mobile-panel-overlay {
-      display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.55);
       z-index: 10002;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0s 0.35s, opacity 0.35s ease;
     }
-    #mobile-panel-overlay.active { display: block; }
+    #mobile-panel-overlay.active {
+      visibility: visible;
+      opacity: 1;
+      transition: visibility 0s, opacity 0.35s ease;
+    }
 
+    /* ── Mobile Slide Panel ── */
     #mobile-panel {
       position: fixed;
       top: 0; right: -100%;
-      width: 88vw;
-      max-width: 360px;
+      width: 90vw;
+      max-width: 380px;
       height: 100vh;
+      height: 100dvh;
       background: rgba(0, 5, 25, 0.97);
       z-index: 10003;
       overflow-y: auto;
+      overflow-x: hidden;
       transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       padding: 20px 16px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
       -webkit-overflow-scrolling: touch;
     }
     #mobile-panel.open { right: 0; }
 
     #mobile-panel-close {
-      position: absolute;
-      top: 14px; right: 16px;
+      position: sticky;
+      top: 0;
+      float: right;
       background: rgba(255,255,255,0.15);
       border: none;
       color: white;
-      width: 36px; height: 36px;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
       border-radius: 50%;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 5;
+    }
+    #mobile-panel-close:focus-visible {
+      outline: 2px solid #00eaff;
+      outline-offset: 2px;
     }
 
-    /* Widget Shared Styles */
+    /* ── Shared Widget Styles ── */
     .widget {
       border-radius: 24px;
       background: rgba(255,255,255,0.12);
@@ -243,13 +349,20 @@
       border: none;
       cursor: pointer;
       padding: 7px 18px;
+      min-height: 40px;
       font-weight: 700;
       backdrop-filter: saturate(180%) blur(15px);
       background: rgba(255,255,255,0.25);
       color: #eee;
       transition: background-color 0.3s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .toggle-btn:hover { background: rgba(255,255,255,0.45); }
+    .toggle-btn:focus-visible {
+      outline: 2px solid #00eaff;
+      outline-offset: 2px;
+    }
 
     .widget-content {
       padding: 16px 24px 24px 24px;
@@ -270,15 +383,18 @@
     input[type="number"],
     input[type="date"],
     input[type="time"] {
-      font-size: 1rem;
+      font-size: 16px;
       border-radius: 16px;
       border: none;
-      padding: 8px 14px;
+      padding: 10px 14px;
+      min-height: 44px;
       background: rgba(255,255,255,0.15);
       color: #eee;
       width: 100%;
       transition: background-color 0.3s ease;
       -webkit-appearance: none;
+      appearance: none;
+      touch-action: manipulation;
     }
     input:focus {
       outline: 2px solid rgba(255,255,255,0.45);
@@ -304,15 +420,23 @@
       border: none;
       cursor: pointer;
       padding: 10px 14px;
+      min-height: 44px;
       font-weight: 700;
       backdrop-filter: saturate(180%) blur(12px);
       background: rgba(255,255,255,0.25);
       color: #eee;
       transition: background-color 0.3s ease;
       white-space: nowrap;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .action-btn:hover { background: rgba(255,255,255,0.45); }
+    .action-btn:focus-visible {
+      outline: 2px solid #00eaff;
+      outline-offset: 2px;
+    }
 
+    /* ── Clock Widget ── */
     .clock {
       background: rgba(255,255,255,0.12);
       border-radius: 18px;
@@ -322,9 +446,10 @@
       color: #eee;
     }
     .city { font-weight: 800; font-size: 1.5rem; }
-    .time { font-size: 2rem; }
+    .time { font-size: 2rem; font-variant-numeric: tabular-nums; }
     .date { font-size: 1.1rem; opacity: 0.75; }
 
+    /* ── Tasks ── */
     #tasks, #tasksMobile { max-height: 400px; overflow-y: auto; }
     #tasks h2, #tasksMobile h2 { margin-top: 0; font-weight: 800; font-size: 1.3rem; color: #eee; }
     #tasksList, #tasksListMobile {
@@ -334,7 +459,8 @@
       overflow-y: auto;
     }
     #tasksList li, #tasksListMobile li {
-      padding: 10px 12px;
+      padding: 12px 14px;
+      min-height: 44px;
       border-radius: 14px;
       background: rgba(255,255,255,0.12);
       margin-bottom: 10px;
@@ -344,15 +470,23 @@
       transition: background-color 0.25s ease;
       word-break: break-word;
       font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     #tasksList li:hover, #tasksListMobile li:hover { background: rgba(255,255,255,0.25); }
+    #tasksList li:focus-visible, #tasksListMobile li:focus-visible {
+      outline: 2px solid #00eaff;
+      outline-offset: -2px;
+    }
     #tasksList li.completed, #tasksListMobile li.completed {
       text-decoration: line-through;
       opacity: 0.6;
       color: #bbb;
     }
 
-    /* Calculator */
+    /* ── Calculator ── */
     #calc-content, #calc-content-mobile {
       display: none;
       padding: 16px 24px 24px 24px;
@@ -367,6 +501,7 @@
       min-height: 50px;
       user-select: none;
       word-break: break-all;
+      font-variant-numeric: tabular-nums;
     }
     .calc-grid {
       display: grid;
@@ -377,20 +512,27 @@
     .calc-btn {
       background: rgba(227, 232, 247, 0.9);
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      padding: 12px 0;
+      padding: 14px 0;
+      min-height: 48px;
       font-weight: 600;
-      font-size: 1rem;
+      font-size: 1.05rem;
       color: #222;
-      transition: background 0.2s ease;
+      transition: background 0.2s ease, transform 0.1s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .calc-btn:active { transform: scale(0.95); }
+    .calc-btn:focus-visible {
+      outline: 2px solid #00eaff;
+      outline-offset: 2px;
+    }
     .calc-btn.operator { background: rgba(90, 115, 244, 0.9); color: white; }
     .calc-btn.clear { background: rgba(245, 98, 98, 0.9); color: white; }
     .calc-btn.equal { background: rgba(80, 120, 225, 0.9); color: white; }
 
-    /* Desktop Widget Container */
+    /* ── Desktop Widget Container ── */
     .widget-container {
       position: fixed;
       top: 10px;
@@ -401,12 +543,18 @@
       gap: 16px;
       z-index: 9999;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-height: calc(100vh - 20px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
+    .widget-container::-webkit-scrollbar { width: 4px; }
+    .widget-container::-webkit-scrollbar-track { background: transparent; }
+    .widget-container::-webkit-scrollbar-thumb { background: rgba(0,191,255,0.3); border-radius: 4px; }
 
-    /* Toast */
+    /* ── Toast Notification ── */
     .toast {
       position: fixed;
-      bottom: 30px;
+      bottom: calc(30px + env(safe-area-inset-bottom, 0px));
       left: 50%;
       transform: translateX(-50%) translateY(100px);
       background: rgba(245, 98, 98, 0.95);
@@ -424,7 +572,26 @@
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* Responsive */
+    /* ── No-JS fallback ── */
+    .noscript-msg {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      color: #00bfff;
+      padding: 40px 20px;
+      font-size: 1.1rem;
+      font-family: monospace;
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE BREAKPOINTS
+       ═══════════════════════════════════════ */
+
+    @media (min-width: 769px) and (max-width: 1100px) {
+      .widget-container { width: 270px; }
+      .categories-box { margin-right: 290px; }
+    }
+
     @media (max-width: 768px) {
       .page-title { font-size: 1.5rem; letter-spacing: 2px; margin-top: 14px; }
       .categories-box { margin: 12px 16px; padding: 14px 16px; }
@@ -437,9 +604,18 @@
       .widget { border-radius: 18px; }
       .toggle-container { border-radius: 18px 18px 0 0; padding: 10px 18px; }
       .widget-content { padding: 14px 18px 20px 18px; }
-      #countdown, #countdownMobile { font-size: 1.3rem; }
+      #countdown, #countdownMobile { font-size: 1.25rem; }
       .time { font-size: 1.6rem; }
       .city { font-size: 1.2rem; }
+      #display, #display-mobile { font-size: 1.6rem; }
+      .calc-btn { font-size: 1rem; padding: 12px 0; min-height: 46px; }
+    }
+
+    @media (max-width: 380px) {
+      .page-title { font-size: 1.25rem; letter-spacing: 1px; }
+      .flex-row { gap: 6px; }
+      .action-btn { font-size: 0.8rem; padding: 8px 10px; }
+      .calc-btn { font-size: 0.95rem; min-height: 44px; padding: 10px 0; }
     }
 
     @media (min-width: 769px) {
@@ -463,58 +639,81 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688" crossorigin="anonymous"></script>
 </head>
 <body>
-  <canvas id="matrix" aria-hidden="true"></canvas>
-  <h1 class="page-title">MY_STUFF</h1>
 
-  <!-- Toast for validation messages (replaces alert()) -->
+  <canvas id="matrix" aria-hidden="true"></canvas>
+
+  <!-- Fallback if JavaScript is disabled -->
+  <noscript>
+    <div class="noscript-msg">
+      JavaScript is required to use this page. Please enable it in your browser settings.
+    </div>
+  </noscript>
+
+  <!-- Skip to main content (keyboard navigation a11y) -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header>
+    <h1 class="page-title">MY_STUFF</h1>
+  </header>
+
+  <!-- Toast for validation messages -->
   <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
 
-  <div class="categories-box">
-    <h3>Categories</h3>
-    <pre>
+  <!-- Shared beep audio — both desktop and mobile countdowns reference this -->
+  <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+
+  <!-- ═══════════ MAIN CONTENT ═══════════ -->
+  <main id="main-content">
+    <section class="categories-box" aria-label="Categories">
+      <h3>Categories</h3>
+      <pre>
 <a href="Activity 3">Activity 3</a>
 <a href="music.html">My_Music</a>
 <a href="radio.html">Live Radio</a>
 <a href="https://mohammad3230.github.io/Games-More-.../"
-   onclick="initiateUplink(event, this.href)"
+   id="uplink-link"
    rel="noopener noreferrer"
    target="_blank">MY_STUFF_AIO v2.0</a>
-    </pre>
-  </div>
+      </pre>
+    </section>
 
-  <div class="page-container">
-    <div id="left-panel">
-      <h5>Search Engines for more</h5>
-      <p>
-        <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Google</a><br>
-        <small>Google will Track You</small>
-      </p>
-      <p>
-        <a href="https://www.startpage.com" target="_blank" rel="noopener noreferrer">Start page</a><br>
-        <small>Most Private search Engine</small>
-      </p>
-      <p>
-        <a href="https://www.ecosia.org" target="_blank" rel="noopener noreferrer">Ecosia</a><br>
-        <small>Save Trees</small>
-      </p>
-    </div>
-  </div>
+    <section class="page-container" aria-label="Search engines">
+      <div id="left-panel">
+        <h5>Search Engines for more</h5>
+        <p>
+          <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Google</a><br>
+          <small>Google will Track You</small>
+        </p>
+        <p>
+          <a href="https://www.startpage.com" target="_blank" rel="noopener noreferrer">Start page</a><br>
+          <small>Most Private search Engine</small>
+        </p>
+        <p>
+          <a href="https://www.ecosia.org" target="_blank" rel="noopener noreferrer">Ecosia</a><br>
+          <small>Save Trees</small>
+        </p>
+      </div>
+    </section>
+  </main>
 
-  <!-- Floating Action Button (mobile only) -->
-  <button id="fab" type="button" aria-label="Open widgets panel">&#9881;</button>
+  <!-- ═══════════ MOBILE FAB ═══════════ -->
+  <button id="fab" type="button" aria-label="Open tools panel">&#9881;</button>
+
+  <!-- Mobile panel overlay -->
+  <div id="mobile-panel-overlay" aria-hidden="true"></div>
 
   <!-- Mobile slide-in panel -->
-  <div id="mobile-panel-overlay" aria-hidden="true"></div>
-  <div id="mobile-panel" role="dialog" aria-label="Widgets">
-    <button id="mobile-panel-close" type="button" aria-label="Close widgets panel">&times;</button>
+  <nav id="mobile-panel" role="dialog" aria-label="Tools" aria-hidden="true">
+    <button id="mobile-panel-close" type="button" aria-label="Close tools panel">&times;</button>
+    <div style="clear:both;"></div>
 
     <!-- Calculator (mobile) -->
     <div class="widget">
       <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="calc-content-mobile" aria-expanded="false">Calculator</button>
+        <button class="toggle-btn" type="button" data-target="calc-content-mobile" data-label="Calculator" aria-expanded="false">Calculator</button>
       </div>
       <div id="calc-content-mobile" class="widget-content" style="display:none;">
-        <div id="display-mobile" aria-live="polite">0</div>
+        <div id="display-mobile" aria-live="polite" aria-atomic="true">0</div>
         <div class="calc-grid" data-calc="mobile">
           <button class="calc-btn clear" type="button">C</button>
           <button class="calc-btn backspace" type="button">&larr;</button>
@@ -542,22 +741,22 @@
     <!-- Countdown (mobile) -->
     <div class="widget">
       <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="countdownContentMobile" aria-expanded="false">Countdown</button>
+        <button class="toggle-btn" type="button" data-target="countdownContentMobile" data-label="Countdown" aria-expanded="false">Countdown</button>
       </div>
       <div class="widget-content" id="countdownContentMobile" style="display:none;">
         <strong style="font-size:1.2rem; font-weight:700;">Mohammad Countdown Timer</strong>
         <div class="flex-row" style="margin-top:10px;">
           <div>
             <label for="addDaysMobile">Days</label>
-            <input type="number" id="addDaysMobile" min="0" max="365" value="0" />
+            <input type="number" id="addDaysMobile" min="0" max="365" value="0" inputmode="numeric" />
           </div>
           <div>
             <label for="addHoursMobile">Hours</label>
-            <input type="number" id="addHoursMobile" min="0" max="23" value="0" />
+            <input type="number" id="addHoursMobile" min="0" max="23" value="0" inputmode="numeric" />
           </div>
           <div>
             <label for="addMinutesMobile">Minutes</label>
-            <input type="number" id="addMinutesMobile" min="0" max="59" value="0" />
+            <input type="number" id="addMinutesMobile" min="0" max="59" value="0" inputmode="numeric" />
           </div>
         </div>
         <div class="flex-row" style="margin-top:12px;">
@@ -566,42 +765,41 @@
           <button class="action-btn countdown-pause" type="button" data-calc-id="mobile">Pause</button>
           <button class="action-btn countdown-reset" type="button" data-calc-id="mobile">Reset</button>
         </div>
-        <div id="countdownMobile" aria-live="polite">0d 0h 0m 0s</div>
+        <div id="countdownMobile" aria-live="polite" aria-atomic="true">0d 0h 0m 0s</div>
       </div>
     </div>
 
     <!-- Delhi Widget (mobile) -->
     <div class="widget">
       <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="delhiContentMobile" aria-expanded="false">Delhi Clock & Tasks</button>
+        <button class="toggle-btn" type="button" data-target="delhiContentMobile" data-label="Delhi Clock &amp; Tasks" aria-expanded="false">Delhi Clock &amp; Tasks</button>
       </div>
       <div class="widget-content" id="delhiContentMobile" style="display:none;">
         <div class="clock">
           <div class="city">Delhi</div>
-          <div id="delhiTimeMobile" class="time">--:--:--</div>
+          <div id="delhiTimeMobile" class="time" aria-live="polite" aria-atomic="true">--:--:--</div>
           <div id="delhiDateMobile" class="date">--/--/----</div>
         </div>
         <div id="tasksMobile">
           <h2>Tasks</h2>
-          <input type="text" id="taskInputMobile" placeholder="Task description" maxlength="120" autocomplete="off" />
+          <input type="text" id="taskInputMobile" placeholder="Task description" maxlength="120" autocomplete="off" spellcheck="false" />
           <input type="date" id="dateInputMobile" />
           <input type="time" id="timeInputMobile" />
           <button class="action-btn task-add" type="button" data-panel="mobile">Add Task</button>
-          <ul id="tasksListMobile"></ul>
+          <ul id="tasksListMobile" role="list"></ul>
         </div>
       </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- ===== Desktop Widgets ===== -->
-  <div class="widget-container" aria-label="Desktop widgets">
-    <!-- Calculator (desktop) -->
+  <!-- ═══════════ DESKTOP WIDGETS ═══════════ -->
+  <aside class="widget-container" aria-label="Desktop tools">
     <div id="calc-widget" class="widget">
       <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="calc-content" aria-expanded="false">Calculator</button>
+        <button class="toggle-btn" type="button" data-target="calc-content" data-label="Calculator" aria-expanded="false">Calculator</button>
       </div>
       <div id="calc-content" class="widget-content" style="display:none;">
-        <div id="display" aria-live="polite">0</div>
+        <div id="display" aria-live="polite" aria-atomic="true">0</div>
         <div class="calc-grid" data-calc="desktop">
           <button class="calc-btn clear" type="button">C</button>
           <button class="calc-btn backspace" type="button">&larr;</button>
@@ -626,25 +824,24 @@
       </div>
     </div>
 
-    <!-- Countdown (desktop) -->
     <div id="mohammad_countdown" class="widget">
       <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="countdownContent" aria-expanded="false">Countdown</button>
+        <button class="toggle-btn" type="button" data-target="countdownContent" data-label="Countdown" aria-expanded="false">Countdown</button>
       </div>
       <div class="widget-content" id="countdownContent" style="display:none;">
         <strong style="font-size:1.3rem; font-weight:700;">Mohammad Countdown Timer</strong>
         <div class="flex-row" style="margin-top:10px;">
           <div>
             <label for="addDays">Days</label>
-            <input type="number" id="addDays" min="0" max="365" value="0" />
+            <input type="number" id="addDays" min="0" max="365" value="0" inputmode="numeric" />
           </div>
           <div>
             <label for="addHours">Hours</label>
-            <input type="number" id="addHours" min="0" max="23" value="0" />
+            <input type="number" id="addHours" min="0" max="23" value="0" inputmode="numeric" />
           </div>
           <div>
             <label for="addMinutes">Minutes</label>
-            <input type="number" id="addMinutes" min="0" max="59" value="0" />
+            <input type="number" id="addMinutes" min="0" max="59" value="0" inputmode="numeric" />
           </div>
         </div>
         <div class="flex-row" style="margin-top:12px;">
@@ -653,79 +850,105 @@
           <button class="action-btn countdown-pause" type="button" data-calc-id="desktop">Pause</button>
           <button class="action-btn countdown-reset" type="button" data-calc-id="desktop">Reset</button>
         </div>
-        <div id="countdown" aria-live="polite">0d 0h 0m 0s</div>
-        <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+        <div id="countdown" aria-live="polite" aria-atomic="true">0d 0h 0m 0s</div>
       </div>
     </div>
 
-    <!-- Delhi Widget (desktop) -->
     <div id="delhi_widget" class="widget">
       <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="delhiContent" aria-expanded="false">Delhi Clock & Tasks</button>
+        <button class="toggle-btn" type="button" data-target="delhiContent" data-label="Delhi Clock &amp; Tasks" aria-expanded="false">Delhi Clock &amp; Tasks</button>
       </div>
       <div class="widget-content" id="delhiContent" style="display:none;">
         <div class="clock">
           <div class="city">Delhi</div>
-          <div id="delhiTime" class="time">--:--:--</div>
+          <div id="delhiTime" class="time" aria-live="polite" aria-atomic="true">--:--:--</div>
           <div id="delhiDate" class="date">--/--/----</div>
         </div>
         <div id="tasks">
           <h2>Tasks</h2>
-          <input type="text" id="taskInput" placeholder="Task description" maxlength="120" autocomplete="off" />
+          <input type="text" id="taskInput" placeholder="Task description" maxlength="120" autocomplete="off" spellcheck="false" />
           <input type="date" id="dateInput" />
           <input type="time" id="timeInput" />
           <button class="action-btn task-add" type="button" data-panel="desktop">Add Task</button>
-          <ul id="tasksList"></ul>
+          <ul id="tasksList" role="list"></ul>
         </div>
       </div>
     </div>
-  </div>
+  </aside>
 
-  <footer class="site-footer">
-    <small>Copyright &copy; 2023-2026 All rights reserved</small>
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer>
+    <div class="site-footer">
+      <small>Copyright &copy; 2023-2026 All rights reserved</small>
+    </div>
+    <div class="policy-links">
+      <a href="https://www.iubenda.com/privacy-policy/12072372" target="_blank" rel="noopener noreferrer">Privacy Policy</a> |
+      <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a>
+    </div>
   </footer>
 
-  <div class="policy-links">
-    <a href="https://www.iubenda.com/privacy-policy/12072372" target="_blank" rel="noopener noreferrer">Privacy Policy</a> |
-    <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a>
-  </div>
-
+  <!-- ═══════════════════════════════════════════════════════════════
+       APPLICATION LOGIC
+       ═══════════════════════════════════════════════════════════════ -->
   <script>
+    'use strict';
+
+    /* ================================================================
+       CLICKJACKING PROTECTION
+       Placed at END of body so the page always renders first.
+       On GitHub Pages you cannot send X-Frame-Options / frame-ancestors
+       HTTP headers, so this JS guard is the only defense.
+       In production with your own server, add these HTTP headers instead:
+         X-Frame-Options: SAMEORIGIN
+         Content-Security-Policy: frame-ancestors 'self';
+       ================================================================ */
+    (function() {
+      try {
+        if (window.top !== window.self) {
+          window.top.location = window.self.location;
+        }
+      } catch (e) {
+        /* Cross-origin frame — cannot bust out, page renders normally */
+      }
+    })();
+
     /* ================================================================
        SECURITY UTILITIES
        ================================================================ */
 
-    /** Escape HTML entities — defense-in-depth for any user-string rendering */
     function escapeHTML(str) {
+      if (typeof str !== 'string') return '';
       var div = document.createElement('div');
       div.appendChild(document.createTextNode(str));
       return div.innerHTML;
     }
 
-    /** Validate URL scheme — blocks javascript:, data:, vbscript: open-redirect vectors */
     function isSafeURL(url) {
       if (typeof url !== 'string') return false;
+      var trimmed = url.trim();
+      if (trimmed.length === 0) return false;
       try {
-        var parsed = new URL(url, window.location.origin);
+        var parsed = new URL(trimmed, window.location.origin);
         return parsed.protocol === 'http:' || parsed.protocol === 'https:';
       } catch (e) {
         return false;
       }
     }
 
-    /** Safely parse JSON from localStorage with structure + type validation */
     function safeParseTasks(raw) {
-      if (!raw) return [];
+      if (typeof raw !== 'string' || raw.length === 0) return [];
       try {
         var parsed = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
         return parsed.filter(function(t) {
+          if (t === null || typeof t !== 'object' || Array.isArray(t)) return false;
+          if (Object.prototype.toString.call(t) !== '[object Object]') return false;
           return (
-            t !== null &&
-            typeof t === 'object' &&
+            Object.keys(t).length === 2 &&
             typeof t.desc === 'string' &&
             typeof t.datetime === 'number' &&
             t.desc.length <= 120 &&
+            t.desc.length > 0 &&
             isFinite(t.datetime)
           );
         }).map(function(t) {
@@ -733,22 +956,33 @@
         });
       } catch (e) {
         console.warn('[Security] Corrupted tasks data cleared.');
-        localStorage.removeItem('tasks');
+        safeRemoveItem('tasks');
         return [];
       }
     }
 
-    /** Non-blocking toast (replaces alert()) */
-    function showToast(msg, duration) {
-      duration = duration || 3000;
-      var el = document.getElementById('toast');
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(el._t);
-      el._t = setTimeout(function() { el.classList.remove('show'); }, duration);
+    function safeGetItem(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
+    }
+    function safeSetItem(key, value) {
+      try { localStorage.setItem(key, value); }
+      catch (e) { showToast('Storage unavailable — data was not saved.'); }
+    }
+    function safeRemoveItem(key) {
+      try { localStorage.removeItem(key); } catch (e) {}
     }
 
-    /** Clamp integer between min and max */
+    var _toastTimer = null;
+    function showToast(msg, duration) {
+      duration = (typeof duration === 'number' && duration > 0) ? duration : 3000;
+      var el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(function() { el.classList.remove('show'); }, duration);
+    }
+
     function clamp(val, min, max) {
       var n = parseInt(val, 10);
       if (isNaN(n)) return min;
@@ -756,20 +990,20 @@
     }
 
     /* ================================================================
-       SAFE NAVIGATION (open-redirect protection)
+       SAFE EXTERNAL NAVIGATION
        ================================================================ */
-    function initiateUplink(event, target) {
-      event.preventDefault();
-      if (!isSafeURL(target)) {
-        showToast('Blocked: unsafe URL detected.');
-        return false;
-      }
-      console.log('%c[UPLINK] Connecting to ' + target, 'color:#00ff88;font-weight:bold');
-      setTimeout(function() {
-        window.open(target, '_blank', 'noopener,noreferrer');
-      }, 1500);
-      return false;
-    }
+    (function() {
+      var link = document.getElementById('uplink-link');
+      if (!link) return;
+      link.addEventListener('click', function(e) {
+        var href = link.getAttribute('href');
+        if (!isSafeURL(href)) {
+          e.preventDefault();
+          showToast('Blocked: unsafe link detected.');
+          return;
+        }
+      });
+    })();
 
     /* ================================================================
        MATRIX BACKGROUND
@@ -779,9 +1013,10 @@
       if (!canvas) return;
       var ctx = canvas.getContext('2d');
       if (!ctx) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
       function resize() {
-        canvas.width = window.innerWidth;
+        canvas.width  = window.innerWidth;
         canvas.height = window.innerHeight;
       }
       resize();
@@ -792,11 +1027,14 @@
 
       function buildDrops() {
         columns = Math.floor(canvas.width / fontSize);
-        drops = new Array(columns).fill(0);
+        drops = [];
+        for (var i = 0; i < columns; i++) {
+          drops[i] = Math.random() * (canvas.height / fontSize) | 0;
+        }
       }
       buildDrops();
 
-      function draw() {
+      var matrixInterval = setInterval(function() {
         ctx.fillStyle = 'rgba(0, 0, 16, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.font = fontSize + 'px monospace';
@@ -809,9 +1047,7 @@
           }
           drops[i]++;
         }
-      }
-
-      setInterval(draw, 50);
+      }, 50);
 
       var rt;
       window.addEventListener('resize', function() {
@@ -821,28 +1057,31 @@
     }
 
     /* ================================================================
-       CALCULATOR (reusable for desktop + mobile)
+       CALCULATOR
        ================================================================ */
     function createCalculator(gridEl, displayEl) {
       var current = '0', prev = '', op = null, resetNext = false;
+      var MAX_LEN = 20;
 
       gridEl.addEventListener('click', function(e) {
         var btn = e.target.closest('.calc-btn');
         if (!btn) return;
 
         if (btn.classList.contains('number')) {
-          var num = btn.dataset.num;
-          if (num === undefined) return;
+          var num = btn.getAttribute('data-num');
+          if (num === null || num === undefined) return;
           if (resetNext) { current = num; resetNext = false; }
           else {
             if (num === '.' && current.indexOf('.') !== -1) return;
             current = (current === '0' && num !== '.') ? num : current + num;
           }
-          if (current.length > 20) current = current.substring(0, 20);
+          if (current.length > MAX_LEN) current = current.substring(0, MAX_LEN);
           displayEl.textContent = current;
 
         } else if (btn.classList.contains('operator')) {
-          op = btn.dataset.op;
+          var opVal = btn.getAttribute('data-op');
+          if (opVal === null) return;
+          op = opVal;
           prev = current;
           resetNext = true;
 
@@ -868,7 +1107,7 @@
                   current = '0'; prev = ''; op = null; resetNext = true;
                   return;
                 }
-                r = op === '/' ? a / b : a % b;
+                r = (op === '/') ? a / b : a % b;
                 break;
               default: r = b;
             }
@@ -877,6 +1116,7 @@
             } else {
               r = Math.round(r * 1e12) / 1e12;
               current = String(r);
+              if (current.length > MAX_LEN) current = current.substring(0, MAX_LEN);
               displayEl.textContent = current;
             }
             prev = ''; op = null; resetNext = true;
@@ -886,7 +1126,7 @@
     }
 
     /* ================================================================
-       COUNTDOWN TIMER (reusable)
+       COUNTDOWN TIMER
        ================================================================ */
     function createCountdown(cfg) {
       var el = document.getElementById(cfg.displayId);
@@ -904,7 +1144,7 @@
         if (diff <= 0) {
           clearInterval(interval); interval = null;
           el.textContent = "Time's up!";
-          if (beep) beep.play().catch(function(){});
+          if (beep) { beep.play().catch(function() {}); }
           return;
         }
         var d = Math.floor(diff / 86400000);
@@ -935,16 +1175,20 @@
           clearInterval(interval); interval = null;
           paused = false; pauseTime = null;
           target = Date.now(); useOrig = false;
-          dIn.value = 0; hIn.value = 0; mIn.value = 0;
+          if (dIn) dIn.value = 0;
+          if (hIn) hIn.value = 0;
+          if (mIn) mIn.value = 0;
           el.textContent = '0d 0h 0m 0s';
         },
         apply: function() {
           clearInterval(interval); interval = null;
           paused = false; pauseTime = null;
-          var d = clamp(dIn.value, 0, 365);
-          var h = clamp(hIn.value, 0, 23);
-          var m = clamp(mIn.value, 0, 59);
-          dIn.value = d; hIn.value = h; mIn.value = m;
+          var d = clamp(dIn ? dIn.value : 0, 0, 365);
+          var h = clamp(hIn ? hIn.value : 0, 0, 23);
+          var m = clamp(mIn ? mIn.value : 0, 0, 59);
+          if (dIn) dIn.value = d;
+          if (hIn) hIn.value = h;
+          if (mIn) mIn.value = m;
           var base = useOrig ? origTarget : Date.now();
           target = base + d * 86400000 + h * 3600000 + m * 60000;
           update();
@@ -953,42 +1197,46 @@
     }
 
     /* ================================================================
-       DELHI CLOCK (reusable)
+       DELHI CLOCK
        ================================================================ */
     function startDelhiClock(timeEl, dateEl) {
+      if (!timeEl || !dateEl) return;
       function tick() {
         var now = new Date();
-        timeEl.textContent = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour12: false });
-        dateEl.textContent = now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
+        timeEl.textContent = now.toLocaleTimeString('en-US', {
+          timeZone: 'Asia/Kolkata', hour12: false
+        });
+        dateEl.textContent = now.toLocaleDateString('en-US', {
+          timeZone: 'Asia/Kolkata'
+        });
       }
       tick();
       setInterval(tick, 1000);
     }
 
     /* ================================================================
-       TASK MANAGER (reusable, localStorage-backed)
+       TASK MANAGER
        ================================================================ */
     function createTaskManager(cfg) {
       var inputEl = document.getElementById(cfg.inputId);
-      var dateEl = document.getElementById(cfg.dateId);
-      var timeEl = document.getElementById(cfg.timeId);
-      var listEl = document.getElementById(cfg.listId);
+      var dateEl  = document.getElementById(cfg.dateId);
+      var timeEl  = document.getElementById(cfg.timeId);
+      var listEl  = document.getElementById(cfg.listId);
 
       function load() {
-        var tasks = safeParseTasks(localStorage.getItem('tasks'));
+        if (!listEl) return;
+        var tasks = safeParseTasks(safeGetItem('tasks'));
         listEl.innerHTML = '';
         var now = Date.now();
         tasks.forEach(function(task, i) {
           var li = document.createElement('li');
-          /* textContent — immune to XSS even if localStorage was tampered with */
-          li.textContent = task.desc + ' (' + new Date(task.datetime).toLocaleString() + ')';
-          li.setAttribute('role', 'button');
+          li.textContent = task.desc + '  (' + new Date(task.datetime).toLocaleString() + ')';
+          li.setAttribute('role', 'listitem');
           li.setAttribute('tabindex', '0');
           if (task.datetime <= now) li.classList.add('completed');
-
           function remove() {
             tasks.splice(i, 1);
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            safeSetItem('tasks', JSON.stringify(tasks));
             load();
           }
           li.addEventListener('click', remove);
@@ -1000,17 +1248,18 @@
       }
 
       function add() {
+        if (!inputEl || !dateEl || !timeEl) return;
         var desc = inputEl.value.trim();
         var date = dateEl.value;
         var time = timeEl.value;
-        if (!desc) { showToast('Please enter a task description.'); return; }
-        if (!date) { showToast('Please select a date.'); return; }
-        if (!time) { showToast('Please select a time.'); return; }
+        if (!desc) { showToast('Please enter a task description.'); inputEl.focus(); return; }
+        if (!date) { showToast('Please select a date.'); dateEl.focus(); return; }
+        if (!time) { showToast('Please select a time.'); timeEl.focus(); return; }
         var dt = new Date(date + 'T' + time + ':00').getTime();
         if (!isFinite(dt)) { showToast('Invalid date or time value.'); return; }
-        var tasks = safeParseTasks(localStorage.getItem('tasks'));
-        tasks.push({ desc: desc, datetime: dt });
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+        var tasks = safeParseTasks(safeGetItem('tasks'));
+        tasks.push({ desc: desc.substring(0, 120), datetime: dt });
+        safeSetItem('tasks', JSON.stringify(tasks));
         inputEl.value = ''; dateEl.value = ''; timeEl.value = '';
         load();
       }
@@ -1019,17 +1268,22 @@
     }
 
     /* ================================================================
-       WIDGET TOGGLES (unified)
+       WIDGET TOGGLES
        ================================================================ */
     function initToggles() {
       document.querySelectorAll('.toggle-btn[data-target]').forEach(function(btn) {
+        /* Store original label on first encounter */
+        var origLabel = btn.getAttribute('data-label') || 'Widget';
+        btn._origLabel = origLabel;
+
         btn.addEventListener('click', function() {
-          var t = document.getElementById(btn.getAttribute('data-target'));
+          var targetId = btn.getAttribute('data-target');
+          var t = document.getElementById(targetId);
           if (!t) return;
-          var open = t.style.display === 'flex';
-          t.style.display = open ? 'none' : 'flex';
-          btn.textContent = open ? 'Show' : 'Hide';
-          btn.setAttribute('aria-expanded', String(!open));
+          var isOpen = t.style.display === 'flex';
+          t.style.display = isOpen ? 'none' : 'flex';
+          btn.textContent = isOpen ? btn._origLabel : 'Hide';
+          btn.setAttribute('aria-expanded', String(!isOpen));
         });
       });
     }
@@ -1038,22 +1292,46 @@
        MOBILE PANEL
        ================================================================ */
     function initMobilePanel() {
-      var fab = document.getElementById('fab');
-      var panel = document.getElementById('mobile-panel');
-      var overlay = document.getElementById('mobile-panel-overlay');
+      var fab      = document.getElementById('fab');
+      var panel    = document.getElementById('mobile-panel');
+      var overlay  = document.getElementById('mobile-panel-overlay');
       var closeBtn = document.getElementById('mobile-panel-close');
+      if (!fab || !panel || !overlay || !closeBtn) return;
+
+      function getFocusable() {
+        return panel.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+      }
+
+      function trapFocus(e) {
+        if (e.key !== 'Tab') return;
+        var focusable = getFocusable();
+        if (focusable.length === 0) return;
+        var first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        } else {
+          if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
 
       function open() {
         panel.classList.add('open');
         overlay.classList.add('active');
         panel.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
+        setTimeout(function() { closeBtn.focus(); }, 100);
+        panel.addEventListener('keydown', trapFocus);
       }
+
       function close() {
         panel.classList.remove('open');
         overlay.classList.remove('active');
         panel.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
+        panel.removeEventListener('keydown', trapFocus);
+        fab.focus();
       }
 
       fab.addEventListener('click', open);
@@ -1084,43 +1362,39 @@
 
       /* Desktop countdown */
       var dc = createCountdown({
-        displayId: 'countdown',
-        daysId: 'addDays',
-        hoursId: 'addHours',
-        minutesId: 'addMinutes'
+        displayId: 'countdown', daysId: 'addDays',
+        hoursId: 'addHours', minutesId: 'addMinutes'
       });
 
       /* Mobile countdown */
       var mc = createCountdown({
-        displayId: 'countdownMobile',
-        daysId: 'addDaysMobile',
-        hoursId: 'addHoursMobile',
-        minutesId: 'addMinutesMobile'
+        displayId: 'countdownMobile', daysId: 'addDaysMobile',
+        hoursId: 'addHoursMobile', minutesId: 'addMinutesMobile'
       });
 
       /* Wire countdown buttons */
       document.querySelectorAll('.countdown-apply').forEach(function(b) {
         b.addEventListener('click', function() {
-          b.dataset.calcId === 'desktop' ? dc.apply() : mc.apply();
+          (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).apply();
         });
       });
       document.querySelectorAll('.countdown-start').forEach(function(b) {
         b.addEventListener('click', function() {
-          b.dataset.calcId === 'desktop' ? dc.start() : mc.start();
+          (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).start();
         });
       });
       document.querySelectorAll('.countdown-pause').forEach(function(b) {
         b.addEventListener('click', function() {
-          b.dataset.calcId === 'desktop' ? dc.pause() : mc.pause();
+          (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).pause();
         });
       });
       document.querySelectorAll('.countdown-reset').forEach(function(b) {
         b.addEventListener('click', function() {
-          b.dataset.calcId === 'desktop' ? dc.reset() : mc.reset();
+          (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).reset();
         });
       });
 
-      /* Delhi clocks (desktop + mobile) */
+      /* Delhi clocks */
       startDelhiClock(
         document.getElementById('delhiTime'),
         document.getElementById('delhiDate')
@@ -1130,27 +1404,23 @@
         document.getElementById('delhiDateMobile')
       );
 
-      /* Task managers (desktop + mobile, shared localStorage) */
+      /* Task managers */
       var dt = createTaskManager({
-        inputId: 'taskInput',
-        dateId: 'dateInput',
-        timeId: 'timeInput',
-        listId: 'tasksList'
+        inputId: 'taskInput', dateId: 'dateInput',
+        timeId: 'timeInput', listId: 'tasksList'
       });
       dt.load();
 
       var mt = createTaskManager({
-        inputId: 'taskInputMobile',
-        dateId: 'dateInputMobile',
-        timeId: 'timeInputMobile',
-        listId: 'tasksListMobile'
+        inputId: 'taskInputMobile', dateId: 'dateInputMobile',
+        timeId: 'timeInputMobile', listId: 'tasksListMobile'
       });
       mt.load();
 
-      /* Wire task add buttons */
+      /* Wire task-add buttons */
       document.querySelectorAll('.task-add').forEach(function(b) {
         b.addEventListener('click', function() {
-          b.dataset.panel === 'desktop' ? dt.add() : mt.add();
+          (b.getAttribute('data-panel') === 'desktop' ? dt : mt).add();
         });
       });
     });
