@@ -1,21 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'GT-NC6T5LRJ');
-  </script>
-  
-  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
   <meta charset="UTF-8" />
-  <title>Offline & Online Music Player Tabs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   
-  <!-- Added Subresource Integrity (SRI) for security -->
+  <!-- ═══════════════════════════════════════════════════════
+       SECURITY HEADERS (Meta tags - GitHub Pages compatible)
+       ═══════════════════════════════════════════════════════ -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline' https://www.googletagmanager.com;
+                 style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+                 img-src 'self' data: https://*.mzstatic.com https://is1-ssl.mzstatic.com https://is2-ssl.mzstatic.com https://is3-ssl.mzstatic.com https://is4-ssl.mzstatic.com https://is5-ssl.mzstatic.com;
+                 media-src 'self' blob: https://audio-ssl.itunes.apple.com https://*.mzstatic.com;
+                 connect-src 'self' https://itunes.apple.com https://www.googletagmanager.com https://www.google-analytics.com;
+                 worker-src 'none';
+                 frame-src 'none';
+                 frame-ancestors 'none';
+                 base-uri 'self';
+                 object-src 'none';
+                 embed-src 'none';
+                 form-action 'none';">
+                 
+  <!-- Prevents MIME type sniffing (e.g., treating an uploaded .txt as .html) -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  
+  <!-- PRIVACY: Strip referrer on all navigation -->
+  <meta name="referrer" content="no-referrer">
+  
+  <!-- Block Search Engine indexing for internal tool -->
+  <meta name="robots" content="noindex, nofollow">
+  
+  <!-- SECURITY: Restrict browser features to prevent abuse -->
+  <meta http-equiv="Permissions-Policy"
+        content="camera=(), microphone=(), geolocation=(), payment=(),
+                 usb=(), magnetometer=(), gyroscope=(), accelerometer=(),
+                 idle-detection=(), screen-wake-lock=()">
+
+  <title>Offline & Online Music Player Tabs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
+  
+  <!-- SRI Protected Bootstrap CSS -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
     rel="stylesheet"
@@ -24,7 +49,6 @@
   />
   
   <style>
-    /* Enable vertical and horizontal scrolling for entire page */
     html, body {
       height: 100%;
       margin: 0;
@@ -32,16 +56,15 @@
       background: linear-gradient(135deg, #243b55, #141e30);
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       color: #fff;
-      overflow-x: auto; /* horizontal scroll */
-      overflow-y: auto; /* vertical scroll */
-      /* Remove flex centering so scroll works on body */
-      display: block;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+      overflow-y: auto;
     }
 
     body {
       width: 100%;
       max-width: 960px;
-      margin: 20px auto; /* center container with margin for scroll */
+      margin: 20px auto;
+      padding: 0 15px; /* Mobile padding */
       box-sizing: border-box;
     }
 
@@ -54,239 +77,169 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      /* No scroll on container */
     }
 
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+    /* Tabs */
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
     .tab-btn {
-      flex: 1;
-      padding: 12px 20px;
-      background: transparent;
-      border: 2px solid #555;
-      border-radius: 12px;
-      color: #bbb;
-      font-size: 18px;
-      cursor: pointer;
-      transition: background-color 0.3s, color 0.3s;
-      user-select: none;
-      text-align: center;
+      flex: 1; padding: 12px 20px; background: transparent; border: 2px solid #555;
+      border-radius: 12px; color: #bbb; font-size: 18px; cursor: pointer;
+      transition: background-color 0.3s, color 0.3s; user-select: none; text-align: center;
     }
     .tab-btn.active {
-      background-color: #ffc107;
-      border-color: #e6ac00;
-      color: #111;
-      font-weight: 600;
-    }
-    .tab-panel {
-      display: none;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .tab-panel.active {
-      display: block;
-    }
-    ul {
-      list-style: none;
-      padding-left: 0;
-      margin-top: 12px;
-      /* Remove scroll on playlist */
-      max-height: none;
-      max-width: 100%;
-      overflow: visible;
-      white-space: normal;
-      border-radius: 12px;
-      background: #222;
-      box-shadow: inset 0 0 6px #0008;
-      box-sizing: border-box;
-    }
-    ul li {
-      padding: 8px 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #333;
-      color: #eee;
-      user-select: none;
-      outline: none;
-      white-space: normal;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-    ul li:last-child {
-      border-bottom: none;
-    }
-    ul li.active,
-    ul li:hover,
-    ul li:focus-visible {
-      background-color: #ffc107;
-      color: #111;
-      font-weight: 600;
-    }
-    input[type="file"], input[type="text"] {
-      background: #333;
-      border-radius: 8px;
-      border: 1px solid #555;
-      color: #fff;
-      padding: 6px 12px;
-      max-width: 100%;
-      user-select: none;
-      box-sizing: border-box;
-    }
-    input[type="text"] {
-      font-size: 14px;
-    }
-    .audio-bar {
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    #seekSlider {
-      flex-grow: 1;
-      cursor: pointer;
-    }
-    .time-display {
-      min-width: 70px;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      font-weight: 600;
-    }
-    .flex-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .card-player h2,
-    .card-search h3 {
-      margin-top: 0;
-      margin-bottom: 12px;
-      font-weight: 700;
-      color: #ffc107;
-      user-select: none;
-      text-align: center;
-    }
-    .search-result {
-      background: #222;
-      margin-bottom: 8px;
-      border-radius: 12px;
-      box-shadow: 0 1px 6px #0009;
-      padding: 8px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      color: #eee;
-      max-width: 100%;
-      overflow: visible;
-      white-space: normal;
-      box-sizing: border-box;
-    }
-    .search-result img {
-      width: 64px;
-      height: 64px;
-      border-radius: 12px;
-      flex-shrink: 0;
-      object-fit: cover;
-    }
-    .search-track-meta {
-      flex-grow: 1;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-    .playlist-btn {
-      flex-shrink: 0;
-      margin-left: 8px;
-      user-select: none;
-    }
-    #onlineResults {
-      max-height: none;
-      max-width: 100%;
-      overflow: visible;
-      white-space: normal;
-      padding-right: 8px;
-      margin-top: 12px;
-      box-sizing: border-box;
+      background-color: #ffc107; border-color: #e6ac00; color: #111; font-weight: 600;
     }
 
-    /* Responsive tweaks */
+    /* Panels */
+    .tab-panel { display: none; width: 100%; box-sizing: border-box; }
+    .tab-panel.active { display: block; }
+
+    /* Lists */
+    ul {
+      list-style: none; padding-left: 0; margin-top: 12px;
+      max-height: 40vh; /* Scrollable playlist to prevent UI breaking */
+      overflow-y: auto;
+      border-radius: 12px; background: #222;
+      box-shadow: inset 0 0 6px #0008; box-sizing: border-box;
+    }
+    ul li {
+      padding: 12px; cursor: pointer; border-bottom: 1px solid #333;
+      color: #eee; user-select: none; outline: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    ul li:last-child { border-bottom: none; }
+    ul li.active, ul li:hover, ul li:focus-visible {
+      background-color: #ffc107; color: #111; font-weight: 600;
+    }
+    ul li.active .remove-offline-btn { color: #111; }
+
+    /* Inputs */
+    input[type="file"], input[type="text"] {
+      background: #333; border-radius: 8px; border: 1px solid #555;
+      color: #fff; padding: 8px 12px; width: 100%; box-sizing: border-box;
+    }
+
+    /* Player Controls */
+    .audio-bar {
+      margin-top: 15px; display: flex; align-items: center; gap: 12px; width: 100%;
+    }
+    #seekSlider, #onlineSeekSlider { flex-grow: 1; cursor: pointer; }
+    .time-display {
+      min-width: 100px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600;
+    }
+    .flex-row { display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
+
+    /* Headings */
+    .card-player h2, .card-search h3 {
+      margin-top: 0; margin-bottom: 16px; font-weight: 700; color: #ffc107;
+      user-select: none; text-align: center;
+    }
+
+    /* Online Search Results */
+    .search-result {
+      background: #222; margin-bottom: 12px; border-radius: 12px;
+      box-shadow: 0 1px 6px #0009; padding: 12px;
+      display: flex; gap: 12px; align-items: center; color: #eee; box-sizing: border-box;
+    }
+    .search-result img {
+      width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0; object-fit: cover;
+    }
+    .search-track-meta { flex-grow: 1; font-size: 14px; overflow-wrap: anywhere; }
+    .playlist-btn { flex-shrink: 0; margin-left: 8px; }
+    
+    /* Remove button for offline tracks */
+    .remove-offline-btn {
+      background: none; border: none; color: #aaa; font-size: 18px; cursor: pointer;
+      padding: 0 5px; flex-shrink: 0;
+    }
+    .remove-offline-btn:hover { color: #dc3545; }
+
+    /* Privacy Banner */
+    #privacy-banner {
+      position: fixed; bottom: 0; left: 0; width: 100%; background: #222; color: #eee;
+      padding: 15px; text-align: center; font-size: 14px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.5); z-index: 1000;
+      display: flex; justify-content: center; align-items: center; gap: 15px;
+    }
+    #privacy-banner button { white-space: nowrap; }
+
+    /* Mobile Responsive */
     @media (max-width: 600px) {
-      .tab-btn {
-        font-size: 16px;
-        padding: 10px 14px;
-      }
-      .card-player h2, .card-search h3 {
-        font-size: 18px;
-      }
-      input[type="text"] {
-        font-size: 12px;
-      }
+      .tab-btn { font-size: 16px; padding: 10px 14px; }
+      .card-player h2, .card-search h3 { font-size: 20px; }
+      .container { padding: 15px; border-radius: 12px; }
+      body { margin: 10px auto; padding: 0 10px; }
+      .search-result { flex-direction: column; text-align: center; }
+      .playlist-btn { margin-left: 0; margin-top: 10px; }
     }
   </style>
 </head>
 <body>
+  
+  <!-- GDPR Compliant Privacy Banner -->
+  <div id="privacy-banner">
+    <span>This tool uses essential cookies/local storage for offline features. Accept non-essential analytics?</span>
+    <button class="btn btn-success btn-sm" id="accept-analytics">Accept</button>
+    <button class="btn btn-outline-light btn-sm" id="reject-analytics">Reject</button>
+  </div>
+
   <div class="container" aria-label="Music player with tabs">
     <div class="tabs" role="tablist" aria-label="Music Player Tabs">
       <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="offlineTab" id="offlineTabBtn">Offline Music</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="onlineTab" id="onlineTabBtn">Online Music</button>
     </div>
+
     <!-- Offline Music Tab -->
     <section id="offlineTab" class="tab-panel active" role="tabpanel" aria-labelledby="offlineTabBtn">
       <div class="card-player" aria-label="Offline local music player">
         <h2>Offline Music Player</h2>
-        <!-- Offline Search & Reset -->
         <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
-          <input type="text" id="offlineSearchInput" placeholder="Search offline music..." aria-label="Offline music search input" style="flex-grow:1; padding: 6px; border-radius: 6px; border: 1px solid #555; background:#222; color:#fff; min-width: 150px;" />
-          <button class="btn btn-warning" id="offlineSearchResetBtn" type="button" style="flex-shrink: 0; min-width: 80px;">Reset</button>
+          <input type="text" id="offlineSearchInput" placeholder="Filter offline music..." aria-label="Offline music search input" style="flex-grow:1; max-width: none;" />
+          <button class="btn btn-warning" id="offlineSearchResetBtn" type="button" style="flex-shrink: 0;">Reset</button>
         </div>
         <input type="file" id="fileInput" multiple accept="audio/*" aria-label="Select audio files" />
+        <p style="font-size:12px; color:#aaa; margin-top:5px;">Files are saved locally in your browser. No uploads to servers.</p>
         <ul id="playlist" aria-live="polite" aria-relevant="additions"></ul>
-        <div id="trackInfo" aria-live="polite" aria-atomic="true" style="text-align:center; margin-top:8px;">Select a song to play</div>
+        <div id="trackInfo" aria-live="polite" aria-atomic="true" style="text-align:center; margin-top:12px; min-height:24px;">Select a song to play</div>
         <audio id="audioPlayer" controls aria-label="Audio player controls" style="width: 100%; margin-top: 12px;"></audio>
         <div class="audio-bar">
           <input type="range" id="seekSlider" value="0" step="1" aria-label="Seek slider" />
           <div class="time-display">
-            <span id="currentTime">00:00</span>
-            <span id="duration">00:00</span>
+            <span id="currentTime">00:00</span> / <span id="duration">00:00</span>
           </div>
         </div>
         <div class="flex-row">
-          <button class="btn btn-warning" id="prevBtn" type="button" style="min-width: 80px;">Prev</button>
-          <button class="btn btn-warning" id="nextBtn" type="button" style="min-width: 80px;">Next</button>
-          <button class="btn btn-danger" id="offlineResetBtn" type="button" style="min-width: 80px;">Reset</button>
+          <button class="btn btn-warning" id="prevBtn" type="button">Prev</button>
+          <button class="btn btn-warning" id="nextBtn" type="button">Next</button>
+          <button class="btn btn-danger" id="offlineResetBtn" type="button">Clear All</button>
         </div>
       </div>
     </section>
+
     <!-- Online Music Tab -->
     <section id="onlineTab" class="tab-panel" role="tabpanel" aria-labelledby="onlineTabBtn" hidden>
       <div class="card-search" aria-label="Online music preview search and playlist">
         <h3>Online Music Preview Search</h3>
-        <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
-          <input
-            type="text"
-            id="onlineSearchInput"
-            placeholder="Search online music..."
-            aria-label="Online music search input"
-            style="flex-grow:1; padding: 6px; border-radius: 6px; border: 1px solid #555; background:#222; color:#fff; min-width: 150px;"
-          />
-          <button class="btn btn-warning" id="onlineResetBtn" type="button" style="min-width: 80px; flex-shrink: 0;">Reset</button>
-          <button class="btn btn-primary" id="onlineSearchBtn" type="button" style="min-width: 80px; margin-left: auto; flex-shrink: 0;">Search</button>
+        <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+          <input type="text" id="onlineSearchInput" placeholder="Search artists, songs..." aria-label="Online music search input" style="flex-grow:1; max-width: none;" />
+          <button class="btn btn-primary" id="onlineSearchBtn" type="button">Search</button>
+          <button class="btn btn-warning" id="onlineResetBtn" type="button">Reset</button>
         </div>
         <div id="onlineResults" aria-live="polite"></div>
         <h6 class="fw-bold mt-4" style="user-select:none; text-align:center;">Online Playlist (30s Previews)</h6>
         <ul id="onlinePlaylist" aria-live="polite" aria-relevant="additions"></ul>
-        <div id="onlineTrackInfo" aria-live="polite" aria-atomic="true" style="margin-bottom: 16px; text-align:center;">
-          Select a preview track to play / use playlist controls
-        </div>
+        <div id="onlineTrackInfo" aria-live="polite" aria-atomic="true" style="margin-bottom: 16px; text-align:center; min-height:24px;">Select a preview track to play</div>
         <audio id="onlineAudioPlayer" controls aria-label="Online audio player controls" style="width: 100%; margin-top: 12px;"></audio>
+        <div class="audio-bar">
+          <input type="range" id="onlineSeekSlider" value="0" step="1" aria-label="Online seek slider" />
+          <div class="time-display">
+            <span id="onlineCurrentTime">00:00</span> / <span id="onlineDuration">00:00</span>
+          </div>
+        </div>
         <div class="flex-row" style="margin-top: auto;">
-          <button class="btn btn-info" id="onlinePrevBtn" type="button" style="min-width: 80px;">Prev</button>
-          <button class="btn btn-info" id="onlineNextBtn" type="button" style="min-width: 80px;">Next</button>
-          <button class="btn btn-success" id="onlinePlayAllBtn" type="button" style="min-width: 150px;">Play All Sequentially</button>
+          <button class="btn btn-info" id="onlinePrevBtn" type="button">Prev</button>
+          <button class="btn btn-info" id="onlineNextBtn" type="button">Next</button>
+          <button class="btn btn-success" id="onlinePlayAllBtn" type="button">Play All Sequentially</button>
         </div>
       </div>
     </section>
@@ -294,146 +247,281 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Tab switching logic
+  
+  // ═══════════════════════════════════════════════════════
+  // PRIVACY & ANALYTICS CONTROL
+  // ═══════════════════════════════════════════════════════
+  const banner = document.getElementById('privacy-banner');
+  const acceptBtn = document.getElementById('accept-analytics');
+  const rejectBtn = document.getElementById('reject-analytics');
+
+  function loadGA() {
+    const s = document.createElement('script');
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ';
+    s.async = true;
+    document.head.appendChild(s);
+    s.onload = () => {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GT-NC6T5LRJ', { 'anonymize_ip': true }); // Privacy tweak
+    };
+  }
+
+  // Check if user already made a choice
+  if (localStorage.getItem('analytics_consent') === 'accepted') {
+    banner.style.display = 'none';
+    loadGA();
+  } else if (localStorage.getItem('analytics_consent') === 'rejected') {
+    banner.style.display = 'none';
+  } else {
+    banner.style.display = 'flex';
+  }
+
+  acceptBtn.addEventListener('click', () => {
+    localStorage.setItem('analytics_consent', 'accepted');
+    banner.style.display = 'none';
+    loadGA();
+  });
+
+  rejectBtn.addEventListener('click', () => {
+    localStorage.setItem('analytics_consent', 'rejected');
+    banner.style.display = 'none';
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // IndexedDB FOR PERSISTENT OFFLINE STORAGE
+  // ═══════════════════════════════════════════════════════
+  const DB_NAME = 'OfflineMusicDB';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'audioFiles';
+  let db;
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = (e) => {
+        const database = e.target.result;
+        if (!database.objectStoreNames.contains(STORE_NAME)) {
+          database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+      request.onerror = (e) => reject("IndexedDB not available");
+    });
+  }
+
+  async function saveTrackToDB(id, file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put({ id, name: file.name, data: reader.result });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject("Failed to save");
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  function getTrackFromDB(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const req = tx.objectStore(STORE_NAME).get(id);
+      req.onsuccess = () => resolve(req.result ? req.result.data : null);
+      req.onerror = () => reject("Failed to fetch");
+    });
+  }
+
+  function deleteTrackFromDB(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject("Failed to delete");
+    });
+  }
+
+  function getAllTracksFromDB() {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const req = tx.objectStore(STORE_NAME).getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject("Failed to get all");
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // TAB SWITCHING
+  // ═══════════════════════════════════════════════════════
   const offlineTabBtn = document.getElementById('offlineTabBtn');
   const onlineTabBtn = document.getElementById('onlineTabBtn');
   const offlineTab = document.getElementById('offlineTab');
   const onlineTab = document.getElementById('onlineTab');
-  offlineTabBtn.addEventListener('click', () => {
-    offlineTabBtn.classList.add('active');
-    offlineTabBtn.setAttribute('aria-selected', 'true');
-    onlineTabBtn.classList.remove('active');
-    onlineTabBtn.setAttribute('aria-selected', 'false');
-    offlineTab.classList.add('active');
-    offlineTab.removeAttribute('hidden');
-    onlineTab.classList.remove('active');
-    onlineTab.setAttribute('hidden', '');
-  });
-  onlineTabBtn.addEventListener('click', () => {
-    onlineTabBtn.classList.add('active');
-    onlineTabBtn.setAttribute('aria-selected', 'true');
-    offlineTabBtn.classList.remove('active');
-    offlineTabBtn.setAttribute('aria-selected', 'false');
-    onlineTab.classList.add('active');
-    onlineTab.removeAttribute('hidden');
-    offlineTab.classList.remove('active');
-    offlineTab.setAttribute('hidden', '');
-  });
 
-  // --- Offline Player Logic ---
+  function switchTab(activeBtn, inactiveBtn, activePanel, inactivePanel) {
+    activeBtn.classList.add('active');
+    activeBtn.setAttribute('aria-selected', 'true');
+    inactiveBtn.classList.remove('active');
+    inactiveBtn.setAttribute('aria-selected', 'false');
+    activePanel.classList.add('active');
+    activePanel.removeAttribute('hidden');
+    inactivePanel.classList.remove('active');
+    inactivePanel.setAttribute('hidden', '');
+  }
+
+  offlineTabBtn.addEventListener('click', () => switchTab(offlineTabBtn, onlineTabBtn, offlineTab, onlineTab));
+  onlineTabBtn.addEventListener('click', () => switchTab(onlineTabBtn, offlineTabBtn, onlineTab, offlineTab));
+
+  // ═══════════════════════════════════════════════════════
+  // OFFLINE PLAYER LOGIC
+  // ═══════════════════════════════════════════════════════
   const fileInput = document.getElementById("fileInput");
-  const playlist = document.getElementById("playlist");
+  const playlistEl = document.getElementById("playlist");
   const audioPlayer = document.getElementById("audioPlayer");
   const trackInfo = document.getElementById("trackInfo");
   const seekSlider = document.getElementById("seekSlider");
-  const currentTime = document.getElementById("currentTime");
-  const duration = document.getElementById("duration");
+  const currentTimeEl = document.getElementById("currentTime");
+  const durationEl = document.getElementById("duration");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
   const offlineResetBtn = document.getElementById("offlineResetBtn");
   const offlineSearchInput = document.getElementById('offlineSearchInput');
   const offlineSearchResetBtn = document.getElementById('offlineSearchResetBtn');
-  let tracks = [];
+  
+  let tracks = []; // Array of objects: { id, name, blob }
   let currentTrack = -1;
 
-  fileInput.addEventListener("change", () => {
-    tracks = [];
-    playlist.innerHTML = "";
-    Array.from(fileInput.files).forEach((file, idx) => {
+  function formatTime(sec) {
+    if(isNaN(sec)) return "00:00";
+    sec = Math.floor(sec);
+    const m = Math.floor(sec / 60), s = sec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function renderOfflinePlaylist() {
+    playlistEl.innerHTML = '';
+    tracks.forEach((track, idx) => {
       const li = document.createElement("li");
-      // Use textContent for security (prevents XSS if filename contains HTML)
-      li.textContent = file.name.replace(/\.(mp3|wav|ogg)$/i, "");
-      li.tabIndex = 0;
-      li.addEventListener("click", () => playTrack(idx));
-      li.addEventListener("keypress", (e) => {
-        if (e.key === "Enter" || e.key === " ") playTrack(idx);
+      const textSpan = document.createElement("span");
+      textSpan.style.overflow = "hidden";
+      textSpan.style.textOverflow = "ellipsis";
+      textSpan.style.whiteSpace = "nowrap";
+      textSpan.textContent = track.name;
+      
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "remove-offline-btn";
+      removeBtn.innerHTML = "&times;";
+      removeBtn.title = "Remove from library";
+      removeBtn.setAttribute('aria-label', `Remove ${track.name}`);
+      removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeOfflineTrack(idx);
       });
-      playlist.appendChild(li);
-      tracks.push(file);
+
+      li.appendChild(textSpan);
+      li.appendChild(removeBtn);
+      
+      li.tabIndex = 0;
+      li.addEventListener("click", () => playOfflineTrack(idx));
+      li.addEventListener("keypress", (e) => { if (e.key === "Enter") playOfflineTrack(idx); });
+      if (idx === currentTrack) li.classList.add("active");
+      playlistEl.appendChild(li);
     });
-    offlineSearchInput.value = '';
-    Array.from(playlist.children).forEach(li => li.style.display = '');
+  }
+
+  async function removeOfflineTrack(idx) {
+    const track = tracks[idx];
+    if(track) await deleteTrackFromDB(track.id);
+    tracks.splice(idx, 1);
+    if (currentTrack === idx) {
+      audioPlayer.pause(); audioPlayer.src = ""; currentTrack = -1;
+      trackInfo.textContent = "Select a song to play";
+    } else if (currentTrack > idx) {
+      currentTrack--;
+    }
+    renderOfflinePlaylist();
+  }
+
+  async function loadPersistedTracks() {
+    try {
+      await openDB();
+      const dbTracks = await getAllTracksFromDB();
+      tracks = dbTracks.map(t => ({
+        id: t.id,
+        name: t.name,
+        blob: new Blob([t.data], { type: 'audio/mpeg' })
+      }));
+      renderOfflinePlaylist();
+    } catch(e) {
+      console.warn("Could not load offline DB. Fresh session.", e);
+      await openDB(); // Ensure DB is open for new saves
+    }
+  }
+
+  fileInput.addEventListener("change", async () => {
+    for (const file of fileInput.files) {
+      const id = 'file_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      const safeName = file.name.replace(/\.(mp3|wav|ogg|m4a|flac)$/i, "");
+      tracks.push({ id, name: safeName, blob: file });
+      try {
+        await saveTrackToDB(id, file); // Persist immediately
+      } catch(e) { console.error("Failed to save file to DB", e); }
+    }
+    renderOfflinePlaylist();
+    fileInput.value = ''; // Reset input
   });
+
+  function playOfflineTrack(idx) {
+    if (tracks.length === 0 || idx < 0 || idx >= tracks.length) return;
+    currentTrack = idx;
+    const track = tracks[idx];
+    if (audioPlayer.src) URL.revokeObjectURL(audioPlayer.src); // Clean up memory
+    audioPlayer.src = URL.createObjectURL(track.blob);
+    trackInfo.textContent = track.name;
+    renderOfflinePlaylist();
+    audioPlayer.play();
+  }
 
   offlineSearchInput.addEventListener('input', () => {
     const filter = offlineSearchInput.value.toLowerCase();
-    Array.from(playlist.children).forEach(li => {
-      li.style.display = li.textContent.toLowerCase().includes(filter) ? '' : 'none';
+    Array.from(playlistEl.children).forEach((li, i) => {
+      const matches = tracks[i].name.toLowerCase().includes(filter);
+      li.style.display = matches ? '' : 'none';
     });
   });
 
   offlineSearchResetBtn.addEventListener('click', () => {
     offlineSearchInput.value = '';
-    Array.from(playlist.children).forEach(li => {
-      li.style.display = '';
-    });
+    Array.from(playlistEl.children).forEach(li => li.style.display = '');
   });
 
-  function playTrack(idx) {
-    if (tracks.length === 0) return;
-    currentTrack = idx;
-    const file = tracks[idx];
-    audioPlayer.src = URL.createObjectURL(file);
-    trackInfo.textContent = file.name;
-    highlightCurrent();
-    audioPlayer.play();
-  }
+  prevBtn.addEventListener("click", () => { if (currentTrack > 0) playOfflineTrack(currentTrack - 1); });
+  nextBtn.addEventListener("click", () => { if (currentTrack < tracks.length - 1) playOfflineTrack(currentTrack + 1); });
+  
+  audioPlayer.addEventListener("ended", () => { if (currentTrack < tracks.length - 1) playOfflineTrack(currentTrack + 1); });
+  audioPlayer.addEventListener("loadedmetadata", () => { seekSlider.max = Math.floor(audioPlayer.duration) || 0; durationEl.textContent = formatTime(audioPlayer.duration); });
+  audioPlayer.addEventListener("timeupdate", () => { seekSlider.value = Math.floor(audioPlayer.currentTime); currentTimeEl.textContent = formatTime(audioPlayer.currentTime); });
+  seekSlider.addEventListener("input", () => { audioPlayer.currentTime = seekSlider.value; });
 
-  function highlightCurrent() {
-    Array.from(playlist.children).forEach((li, i) => {
-      li.classList.toggle("active", i === currentTrack);
-    });
-  }
-
-  prevBtn.addEventListener("click", () => {
-    if (currentTrack > 0) playTrack(currentTrack - 1);
+  offlineResetBtn.addEventListener("click", async () => {
+    if(confirm("Clear all offline music from this browser?")) {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).clear();
+      tracks = []; currentTrack = -1; playlistEl.innerHTML = "";
+      audioPlayer.pause(); audioPlayer.src = ""; trackInfo.textContent = "Select a song to play";
+      seekSlider.value = 0; currentTimeEl.textContent = "00:00"; durationEl.textContent = "00:00";
+    }
   });
 
-  nextBtn.addEventListener("click", () => {
-    if (currentTrack < tracks.length - 1) playTrack(currentTrack + 1);
-  });
+  // Initialize Offline Player
+  loadPersistedTracks();
 
-  audioPlayer.addEventListener("ended", () => {
-    if (currentTrack < tracks.length - 1) playTrack(currentTrack + 1);
-  });
-
-  audioPlayer.addEventListener("loadedmetadata", () => {
-    seekSlider.max = Math.floor(audioPlayer.duration) || 0;
-    duration.textContent = formatTime(audioPlayer.duration);
-  });
-
-  audioPlayer.addEventListener("timeupdate", () => {
-    seekSlider.value = Math.floor(audioPlayer.currentTime);
-    currentTime.textContent = formatTime(audioPlayer.currentTime);
-  });
-
-  seekSlider.addEventListener("input", () => {
-    audioPlayer.currentTime = seekSlider.value;
-  });
-
-  function formatTime(sec) {
-    sec = Math.floor(sec);
-    const m = Math.floor(sec / 60),
-      s = sec % 60;
-    return `${String(m).padStart(2, 0)}:${String(s).padStart(2, 0)}`;
-  }
-
-  offlineResetBtn.addEventListener("click", () => {
-    tracks = [];
-    currentTrack = -1;
-    playlist.innerHTML = "";
-    audioPlayer.pause();
-    audioPlayer.src = "";
-    trackInfo.textContent = "Select a song to play";
-    seekSlider.value = 0;
-    currentTime.textContent = "00:00";
-    duration.textContent = "00:00";
-    offlineSearchInput.value = '';
-  });
-
-  // --- Online Player Logic ---
+  // ═══════════════════════════════════════════════════════
+  // ONLINE PLAYER LOGIC
+  // ═══════════════════════════════════════════════════════
   const onlineResults = document.getElementById("onlineResults");
-  const onlinePlaylist = document.getElementById("onlinePlaylist");
+  const onlinePlaylistEl = document.getElementById("onlinePlaylist");
   const onlineAudioPlayer = document.getElementById("onlineAudioPlayer");
   const onlineTrackInfo = document.getElementById("onlineTrackInfo");
   const onlinePrevBtn = document.getElementById("onlinePrevBtn");
@@ -441,58 +529,67 @@ document.addEventListener('DOMContentLoaded', () => {
   const onlinePlayAllBtn = document.getElementById("onlinePlayAllBtn");
   const onlineResetBtn = document.getElementById("onlineResetBtn");
   const onlineSearchBtn = document.getElementById("onlineSearchBtn");
-  let onlineTracks = [];
+  const onlineSearchInput = document.getElementById("onlineSearchInput");
+  const onlineSeekSlider = document.getElementById("onlineSeekSlider");
+  const onlineCurrentTimeEl = document.getElementById("onlineCurrentTime");
+  const onlineDurationEl = document.getElementById("onlineDuration");
+  
   let onlinePlaylistTracks = [];
   let currentOnlineTrack = -1;
   let playAllSeq = false;
 
+  // Security: Strict URL validation for Apple CDN
+  function isSafeAppleUrl(str) {
+    if (typeof str !== 'string') return false;
+    try {
+      const url = new URL(str);
+      if (url.protocol !== 'https:') return false;
+      const safeHosts = ['audio-ssl.itunes.apple.com', 'is1-ssl.mzstatic.com', 'is2-ssl.mzstatic.com', 'is3-ssl.mzstatic.com', 'is4-ssl.mzstatic.com', 'is5-ssl.mzstatic.com'];
+      return safeHosts.some(h => url.hostname === h || url.hostname.endsWith('.' + h));
+    } catch(e) { return false; }
+  }
+
   onlineSearchBtn.addEventListener('click', searchOnlineMusic);
+  onlineSearchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') searchOnlineMusic(); });
 
   async function searchOnlineMusic() {
-    const query = document.getElementById("onlineSearchInput").value.trim();
-    onlineResults.innerHTML = "";
-    if (!query) return;
+    const query = onlineSearchInput.value.trim();
+    onlineResults.innerHTML = "<div style='text-align:center; padding:20px;'>Searching...</div>";
+    if (!query) { onlineResults.innerHTML = ""; return; }
+    
     try {
-      // encodeURIComponent is used here to prevent URL injection
-      const resp = await fetch(
-        `https://itunes.apple.com/search?term=${encodeURIComponent(
-          query
-        )}&media=music&limit=10`
-      );
+      const resp = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=10`);
+      if(!resp.ok) throw new Error('Network response was not ok');
       const data = await resp.json();
+      onlineResults.innerHTML = "";
+      
       if (!data.results.length) {
         onlineResults.textContent = "No results found.";
         return;
       }
-      onlineTracks = data.results;
-      onlineTracks.forEach((track, idx) => {
-        // SECURITY FIX: Construct DOM elements manually instead of using innerHTML
-        // to prevent Cross-Site Scripting (XSS) from API data.
+      
+      data.results.forEach((track, idx) => {
         const resultDiv = document.createElement("div");
         resultDiv.className = "search-result";
 
         const img = document.createElement("img");
-        img.src = track.artworkUrl100;
+        // Security: Ensure image comes from Apple CDN
+        img.src = isSafeAppleUrl(track.artworkUrl100) ? track.artworkUrl100 : '';
         img.alt = "Album Art";
+        img.loading = "lazy";
         resultDiv.appendChild(img);
 
         const metaDiv = document.createElement("div");
         metaDiv.className = "search-track-meta";
 
+        // Security: Using textContent strictly to prevent XSS
         const titleDiv = document.createElement("div");
         titleDiv.className = "fw-bold";
         titleDiv.textContent = track.trackName || "Untitled";
         metaDiv.appendChild(titleDiv);
 
         const artistDiv = document.createElement("div");
-        artistDiv.textContent = `${track.artistName || "Unknown"}`;
-        
-        const collectionSpan = document.createElement("span");
-        collectionSpan.className = "badge text-bg-dark";
-        collectionSpan.textContent = track.collectionName || "";
-        
-        artistDiv.appendChild(document.createElement("br"));
-        artistDiv.appendChild(collectionSpan);
+        artistDiv.textContent = track.artistName || "Unknown";
         metaDiv.appendChild(artistDiv);
         resultDiv.appendChild(metaDiv);
 
@@ -500,79 +597,62 @@ document.addEventListener('DOMContentLoaded', () => {
         playlistBtn.className = "btn btn-success btn-sm playlist-btn";
         playlistBtn.type = "button";
         playlistBtn.textContent = "+ Playlist";
-        playlistBtn.addEventListener("click", () => {
-          addToOnlinePlaylist(idx);
-        });
+        playlistBtn.addEventListener("click", () => addToOnlinePlaylist(track));
         resultDiv.appendChild(playlistBtn);
-
-        // Audio element
-        const audio = document.createElement("audio");
-        audio.className = "search-preview-audio";
-        audio.controls = true;
-        audio.src = track.previewUrl;
-        resultDiv.appendChild(audio);
 
         onlineResults.appendChild(resultDiv);
       });
     } catch (err) {
-      onlineResults.textContent = "Error loading previews.";
+      onlineResults.innerHTML = "<div style='color:#f87171; text-align:center;'>Error loading previews. Check connection.</div>";
     }
   }
 
-  function addToOnlinePlaylist(idx) {
-    const track = onlineTracks[idx];
-    if (!track) return;
+  function addToOnlinePlaylist(track) {
+    // Prevent exact duplicates based on track ID
+    if (onlinePlaylistTracks.some(t => t.trackId === track.trackId)) return;
     onlinePlaylistTracks.push(track);
     renderOnlinePlaylist();
   }
 
   function renderOnlinePlaylist() {
-    onlinePlaylist.innerHTML = "";
+    onlinePlaylistEl.innerHTML = "";
+    if(!onlinePlaylistTracks.length) return;
+    
     onlinePlaylistTracks.forEach((track, idx) => {
       const li = document.createElement("li");
       
-      // SECURITY FIX: Use textContent for external data to prevent XSS
-      const titleSpan = document.createElement("span");
-      titleSpan.className = "fw-bold";
-      titleSpan.textContent = track.trackName;
-      
-      const separator = document.createTextNode(" - ");
-      
-      const artistSpan = document.createElement("span");
-      artistSpan.textContent = track.artistName;
+      const textSpan = document.createElement("span");
+      textSpan.textContent = `${track.trackName} - ${track.artistName}`;
+      textSpan.style.overflow = "hidden";
+      textSpan.style.textOverflow = "ellipsis";
+      textSpan.style.whiteSpace = "nowrap";
 
-      li.appendChild(titleSpan);
-      li.appendChild(separator);
-      li.appendChild(artistSpan);
-
+      li.appendChild(textSpan);
       li.tabIndex = 0;
       li.addEventListener("click", () => playOnlineTrack(idx));
-      li.addEventListener("keypress", (e) => {
-        if (e.key === "Enter" || e.key === " ") playOnlineTrack(idx);
-      });
+      li.addEventListener("keypress", (e) => { if (e.key === "Enter") playOnlineTrack(idx); });
       if (idx === currentOnlineTrack) li.classList.add("active");
-      onlinePlaylist.appendChild(li);
+      onlinePlaylistEl.appendChild(li);
     });
   }
 
   function playOnlineTrack(idx) {
-    if (!onlinePlaylistTracks.length) return;
+    if (!onlinePlaylistTracks.length || idx < 0 || idx >= onlinePlaylistTracks.length) return;
     currentOnlineTrack = idx;
     const track = onlinePlaylistTracks[idx];
-    onlineAudioPlayer.src = track.previewUrl;
-    onlineTrackInfo.textContent = `${track.trackName} by ${track.artistName}`;
+    
+    // Security: Only play if URL passes strict check
+    const safeUrl = isSafeAppleUrl(track.previewUrl) ? track.previewUrl : '';
+    onlineAudioPlayer.src = safeUrl;
+    
+    // Security: textContent to avoid XSS
+    onlineTrackInfo.textContent = `Playing: ${track.trackName} by ${track.artistName}`;
     renderOnlinePlaylist();
-    onlineAudioPlayer.play();
+    if(safeUrl) onlineAudioPlayer.play();
   }
 
-  onlinePrevBtn.addEventListener("click", () => {
-    if (currentOnlineTrack > 0) playOnlineTrack(currentOnlineTrack - 1);
-  });
-
-  onlineNextBtn.addEventListener("click", () => {
-    if (currentOnlineTrack < onlinePlaylistTracks.length - 1)
-      playOnlineTrack(currentOnlineTrack + 1);
-  });
+  onlinePrevBtn.addEventListener("click", () => { if (currentOnlineTrack > 0) playOnlineTrack(currentOnlineTrack - 1); });
+  onlineNextBtn.addEventListener("click", () => { if (currentOnlineTrack < onlinePlaylistTracks.length - 1) playOnlineTrack(currentOnlineTrack + 1); });
 
   onlineAudioPlayer.addEventListener("ended", () => {
     if (playAllSeq && currentOnlineTrack < onlinePlaylistTracks.length - 1) {
@@ -589,18 +669,28 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   onlineResetBtn.addEventListener("click", () => {
-    document.getElementById("onlineSearchInput").value = "";
+    onlineSearchInput.value = "";
     onlineResults.innerHTML = "";
-    onlinePlaylist.innerHTML = "";
-    onlineTracks = [];
     onlinePlaylistTracks = [];
     currentOnlineTrack = -1;
     playAllSeq = false;
-    onlineTrackInfo.textContent = "Select a preview track to play / use playlist controls";
+    onlineTrackInfo.textContent = "Select a preview track to play";
     onlineAudioPlayer.pause();
     onlineAudioPlayer.src = "";
-    onlineAudioPlayer.currentTime = 0;
+    renderOnlinePlaylist();
   });
+
+  // Online Player Seek Bar
+  onlineAudioPlayer.addEventListener("loadedmetadata", () => { 
+    onlineSeekSlider.max = Math.floor(onlineAudioPlayer.duration) || 0; 
+    onlineDurationEl.textContent = formatTime(onlineAudioPlayer.duration); 
+  });
+  onlineAudioPlayer.addEventListener("timeupdate", () => { 
+    onlineSeekSlider.value = Math.floor(onlineAudioPlayer.currentTime); 
+    onlineCurrentTimeEl.textContent = formatTime(onlineAudioPlayer.currentTime); 
+  });
+  onlineSeekSlider.addEventListener("input", () => { onlineAudioPlayer.currentTime = onlineSeekSlider.value; });
+
 });
 </script>
 </body>
