@@ -7,6 +7,11 @@
   <!-- ── Security Meta Tags ── -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+  <!--
+    NOTE: noindex + Google Analytics is contradictory.
+    If you want traffic/tracking, remove noindex.
+    If you want full privacy, remove the GA/AdSense scripts.
+  -->
   <meta name="robots" content="noindex, nofollow" />
 
   <!--
@@ -17,16 +22,26 @@
     NOTE: 'unsafe-inline' is unavoidable while JS/CSS live inside this file.
           For full CSP XSS mitigation, move all JS/CSS to external files
           and remove 'unsafe-inline'.
+
+    TRADE-OFF: frame-src and connect-src include Google Ads domains so that
+    AdSense can serve ads via iframes. If you remove AdSense, you can
+    restore frame-src 'none' for stronger clickjacking defense.
   -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self';
              script-src 'self' 'unsafe-inline'
                https://pagead2.googlesyndication.com
                https://www.googletagmanager.com;
-             frame-src 'none';
+             frame-src
+               https://googleads.g.doubleclick.net
+               https://tpc.googlesyndication.com;
              connect-src 'self'
                https://www.google-analytics.com
-               https://www.googletagmanager.com;
+               https://www.googletagmanager.com
+               https://googleads.g.doubleclick.net
+               https://tpc.googlesyndication.com
+               https://pagead2.googlesyndication.com
+               https://stats.g.doubleclick.net;
              style-src 'self' 'unsafe-inline';
              img-src 'self' data: https:;
              media-src https://actions.google.com;
@@ -41,6 +56,8 @@
   <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
   <link rel="dns-prefetch" href="//www.google-analytics.com" />
   <link rel="dns-prefetch" href="//actions.google.com" />
+  <link rel="dns-prefetch" href="//googleads.g.doubleclick.net" />
+  <link rel="dns-prefetch" href="//tpc.googlesyndication.com" />
 
   <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
   <title>MY_STUFF</title>
@@ -414,6 +431,13 @@
       word-break: break-all;
     }
 
+    .countdown-target {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #88aacc;
+      margin-top: 4px;
+    }
+
     .action-btn {
       font-size: 0.85rem;
       border-radius: 16px;
@@ -451,7 +475,35 @@
 
     /* ── Tasks ── */
     #tasks, #tasksMobile { max-height: 400px; overflow-y: auto; }
-    #tasks h2, #tasksMobile h2 { margin-top: 0; font-weight: 800; font-size: 1.3rem; color: #eee; }
+    #tasks h2, #tasksMobile h2 {
+      margin-top: 0;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: #eee;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .task-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 191, 255, 0.3);
+      color: #00eaff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      padding: 0 6px;
+    }
+    .tasks-empty {
+      color: #777;
+      font-size: 0.85rem;
+      font-style: italic;
+      padding: 10px 0;
+      text-align: center;
+    }
     #tasksList, #tasksListMobile {
       list-style: none;
       padding-left: 0;
@@ -467,11 +519,12 @@
       cursor: pointer;
       user-select: none;
       color: #eee;
-      transition: background-color 0.25s ease;
+      transition: background-color 0.25s ease, opacity 0.25s ease;
       word-break: break-word;
       font-size: 0.9rem;
       display: flex;
       align-items: center;
+      gap: 8px;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
@@ -482,8 +535,31 @@
     }
     #tasksList li.completed, #tasksListMobile li.completed {
       text-decoration: line-through;
-      opacity: 0.6;
+      opacity: 0.55;
       color: #bbb;
+    }
+    #tasksList li.completed::before, #tasksListMobile li.completed::before {
+      content: '\2713';
+      color: #4caf50;
+      font-weight: 900;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+    #tasksList li:not(.completed)::before, #tasksListMobile li:not(.completed)::before {
+      content: '\25CB';
+      color: #00bfff;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+    .task-text { flex: 1; }
+    .task-due {
+      font-size: 0.75rem;
+      color: #999;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #tasksList li.completed .task-due, #tasksListMobile li.completed .task-due {
+      color: #666;
     }
 
     /* ── Calculator ── */
@@ -491,16 +567,28 @@
       display: none;
       padding: 16px 24px 24px 24px;
     }
-    #display, #display-mobile {
+    .calc-display {
       background: rgba(52, 78, 134, 0.8);
       color: white;
-      font-size: 2rem;
-      padding: 12px 15px;
+      padding: 8px 15px;
       border-radius: 10px;
-      text-align: right;
-      min-height: 50px;
+      min-height: 70px;
       user-select: none;
       word-break: break-all;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .calc-expression {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      text-align: right;
+      min-height: 1.2em;
+      font-variant-numeric: tabular-nums;
+    }
+    .calc-value {
+      font-size: 2rem;
+      text-align: right;
       font-variant-numeric: tabular-nums;
     }
     .calc-grid {
@@ -589,7 +677,8 @@
 
     @media (min-width: 769px) and (max-width: 1100px) {
       .widget-container { width: 270px; }
-      .categories-box { margin-right: 290px; }
+      .categories-box { margin-right: 290px; margin-left: 20px; }
+      .page-container { justify-content: flex-start; }
     }
 
     @media (max-width: 768px) {
@@ -607,7 +696,7 @@
       #countdown, #countdownMobile { font-size: 1.25rem; }
       .time { font-size: 1.6rem; }
       .city { font-size: 1.2rem; }
-      #display, #display-mobile { font-size: 1.6rem; }
+      .calc-value { font-size: 1.6rem; }
       .calc-btn { font-size: 1rem; padding: 12px 0; min-height: 46px; }
     }
 
@@ -713,7 +802,10 @@
         <button class="toggle-btn" type="button" data-target="calc-content-mobile" data-label="Calculator" aria-expanded="false">Calculator</button>
       </div>
       <div id="calc-content-mobile" class="widget-content" style="display:none;">
-        <div id="display-mobile" aria-live="polite" aria-atomic="true">0</div>
+        <div class="calc-display" aria-live="polite" aria-atomic="true">
+          <div class="calc-expression" id="calcExprMobile"></div>
+          <div class="calc-value" id="display-mobile">0</div>
+        </div>
         <div class="calc-grid" data-calc="mobile">
           <button class="calc-btn clear" type="button">C</button>
           <button class="calc-btn backspace" type="button">&larr;</button>
@@ -766,6 +858,7 @@
           <button class="action-btn countdown-reset" type="button" data-calc-id="mobile">Reset</button>
         </div>
         <div id="countdownMobile" aria-live="polite" aria-atomic="true">0d 0h 0m 0s</div>
+        <div class="countdown-target" id="countdownTargetMobile">Not set</div>
       </div>
     </div>
 
@@ -781,12 +874,12 @@
           <div id="delhiDateMobile" class="date">--/--/----</div>
         </div>
         <div id="tasksMobile">
-          <h2>Tasks</h2>
+          <h2>Tasks <span class="task-count" id="taskCountMobile">0</span></h2>
           <input type="text" id="taskInputMobile" placeholder="Task description" maxlength="120" autocomplete="off" spellcheck="false" />
           <input type="date" id="dateInputMobile" />
           <input type="time" id="timeInputMobile" />
           <button class="action-btn task-add" type="button" data-panel="mobile">Add Task</button>
-          <ul id="tasksListMobile" role="list"></ul>
+          <ul id="tasksListMobile" role="list" aria-label="Task list"></ul>
         </div>
       </div>
     </div>
@@ -799,7 +892,10 @@
         <button class="toggle-btn" type="button" data-target="calc-content" data-label="Calculator" aria-expanded="false">Calculator</button>
       </div>
       <div id="calc-content" class="widget-content" style="display:none;">
-        <div id="display" aria-live="polite" aria-atomic="true">0</div>
+        <div class="calc-display" aria-live="polite" aria-atomic="true">
+          <div class="calc-expression" id="calcExprDesktop"></div>
+          <div class="calc-value" id="display">0</div>
+        </div>
         <div class="calc-grid" data-calc="desktop">
           <button class="calc-btn clear" type="button">C</button>
           <button class="calc-btn backspace" type="button">&larr;</button>
@@ -851,6 +947,7 @@
           <button class="action-btn countdown-reset" type="button" data-calc-id="desktop">Reset</button>
         </div>
         <div id="countdown" aria-live="polite" aria-atomic="true">0d 0h 0m 0s</div>
+        <div class="countdown-target" id="countdownTarget">Not set</div>
       </div>
     </div>
 
@@ -865,12 +962,12 @@
           <div id="delhiDate" class="date">--/--/----</div>
         </div>
         <div id="tasks">
-          <h2>Tasks</h2>
+          <h2>Tasks <span class="task-count" id="taskCountDesktop">0</span></h2>
           <input type="text" id="taskInput" placeholder="Task description" maxlength="120" autocomplete="off" spellcheck="false" />
           <input type="date" id="dateInput" />
           <input type="time" id="timeInput" />
           <button class="action-btn task-add" type="button" data-panel="desktop">Add Task</button>
-          <ul id="tasksList" role="list"></ul>
+          <ul id="tasksList" role="list" aria-label="Task list"></ul>
         </div>
       </div>
     </div>
@@ -898,7 +995,13 @@
        Placed at END of body so the page always renders first.
        On GitHub Pages you cannot send X-Frame-Options / frame-ancestors
        HTTP headers, so this JS guard is the only defense.
-       In production with your own server, add these HTTP headers instead:
+
+       IMPORTANT: This can be bypassed by an attacker who embeds your
+       page in an iframe with the sandbox="" attribute (without
+       allow-scripts). In that case the script won't execute and the
+       page simply won't render — which is an acceptable fail-closed.
+
+       For PRODUCTION with your own server, add these HTTP headers:
          X-Frame-Options: SAMEORIGIN
          Content-Security-Policy: frame-ancestors 'self';
        ================================================================ */
@@ -916,6 +1019,7 @@
        SECURITY UTILITIES
        ================================================================ */
 
+    /** Escape HTML entities to prevent XSS when inserting into DOM */
     function escapeHTML(str) {
       if (typeof str !== 'string') return '';
       var div = document.createElement('div');
@@ -923,6 +1027,7 @@
       return div.innerHTML;
     }
 
+    /** Validate that a URL uses http: or https: protocol only */
     function isSafeURL(url) {
       if (typeof url !== 'string') return false;
       var trimmed = url.trim();
@@ -935,6 +1040,15 @@
       }
     }
 
+    /** Maximum number of tasks to prevent localStorage abuse */
+    var MAX_TASKS = 50;
+
+    /**
+     * Safely parse tasks from localStorage.
+     * Rejects any object that doesn't match the exact expected shape:
+     *   { desc: string (1-120 chars), datetime: number (finite) }
+     * Also rejects arrays with unexpected extra keys (prototype pollution guard).
+     */
     function safeParseTasks(raw) {
       if (typeof raw !== 'string' || raw.length === 0) return [];
       try {
@@ -961,6 +1075,7 @@
       }
     }
 
+    /** localStorage wrappers — fail gracefully if storage is blocked */
     function safeGetItem(key) {
       try { return localStorage.getItem(key); } catch (e) { return null; }
     }
@@ -972,6 +1087,7 @@
       try { localStorage.removeItem(key); } catch (e) {}
     }
 
+    /** Toast notification system */
     var _toastTimer = null;
     function showToast(msg, duration) {
       duration = (typeof duration === 'number' && duration > 0) ? duration : 3000;
@@ -983,14 +1099,31 @@
       _toastTimer = setTimeout(function() { el.classList.remove('show'); }, duration);
     }
 
+    /** Clamp a numeric input value between min and max */
     function clamp(val, min, max) {
       var n = parseInt(val, 10);
       if (isNaN(n)) return min;
       return Math.min(max, Math.max(min, n));
     }
 
+    /**
+     * Validate a date+time string combination produces a valid Date.
+     * Rejects NaN dates and dates too far in the past or future.
+     */
+    function isValidTaskDateTime(dateStr, timeStr) {
+      if (!dateStr || !timeStr) return false;
+      var dt = new Date(dateStr + 'T' + timeStr + ':00');
+      if (!isFinite(dt.getTime())) return false;
+      var now = Date.now();
+      /* Reject dates more than 10 years in the past or 100 years in future */
+      if (dt.getTime() < now - 315360000000 || dt.getTime() > now + 3153600000000) return false;
+      return true;
+    }
+
     /* ================================================================
        SAFE EXTERNAL NAVIGATION
+       Validates all external links at click time to prevent
+       javascript:/data:/blob: URI injection via compromised links.
        ================================================================ */
     (function() {
       var link = document.getElementById('uplink-link');
@@ -1058,15 +1191,34 @@
 
     /* ================================================================
        CALCULATOR
+       Supports click and keyboard input (desktop only).
+       Shows pending expression above the current value.
        ================================================================ */
-    function createCalculator(gridEl, displayEl) {
+    var OP_SYMBOLS = { '+': '+', '-': '−', '*': '×', '/': '÷', '%': '%' };
+
+    function createCalculator(gridEl, valueEl, exprEl) {
       var current = '0', prev = '', op = null, resetNext = false;
       var MAX_LEN = 20;
+
+      function updateDisplay() {
+        valueEl.textContent = current;
+      }
+
+      function updateExpression() {
+        if (op && prev !== '') {
+          exprEl.textContent = prev + ' ' + (OP_SYMBOLS[op] || op);
+        } else {
+          exprEl.textContent = '';
+        }
+      }
 
       gridEl.addEventListener('click', function(e) {
         var btn = e.target.closest('.calc-btn');
         if (!btn) return;
+        handleButton(btn);
+      });
 
+      function handleButton(btn) {
         if (btn.classList.contains('number')) {
           var num = btn.getAttribute('data-num');
           if (num === null || num === undefined) return;
@@ -1076,74 +1228,157 @@
             current = (current === '0' && num !== '.') ? num : current + num;
           }
           if (current.length > MAX_LEN) current = current.substring(0, MAX_LEN);
-          displayEl.textContent = current;
+          updateDisplay();
 
         } else if (btn.classList.contains('operator')) {
           var opVal = btn.getAttribute('data-op');
           if (opVal === null) return;
+          /* Chain operations: if there's a pending op, evaluate first */
+          if (op && prev !== '' && !resetNext) {
+            evaluate();
+          }
           op = opVal;
           prev = current;
           resetNext = true;
+          updateExpression();
 
         } else if (btn.classList.contains('clear')) {
           current = '0'; prev = ''; op = null; resetNext = false;
-          displayEl.textContent = '0';
+          updateDisplay();
+          updateExpression();
 
         } else if (btn.classList.contains('backspace')) {
           if (resetNext) return;
           current = current.slice(0, -1) || '0';
-          displayEl.textContent = current;
+          updateDisplay();
 
         } else if (btn.classList.contains('equal')) {
-          if (op && prev !== '') {
-            var a = parseFloat(prev), b = parseFloat(current), r;
-            switch (op) {
-              case '+': r = a + b; break;
-              case '-': r = a - b; break;
-              case '*': r = a * b; break;
-              case '/': case '%':
-                if (b === 0) {
-                  displayEl.textContent = 'Error';
-                  current = '0'; prev = ''; op = null; resetNext = true;
-                  return;
-                }
-                r = (op === '/') ? a / b : a % b;
-                break;
-              default: r = b;
-            }
-            if (!isFinite(r) || isNaN(r)) {
-              displayEl.textContent = 'Error'; current = '0';
-            } else {
-              r = Math.round(r * 1e12) / 1e12;
-              current = String(r);
-              if (current.length > MAX_LEN) current = current.substring(0, MAX_LEN);
-              displayEl.textContent = current;
-            }
-            prev = ''; op = null; resetNext = true;
+          evaluate();
+          updateExpression();
+        }
+      }
+
+      function evaluate() {
+        if (op && prev !== '') {
+          var a = parseFloat(prev), b = parseFloat(current), r;
+          switch (op) {
+            case '+': r = a + b; break;
+            case '-': r = a - b; break;
+            case '*': r = a * b; break;
+            case '/': case '%':
+              if (b === 0) {
+                valueEl.textContent = 'Error';
+                current = '0'; prev = ''; op = null; resetNext = true;
+                return;
+              }
+              r = (op === '/') ? a / b : a % b;
+              break;
+            default: r = b;
           }
+          if (!isFinite(r) || isNaN(r)) {
+            valueEl.textContent = 'Error'; current = '0';
+          } else {
+            r = Math.round(r * 1e12) / 1e12;
+            current = String(r);
+            if (current.length > MAX_LEN) current = current.substring(0, MAX_LEN);
+            updateDisplay();
+          }
+          prev = ''; op = null; resetNext = true;
+        }
+      }
+
+      /* Expose handleButton for keyboard support */
+      return { handleButton: handleButton };
+    }
+
+    /* ================================================================
+       CALCULATOR KEYBOARD SUPPORT (desktop only)
+       Only captures keys when a calculator widget is open and
+       focus is not in a text input.
+       ================================================================ */
+    function initCalcKeyboard(desktopCalc, mobileCalc) {
+      document.addEventListener('keydown', function(e) {
+        /* Don't intercept when user is typing in inputs */
+        var tag = e.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+        /* Determine which calculator is open */
+        var desktopOpen = document.getElementById('calc-content').style.display === 'flex';
+        var mobileOpen = document.getElementById('calc-content-mobile').style.display === 'flex';
+        if (!desktopOpen && !mobileOpen) return;
+
+        var calc = desktopOpen ? desktopCalc : mobileCalc;
+        if (!calc) return;
+
+        /* Map keys to button selectors */
+        var selector = null;
+        if (e.key >= '0' && e.key <= '9') {
+          selector = '[data-num="' + e.key + '"]';
+        } else if (e.key === '.') {
+          selector = '[data-num="."]';
+        } else if (e.key === '+') {
+          selector = '[data-op="+"]';
+        } else if (e.key === '-') {
+          selector = '[data-op="-"]';
+        } else if (e.key === '*') {
+          selector = '[data-op="*"]';
+        } else if (e.key === '/') {
+          e.preventDefault(); /* Prevent Firefox quick-find */
+          selector = '[data-op="/"]';
+        } else if (e.key === '%') {
+          selector = '[data-op="%"]';
+        } else if (e.key === 'Enter' || e.key === '=') {
+          selector = '.equal';
+        } else if (e.key === 'Backspace') {
+          selector = '.backspace';
+        } else if (e.key === 'Escape' || e.key === 'Delete') {
+          selector = '.clear';
+        }
+
+        if (!selector) return;
+
+        var grid = desktopOpen
+          ? document.querySelector('.calc-grid[data-calc="desktop"]')
+          : document.querySelector('.calc-grid[data-calc="mobile"]');
+        if (!grid) return;
+
+        var btn = grid.querySelector(selector);
+        if (btn) {
+          e.preventDefault();
+          calc.handleButton(btn);
         }
       });
     }
 
     /* ================================================================
        COUNTDOWN TIMER
+       "Apply" sets target = now + specified duration (consistent behavior).
+       "Start" begins the countdown interval.
+       "Pause" freezes the countdown (resumes from where it left off).
+       "Reset" clears everything to zero.
        ================================================================ */
     function createCountdown(cfg) {
       var el = document.getElementById(cfg.displayId);
+      var targetEl = document.getElementById(cfg.targetId);
       var dIn = document.getElementById(cfg.daysId);
       var hIn = document.getElementById(cfg.hoursId);
       var mIn = document.getElementById(cfg.minutesId);
       var beep = document.getElementById('beepSound');
 
-      var origTarget = new Date(2025, 11, 31, 23, 59, 59).getTime();
-      var target = origTarget;
-      var interval = null, paused = false, pauseTime = null, useOrig = true;
+      var target = 0;
+      var interval = null, paused = false, pauseRemaining = 0;
+
+      function formatTargetDate(ts) {
+        if (!ts || ts <= 0) return 'Not set';
+        return 'Target: ' + new Date(ts).toLocaleString();
+      }
 
       function update() {
         var diff = target - Date.now();
         if (diff <= 0) {
           clearInterval(interval); interval = null;
           el.textContent = "Time's up!";
+          if (targetEl) targetEl.textContent = 'Finished';
           if (beep) { beep.play().catch(function() {}); }
           return;
         }
@@ -1156,42 +1391,54 @@
 
       return {
         start: function() {
-          if (!interval) {
-            if (paused && pauseTime) {
-              target += Date.now() - pauseTime;
-              paused = false; pauseTime = null;
-            }
-            interval = setInterval(update, 1000);
-            update();
+          if (interval) return;
+          if (target <= 0) {
+            showToast('Set a duration first, then click Apply.');
+            return;
           }
+          if (paused && pauseRemaining > 0) {
+            /* Resume from paused state */
+            target = Date.now() + pauseRemaining;
+            paused = false;
+          }
+          interval = setInterval(update, 1000);
+          update();
         },
         pause: function() {
-          if (interval) {
-            clearInterval(interval); interval = null;
-            paused = true; pauseTime = Date.now();
-          }
+          if (!interval) return;
+          clearInterval(interval); interval = null;
+          pauseRemaining = Math.max(0, target - Date.now());
+          paused = true;
         },
         reset: function() {
           clearInterval(interval); interval = null;
-          paused = false; pauseTime = null;
-          target = Date.now(); useOrig = false;
+          paused = false; pauseRemaining = 0; target = 0;
           if (dIn) dIn.value = 0;
           if (hIn) hIn.value = 0;
           if (mIn) mIn.value = 0;
           el.textContent = '0d 0h 0m 0s';
+          if (targetEl) targetEl.textContent = 'Not set';
         },
         apply: function() {
+          /* Stop any running countdown */
           clearInterval(interval); interval = null;
-          paused = false; pauseTime = null;
+          paused = false; pauseRemaining = 0;
+
           var d = clamp(dIn ? dIn.value : 0, 0, 365);
           var h = clamp(hIn ? hIn.value : 0, 0, 23);
           var m = clamp(mIn ? mIn.value : 0, 0, 59);
           if (dIn) dIn.value = d;
           if (hIn) hIn.value = h;
           if (mIn) mIn.value = m;
-          var base = useOrig ? origTarget : Date.now();
-          target = base + d * 86400000 + h * 3600000 + m * 60000;
+
+          var totalMs = d * 86400000 + h * 3600000 + m * 60000;
+          if (totalMs <= 0) {
+            showToast('Enter a duration greater than zero.');
+            return;
+          }
+          target = Date.now() + totalMs;
           update();
+          if (targetEl) targetEl.textContent = formatTargetDate(target);
         }
       };
     }
@@ -1216,29 +1463,68 @@
 
     /* ================================================================
        TASK MANAGER
+       Both desktop and mobile instances share the same localStorage key.
+       Changes in one panel trigger a 'tasks-updated' custom event so
+       the other panel stays in sync without a page reload.
        ================================================================ */
     function createTaskManager(cfg) {
       var inputEl = document.getElementById(cfg.inputId);
       var dateEl  = document.getElementById(cfg.dateId);
       var timeEl  = document.getElementById(cfg.timeId);
       var listEl  = document.getElementById(cfg.listId);
+      var countEl = document.getElementById(cfg.countId);
 
       function load() {
         if (!listEl) return;
         var tasks = safeParseTasks(safeGetItem('tasks'));
         listEl.innerHTML = '';
+
+        /* Update count badge */
+        if (countEl) countEl.textContent = String(tasks.length);
+
+        if (tasks.length === 0) {
+          var empty = document.createElement('li');
+          empty.className = 'tasks-empty';
+          empty.textContent = 'No tasks yet. Add one above.';
+          empty.setAttribute('role', 'listitem');
+          empty.style.cursor = 'default';
+          empty.style.background = 'none';
+          empty.style.padding = '10px 0';
+          empty.style.minHeight = 'auto';
+          listEl.appendChild(empty);
+          return;
+        }
+
         var now = Date.now();
         tasks.forEach(function(task, i) {
           var li = document.createElement('li');
-          li.textContent = task.desc + '  (' + new Date(task.datetime).toLocaleString() + ')';
           li.setAttribute('role', 'listitem');
           li.setAttribute('tabindex', '0');
-          if (task.datetime <= now) li.classList.add('completed');
+          li.setAttribute('aria-label', 'Task: ' + task.desc + '. Click to remove.');
+
+          var isCompleted = task.datetime <= now;
+          if (isCompleted) li.classList.add('completed');
+
+          var textSpan = document.createElement('span');
+          textSpan.className = 'task-text';
+          textSpan.textContent = task.desc;
+          li.appendChild(textSpan);
+
+          var dueSpan = document.createElement('span');
+          dueSpan.className = 'task-due';
+          dueSpan.textContent = new Date(task.datetime).toLocaleString();
+          li.appendChild(dueSpan);
+
           function remove() {
-            tasks.splice(i, 1);
-            safeSetItem('tasks', JSON.stringify(tasks));
-            load();
+            var currentTasks = safeParseTasks(safeGetItem('tasks'));
+            if (i < currentTasks.length) {
+              currentTasks.splice(i, 1);
+              safeSetItem('tasks', JSON.stringify(currentTasks));
+            }
+            /* Notify other panel instances */
+            window.dispatchEvent(new CustomEvent('tasks-updated'));
           }
+
           li.addEventListener('click', remove);
           li.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); remove(); }
@@ -1252,27 +1538,46 @@
         var desc = inputEl.value.trim();
         var date = dateEl.value;
         var time = timeEl.value;
+
         if (!desc) { showToast('Please enter a task description.'); inputEl.focus(); return; }
         if (!date) { showToast('Please select a date.'); dateEl.focus(); return; }
         if (!time) { showToast('Please select a time.'); timeEl.focus(); return; }
-        var dt = new Date(date + 'T' + time + ':00').getTime();
-        if (!isFinite(dt)) { showToast('Invalid date or time value.'); return; }
+
+        if (!isValidTaskDateTime(date, time)) {
+          showToast('Invalid date or time value.');
+          return;
+        }
+
         var tasks = safeParseTasks(safeGetItem('tasks'));
+        if (tasks.length >= MAX_TASKS) {
+          showToast('Maximum ' + MAX_TASKS + ' tasks reached. Remove some first.');
+          return;
+        }
+
+        var dt = new Date(date + 'T' + time + ':00').getTime();
         tasks.push({ desc: desc.substring(0, 120), datetime: dt });
         safeSetItem('tasks', JSON.stringify(tasks));
+
         inputEl.value = ''; dateEl.value = ''; timeEl.value = '';
-        load();
+        inputEl.focus();
+
+        /* Notify other panel instances */
+        window.dispatchEvent(new CustomEvent('tasks-updated'));
       }
+
+      /* Listen for changes from the other panel */
+      window.addEventListener('tasks-updated', function() { load(); });
 
       return { load: load, add: add };
     }
 
     /* ================================================================
        WIDGET TOGGLES
+       On mobile, scrolls the opened widget into view so it isn't
+       hidden behind the keyboard or off-screen.
        ================================================================ */
     function initToggles() {
       document.querySelectorAll('.toggle-btn[data-target]').forEach(function(btn) {
-        /* Store original label on first encounter */
         var origLabel = btn.getAttribute('data-label') || 'Widget';
         btn._origLabel = origLabel;
 
@@ -1284,12 +1589,20 @@
           t.style.display = isOpen ? 'none' : 'flex';
           btn.textContent = isOpen ? btn._origLabel : 'Hide';
           btn.setAttribute('aria-expanded', String(!isOpen));
+
+          /* On mobile, scroll the opened widget into view */
+          if (!isOpen && window.innerWidth <= 768) {
+            setTimeout(function() {
+              t.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 80);
+          }
         });
       });
     }
 
     /* ================================================================
        MOBILE PANEL
+       Includes focus trapping for accessibility when the panel is open.
        ================================================================ */
     function initMobilePanel() {
       var fab      = document.getElementById('fab');
@@ -1343,36 +1656,49 @@
     }
 
     /* ================================================================
-       BOOT
+       BOOT — Initialize everything after DOM is ready
        ================================================================ */
     document.addEventListener('DOMContentLoaded', function() {
       initializeMatrix();
       initToggles();
       initMobilePanel();
 
-      /* Desktop calculator */
+      /* ── Desktop Calculator ── */
       var dg = document.querySelector('.calc-grid[data-calc="desktop"]');
-      var dd = document.getElementById('display');
-      if (dg && dd) createCalculator(dg, dd);
+      var dv = document.getElementById('display');
+      var de = document.getElementById('calcExprDesktop');
+      var desktopCalc = null;
+      if (dg && dv && de) desktopCalc = createCalculator(dg, dv, de);
 
-      /* Mobile calculator */
+      /* ── Mobile Calculator ── */
       var mg = document.querySelector('.calc-grid[data-calc="mobile"]');
-      var md = document.getElementById('display-mobile');
-      if (mg && md) createCalculator(mg, md);
+      var mv = document.getElementById('display-mobile');
+      var me = document.getElementById('calcExprMobile');
+      var mobileCalc = null;
+      if (mg && mv && me) mobileCalc = createCalculator(mg, mv, me);
 
-      /* Desktop countdown */
+      /* ── Keyboard support (desktop only) ── */
+      initCalcKeyboard(desktopCalc, mobileCalc);
+
+      /* ── Desktop Countdown ── */
       var dc = createCountdown({
-        displayId: 'countdown', daysId: 'addDays',
-        hoursId: 'addHours', minutesId: 'addMinutes'
+        displayId: 'countdown',
+        targetId: 'countdownTarget',
+        daysId: 'addDays',
+        hoursId: 'addHours',
+        minutesId: 'addMinutes'
       });
 
-      /* Mobile countdown */
+      /* ── Mobile Countdown ── */
       var mc = createCountdown({
-        displayId: 'countdownMobile', daysId: 'addDaysMobile',
-        hoursId: 'addHoursMobile', minutesId: 'addMinutesMobile'
+        displayId: 'countdownMobile',
+        targetId: 'countdownTargetMobile',
+        daysId: 'addDaysMobile',
+        hoursId: 'addHoursMobile',
+        minutesId: 'addMinutesMobile'
       });
 
-      /* Wire countdown buttons */
+      /* ── Wire countdown buttons ── */
       document.querySelectorAll('.countdown-apply').forEach(function(b) {
         b.addEventListener('click', function() {
           (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).apply();
@@ -1394,7 +1720,7 @@
         });
       });
 
-      /* Delhi clocks */
+      /* ── Delhi clocks ── */
       startDelhiClock(
         document.getElementById('delhiTime'),
         document.getElementById('delhiDate')
@@ -1404,23 +1730,40 @@
         document.getElementById('delhiDateMobile')
       );
 
-      /* Task managers */
+      /* ── Task managers (shared localStorage, synced via custom events) ── */
       var dt = createTaskManager({
         inputId: 'taskInput', dateId: 'dateInput',
-        timeId: 'timeInput', listId: 'tasksList'
+        timeId: 'timeInput', listId: 'tasksList',
+        countId: 'taskCountDesktop'
       });
       dt.load();
 
       var mt = createTaskManager({
         inputId: 'taskInputMobile', dateId: 'dateInputMobile',
-        timeId: 'timeInputMobile', listId: 'tasksListMobile'
+        timeId: 'timeInputMobile', listId: 'tasksListMobile',
+        countId: 'taskCountMobile'
       });
       mt.load();
 
-      /* Wire task-add buttons */
+      /* ── Wire task-add buttons ── */
       document.querySelectorAll('.task-add').forEach(function(b) {
         b.addEventListener('click', function() {
           (b.getAttribute('data-panel') === 'desktop' ? dt : mt).add();
+        });
+      });
+
+      /* ── Allow Enter key to submit tasks from the text input ── */
+      var taskInputs = [
+        document.getElementById('taskInput'),
+        document.getElementById('taskInputMobile')
+      ];
+      taskInputs.forEach(function(inp, idx) {
+        if (!inp) return;
+        inp.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            (idx === 0 ? dt : mt).add();
+          }
         });
       });
     });
