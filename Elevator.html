@@ -753,8 +753,10 @@
 
             function _detectServerHeaders() {
                 try {
-                    const h = window.location.hostname;
-                    _isServerHeaders = !(h.includes('github.io') || h.includes('github.com') || h === 'localhost' || h === '127.0.0.1' || window.location.protocol === 'file:');
+                    const h = (window.location.hostname || '').toLowerCase();
+                    const isDomainOrSubdomain = (host, domain) => host === domain || host.endsWith('.' + domain);
+                    const isGithubHost = isDomainOrSubdomain(h, 'github.io') || isDomainOrSubdomain(h, 'github.com');
+                    _isServerHeaders = !(isGithubHost || h === 'localhost' || h === '127.0.0.1' || window.location.protocol === 'file:');
                 } catch(e) { _isServerHeaders = false; }
                 return _isServerHeaders;
             }
