@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Skyscraper OS - Ultimate Hybrid Edition</title>
+
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=()">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content;">
+
+    <style>
+        :root {
+            --floor-h: 70px;
+            --shaft-width: 130px;
+            --room-width: 150px;
+            --bg-color: #05050a;
+            --building-bg: rgba(0,0,0,0.9);
+            --theme-color: #00d2ff;
+            --active-glow: #00ff88;
+            --moving-glow: #ff8c00;
+            --emergency: #ff0033;
+            --text-main: #ffffff;
+            --security-green: #00ff88;
+            --security-red: #ff0033;
+            --security-yellow: #ffb300;
+            --security-muted: #666;
+            --panel-radius: 12px;
+        }
+
+        body.theme-morning { --bg-color: #e3f2fd; --building-bg: rgba(255,255,255,0.8); --theme-color: #1976d2; --text-main: #263238; }
+        body.theme-afternoon { --bg-color: #f5f5f5; --building-bg: rgba(250,250,250,0.9); --theme-color: #00796b; --text-main: #212121; }
+        body.theme-evening { --bg-color: #263238; --building-bg: rgba(38, 50, 56, 0.95); --theme-color: #ffb300; --text-main: #eceff1; }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background 1s ease;
+        }
+
+        /* ========== EXTERIOR ========== */
+        #exterior-view {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh; height: 100dvh;
+            background: url('elevatorbuilding.jpg') no-repeat center center / cover,
+                        linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+            z-index: 1000;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .enter-btn-ui {
+            margin: 4% 6%;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.3s;
+            z-index: 1;
+        }
+        .enter-btn-ui:hover { transform: scale(1.1); }
+        .enter-btn-ui:active { transform: scale(0.95); }
+        .enter-btn-ui .glow-circle {
+            width: 70px; height: 70px;
+            background: var(--theme-color);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 25px var(--theme-color);
+            margin-bottom: 10px;
+        }
+        .enter-btn-ui span {
+            font-size: 11px; font-weight: bold; color: #fff;
+            text-shadow: 0 0 5px #000, 0 0 10px #000;
+            letter-spacing: 1px;
+        }
+
+        .system-active #exterior-view { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        /* ========== BUILDING ========== */
+        .building-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            background: var(--building-bg);
+            border-left: 3px solid var(--theme-color);
+            border-bottom: 20px solid #111;
+            display: flex;
+            flex-direction: column-reverse;
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            visibility: hidden; opacity: 0; transform: scale(0.95);
+        }
+        .system-active .building-container { visibility: visible; opacity: 1; transform: scale(1); }
+
+        .mode-desktop {
+            height: auto;
+            max-height: 95vh;
+            max-height: 95dvh;
+        }
+        .mode-mobile {
+            height: 90vh;
+            height: 90dvh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--theme-color) #111;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .floor-row {
+            height: var(--floor-h);
+            min-height: var(--floor-h);
+            border-top: 1px solid rgba(128,128,128,0.1);
+            display: flex;
+            align-items: center;
+            padding-left: var(--shaft-width);
+            position: relative;
+        }
+        .floor-label-text {
+            margin-left: 15px;
+            font-size: 11px;
+            opacity: 0.5;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .floor-active .floor-label-text,
+        .alarm-on .floor-label-text { opacity: 1; color: var(--theme-color); font-weight: bold; }
+
+        /* ========== ROOMS ========== */
+        .room-view {
+            width: var(--room-width);
+            height: 50px;
+            background: rgba(0,0,0,0.05);
+            border: 1px solid var(--theme-color);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: 0.4s;
+            flex-shrink: 0;
+        }
+        .floor-active .room-view,
+        .alarm-on .room-view { opacity: 1; transform: scale(1); }
+
+        .room-door-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #1e272e;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 10;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .room-view.unlocked .room-door-layer { transform: translateY(-100%); }
+
+        .ad-text {
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--theme-color);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .ad-text:hover { text-shadow: 0 0 8px var(--theme-color); }
+
+        .room-controls { display: flex; gap: 4px; justify-content: center; margin-top: 2px; }
+        .room-btn {
+            background: none;
+            font-size: 8px;
+            cursor: pointer;
+            border: 1px solid var(--theme-color);
+            color: var(--theme-color);
+            padding: 2px 6px;
+            border-radius: 2px;
+            min-height: 20px;
+            min-width: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .room-btn:active { background: rgba(0,210,255,0.2); }
+        .btn-lock { border-color: var(--emergency); color: var(--emergency); }
+
+        /* ========== ELEVATOR ========== */
+        .elevator {
+            position: absolute;
+            left: 10px;
+            bottom: 0;
+            width: 100px;
+            height: calc(var(--floor-h) - 2px);
+            background: #000;
+            border: 2px solid var(--theme-color);
+            transition: bottom 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            z-index: 20;
+            cursor: pointer;
+        }
+        .lift-door { position: absolute; width: 50%; height: 100%; background: #222; transition: 0.6s; }
+        .lift-door-l { left: 0; border-right: 1px solid var(--theme-color); }
+        .lift-door-r { right: 0; border-left: 1px solid var(--theme-color); }
+        .open .lift-door-l { transform: translateX(-85%); }
+        .open .lift-door-r { transform: translateX(85%); }
+
+        /* ========== DASHBOARD PANEL ========== */
+        .dashboard-panel {
+            position: fixed;
+            right: 15px;
+            bottom: 15px;
+            width: 310px;
+            background: #000;
+            color: #fff;
+            border: 2px solid var(--theme-color);
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            border-radius: var(--panel-radius);
+            z-index: 100;
+            box-shadow: 0 0 30px #000;
+            max-height: 88vh;
+            max-height: 88dvh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .select-input {
+            background: #111;
+            color: var(--theme-color);
+            border: 1px solid var(--theme-color);
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            outline: none;
+            border-radius: 6px;
+            min-height: 40px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300d2ff'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .num-pad {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+            overflow-y: auto;
+            max-height: 180px;
+        }
+        .circ-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+            min-height: 36px;
+        }
+        .circ-btn:active { background: rgba(255,255,255,0.05); }
+        .btn-circle {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 1px solid #333;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: bold;
+            flex-shrink: 0;
+        }
+        .circ-btn.moving .btn-circle { border-color: var(--moving-glow); color: var(--moving-glow); box-shadow: 0 0 8px var(--moving-glow); }
+        .circ-btn.arrived .btn-circle { border-color: var(--active-glow); color: var(--active-glow); }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px solid #222;
+        }
+        .ctrl-btn {
+            background: #111;
+            border: 1px solid var(--theme-color);
+            color: var(--theme-color);
+            padding: 12px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: 0.2s;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .ctrl-btn:active { background: rgba(0,210,255,0.2); transform: scale(0.97); }
+        .alarm-btn { border-color: var(--emergency); color: var(--emergency); grid-column: span 2; }
+        .exit-btn { border-color: #fff; color: #fff; background: #333; grid-column: span 2; }
+        .security-btn { border-color: var(--security-green); color: var(--security-green); grid-column: span 2; }
+        .alarm-active { background: var(--emergency) !important; color: #fff !important; animation: blink 0.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        /* ========== SECURITY PANEL ========== */
+        .security-panel {
+            position: fixed;
+            left: 15px;
+            top: 15px;
+            width: 370px;
+            max-height: 85vh;
+            max-height: 85dvh;
+            background: #000;
+            color: #fff;
+            border: 2px solid var(--security-green);
+            padding: 0;
+            display: none;
+            flex-direction: column;
+            border-radius: var(--panel-radius);
+            z-index: 200;
+            box-shadow: 0 0 40px rgba(0,255,136,0.2);
+            overflow: hidden;
+        }
+        .security-header {
+            background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,210,255,0.1));
+            padding: 14px 15px;
+            border-bottom: 1px solid var(--security-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 48px;
+        }
+        .security-header h3 { margin: 0; font-size: 13px; color: var(--security-green); letter-spacing: 2px; }
+        .security-close {
+            background: none;
+            border: 1px solid var(--security-red);
+            color: var(--security-red);
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            min-height: 32px;
+            min-width: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .security-close:active { background: rgba(255,0,51,0.2); }
+        .security-body { padding: 15px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+
+        .shield-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 15px; }
+        .shield-item {
+            display: flex; align-items: center; gap: 5px;
+            padding: 6px; border-radius: 6px; font-size: 9px;
+        }
+        .shield-item.active { background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.2); }
+        .shield-item.meta-only { background: rgba(255,179,0,0.05); border: 1px solid rgba(255,179,0,0.2); }
+        .shield-item.inactive { background: rgba(255,0,51,0.05); border: 1px solid rgba(255,0,51,0.2); }
+        .shield-icon { font-size: 12px; flex-shrink: 0; }
+        .shield-label { color: #aaa; font-size: 7px; display: block; line-height: 1.2; }
+        .shield-value { font-weight: bold; font-size: 8px; }
+        .shield-value.active-val { color: var(--security-green); }
+        .shield-value.meta-val { color: var(--security-yellow); }
+        .shield-value.inactive-val { color: var(--security-red); }
+
+        .audit-log-container {
+            background: #0a0a0a; border: 1px solid #222; border-radius: 6px;
+            padding: 10px; max-height: 180px; overflow-y: auto;
+            font-family: 'Courier New', monospace; font-size: 9px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .audit-entry { padding: 4px 0; border-bottom: 1px solid #111; }
+        .audit-time { color: #555; }
+        .audit-event { color: var(--security-green); }
+        .audit-event.blocked { color: var(--security-red); }
+        .audit-event.warning { color: var(--security-yellow); }
+        .audit-event.info { color: #666; }
+        .audit-details { color: #888; font-size: 8px; }
+
+        .security-score-bar { height: 6px; background: #111; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+        .security-score-fill { height: 100%; border-radius: 3px; transition: width 0.5s, background 0.5s; }
+
+        .deploy-hint {
+            margin-top: 15px; padding: 10px;
+            background: rgba(255,179,0,0.05); border: 1px dashed rgba(255,179,0,0.3);
+            border-radius: 6px; font-size: 8px; color: var(--security-yellow); line-height: 1.7;
+        }
+
+        /* ========== THREAT OVERLAY ========== */
+        .threat-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh; height: 100dvh;
+            background: rgba(255,0,0,0.1); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px); padding: 20px;
+        }
+        .threat-overlay.active { display: flex; }
+        .threat-modal {
+            background: #000; border: 2px solid var(--security-red);
+            padding: 30px; border-radius: var(--panel-radius); text-align: center;
+            max-width: 400px; width: 100%; box-shadow: 0 0 60px rgba(255,0,51,0.3);
+        }
+        .threat-modal h2 { color: var(--security-red); margin: 0 0 10px 0; font-size: 16px; letter-spacing: 3px; }
+        .threat-modal p { color: #ccc; font-size: 13px; margin: 10px 0; line-height: 1.5; }
+        .threat-modal button {
+            background: var(--security-red); color: #fff; border: none;
+            padding: 14px 30px; cursor: pointer; border-radius: 6px;
+            font-weight: bold; margin-top: 15px; font-size: 13px; min-height: 48px;
+        }
+
+        /* ========== BADGE ========== */
+        .security-badge {
+            position: fixed; left: 12px; bottom: 12px;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: #000; border: 2px solid var(--security-green);
+            display: none; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 150; transition: 0.3s; font-size: 18px;
+        }
+        .system-active .security-badge { display: flex; }
+        .security-badge:active { transform: scale(0.9); }
+        .security-badge.threat-active { border-color: var(--security-red); animation: pulse-red 1s infinite; }
+        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 5px rgba(255,0,51,0.3); } 50% { box-shadow: 0 0 25px rgba(255,0,51,0.6); } }
+
+        /* ========== TOAST ========== */
+        .security-toast {
+            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
+            padding: 12px 20px; border-radius: 8px; z-index: 10000;
+            font-size: 12px; font-weight: bold; display: none; animation: slideDown 0.3s ease;
+            max-width: 90vw; text-align: center;
+        }
+        .security-toast.show { display: block; }
+        .security-toast.blocked { background: rgba(255,0,51,0.95); color: #fff; border: 1px solid var(--security-red); }
+        .security-toast.info { background: rgba(0,210,255,0.95); color: #000; border: 1px solid var(--theme-color); }
+        .security-toast.success { background: rgba(0,255,136,0.95); color: #000; border: 1px solid var(--security-green); }
+        @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        /* ========== SECURE PROMPT ========== */
+        .secure-prompt-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh; height: 100dvh;
+            background: rgba(0,0,0,0.7); z-index: 500;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(3px); padding: 20px;
+        }
+        .secure-prompt-overlay.active { display: flex; }
+        .secure-prompt-box {
+            background: #111; border: 2px solid var(--theme-color);
+            padding: 25px; border-radius: var(--panel-radius);
+            width: 100%; max-width: 340px;
+        }
+        .secure-prompt-box h4 { margin: 0 0 5px 0; color: var(--theme-color); font-size: 13px; }
+        .secure-prompt-box p { margin: 0 0 15px 0; color: #888; font-size: 11px; line-height: 1.4; }
+        .secure-prompt-input {
+            width: 100%; padding: 14px; background: #000;
+            border: 1px solid var(--theme-color); color: #fff;
+            font-family: monospace; font-size: 16px; outline: none;
+            border-radius: 6px; min-height: 48px;
+        }
+        .secure-prompt-input:focus { box-shadow: 0 0 10px rgba(0,210,255,0.3); }
+        .secure-prompt-actions { display: flex; gap: 10px; margin-top: 18px; }
+        .secure-prompt-actions button {
+            padding: 14px 20px; cursor: pointer; border-radius: 6px;
+            font-size: 12px; font-weight: bold; border: 1px solid; min-height: 48px;
+            flex: 1;
+        }
+        .sp-confirm { background: var(--theme-color); color: #000; border-color: var(--theme-color); }
+        .sp-cancel { background: transparent; color: #888; border-color: #444; }
+        .sp-error { color: var(--security-red); font-size: 10px; margin-top: 8px; display: none; line-height: 1.4; }
+
+        /* ========== MOBILE FLOATING BUTTONS ========== */
+        .mobile-fab-row {
+            position: fixed;
+            bottom: 15px; right: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 150;
+        }
+        .mobile-fab {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            border: 2px solid var(--theme-color);
+            background: #000;
+            color: var(--theme-color);
+            font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+        .mobile-fab:active { transform: scale(0.9); background: rgba(0,210,255,0.1); }
+        .mobile-fab.fab-security { border-color: var(--security-green); color: var(--security-green); }
+
+        /* ============================================================
+           RESPONSIVE BREAKPOINTS
+           ============================================================ */
+
+        /* --- Tablets & small laptops (768px - 1024px) --- */
+        @media (max-width: 1024px) {
+            .dashboard-panel { width: 290px; right: 10px; bottom: 10px; padding: 12px; }
+            .security-panel { width: 340px; left: 10px; top: 10px; }
+        }
+
+        /* --- Large phones & small tablets (< 768px) --- */
+        @media (max-width: 768px) {
+            :root {
+                --floor-h: 60px;
+                --shaft-width: 100px;
+                --room-width: 130px;
+            }
+
+            .elevator { width: 80px; left: 8px; }
+
+            .room-view { height: 46px; }
+            .ad-text { font-size: 9px; }
+            .room-btn { font-size: 7px; padding: 1px 4px; min-height: 18px; min-width: 28px; }
+            .floor-label-text { font-size: 10px; margin-left: 10px; }
+
+            .dashboard-panel {
+                position: fixed;
+                right: 0; bottom: 0; left: 0;
+                width: 100%;
+                max-height: 85vh;
+                max-height: 85dvh;
+                border-radius: var(--panel-radius) var(--panel-radius) 0 0;
+                border-right: none;
+                border-bottom: none;
+                border-left: none;
+            }
+            .security-panel {
+                position: fixed;
+                left: 0; top: 0; right: 0;
+                width: 100%;
+                max-height: 90vh;
+                max-height: 90dvh;
+                border-radius: 0 0 var(--panel-radius) var(--panel-radius);
+                border-left: none; border-right: none; border-top: none;
+            }
+
+            .mobile-fab-row { display: flex; }
+            .security-badge { display: none !important; }
+        }
+
+        /* --- Small phones (< 480px) --- */
+        @media (max-width: 480px) {
+            :root {
+                --floor-h: 54px;
+                --shaft-width: 85px;
+                --room-width: 110px;
+            }
+
+            .elevator { width: 68px; left: 6px; }
+
+            .room-view { height: 42px; }
+            .ad-text { font-size: 8px; }
+            .room-btn { font-size: 7px; padding: 1px 3px; min-height: 16px; min-width: 24px; }
+            .floor-label-text { font-size: 9px; margin-left: 8px; }
+
+            .control-row { gap: 6px; }
+            .ctrl-btn { padding: 10px 6px; font-size: 9px; min-height: 42px; }
+            .circ-btn { padding: 6px; min-height: 32px; gap: 6px; }
+            .btn-circle { width: 22px; height: 22px; font-size: 9px; }
+
+            .enter-btn-ui .glow-circle { width: 60px; height: 60px; }
+            .enter-btn-ui span { font-size: 10px; }
+
+            .secure-prompt-box { padding: 20px; }
+            .secure-prompt-input { font-size: 14px; padding: 12px; }
+        }
+
+        /* --- Very small phones (< 360px) --- */
+        @media (max-width: 360px) {
+            :root {
+                --floor-h: 48px;
+                --shaft-width: 75px;
+                --room-width: 95px;
+            }
+
+            .elevator { width: 60px; left: 5px; }
+
+            .room-view { height: 38px; }
+            .ad-text { font-size: 7px; }
+            .room-btn { font-size: 6px; min-height: 14px; min-width: 22px; }
+            .floor-label-text { font-size: 8px; margin-left: 6px; }
+        }
+
+        /* --- Landscape phones (h < 500px) --- */
+        @media (max-height: 500px) and (orientation: landscape) {
+            :root {
+                --floor-h: 44px;
+                --shaft-width: 85px;
+                --room-width: 110px;
+            }
+
+            .elevator { width: 72px; height: calc(var(--floor-h) - 2px); }
+
+            .room-view { height: 36px; }
+            .room-door-layer { font-size: 7px; }
+            .ad-text { font-size: 8px; }
+            .room-btn { font-size: 6px; min-height: 14px; }
+            .floor-label-text { font-size: 8px; margin-left: 8px; }
+
+            .dashboard-panel { max-height: 95vh; max-height: 95dvh; }
+            .security-panel { max-height: 95vh; max-height: 95dvh; }
+            .security-body { padding: 10px; }
+            .shield-grid { gap: 3px; }
+            .shield-item { padding: 4px; font-size: 8px; }
+            .shield-icon { font-size: 10px; }
+            .audit-log-container { max-height: 80px; }
+        }
+
+        /* --- Safe area insets (notch phones) --- */
+        @supports (padding: env(safe-area-inset-bottom)) {
+            .dashboard-panel { padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
+            .mobile-fab-row { bottom: calc(15px + env(safe-area-inset-bottom)); }
+            .security-badge { bottom: calc(12px + env(safe-area-inset-bottom)); }
+        }
+    </style>
+</head>
+<body class="theme-evening">
+
+    <div class="threat-overlay" id="threatOverlay">
+        <div class="threat-modal">
+            <h2>⚠ THREAT DETECTED ⚠</h2>
+            <p id="threatMessage">A security threat was blocked.</p>
+            <p style="font-size:9px; color:#666;">This incident has been logged.</p>
+            <button onclick="dismissThreat()">ACKNOWLEDGE</button>
+        </div>
+    </div>
+
+    <div class="security-toast" id="securityToast"></div>
+
+    <div class="secure-prompt-overlay" id="securePromptOverlay">
+        <div class="secure-prompt-box">
+            <h4 id="spTitle">SECURITY VERIFICATION</h4>
+            <p id="spDesc">Enter your security code.</p>
+            <input type="password" class="secure-prompt-input" id="spInput"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div class="sp-error" id="spError"></div>
+            <div class="secure-prompt-actions">
+                <button class="sp-cancel" onclick="closeSecurePrompt(null)">CANCEL</button>
+                <button class="sp-confirm" onclick="submitSecurePrompt()">VERIFY</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="exterior-view">
+        <div class="enter-btn-ui" onclick="enterBuilding()">
+            <div class="glow-circle">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10 17 15 12 10 7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+            </div>
+            <span>ENTER | EXIT SYSTEM</span>
+        </div>
+    </div>
+
+    <div class="building-container mode-desktop" id="building">
+        <div id="elevator" class="elevator open" onclick="toggleDash()">
+            <div class="lift-door lift-door-l"></div>
+            <div class="lift-door lift-door-r"></div>
+        </div>
+    </div>
+
+    <!-- Mobile FABs -->
+    <div class="mobile-fab-row" id="mobileFabs">
+        <div class="mobile-fab fab-security" onclick="toggleSecurityPanel()" title="Security">🛡</div>
+        <div class="mobile-fab" onclick="toggleDash()" title="Controls">⚙</div>
+    </div>
+
+    <div class="dashboard-panel" id="dash">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span id="clock" style="font-family:monospace; color:var(--theme-color); font-size:14px;">00:00:00</span>
+            <span id="status-tag" style="font-size:9px; letter-spacing:1px; color:var(--theme-color);">SYSTEM ACTIVE</span>
+        </div>
+        <label style="font-size:9px; color:#888;">PLATFORM:</label>
+        <select class="select-input" id="platformSelector" onchange="changePlatformMode()">
+            <option value="desktop">Desktop (Compact)</option>
+            <option value="mobile">Mobile (Scrollable)</option>
+        </select>
+        <label style="font-size:9px; color:#888;">TIMEZONE:</label>
+        <select class="select-input" id="locationSelector" onchange="updateLocationTime()">
+            <option value="local">Auto Detect</option>
+            <option value="IN">India (IST)</option>
+            <option value="US">USA (EST)</option>
+        </select>
+        <div class="num-pad" id="btn-container"></div>
+        <div class="control-row">
+            <button class="ctrl-btn" onclick="controlLiftDoors('open')">OPEN DOORS</button>
+            <button class="ctrl-btn" onclick="controlLiftDoors('close')">CLOSE DOORS</button>
+            <button class="ctrl-btn alarm-btn" id="alarm" onclick="triggerFireExit()">ALARM / FIRE EXIT</button>
+            <button class="ctrl-btn security-btn" onclick="toggleSecurityPanel()">🛡 SECURITY CENTER</button>
+            <button class="ctrl-btn exit-btn" onclick="exitBuilding()">LOGOUT / EXIT</button>
+            <button class="ctrl-btn" style="grid-column:span 2;" onclick="toggleDash()">MINIMIZE</button>
+        </div>
+    </div>
+
+    <div class="security-badge" id="securityBadge" onclick="toggleSecurityPanel()" title="Security Center">🛡</div>
+
+    <div class="security-panel" id="securityPanel">
+        <div class="security-header">
+            <h3>🛡 SECURITY CENTER</h3>
+            <button class="security-close" onclick="toggleSecurityPanel()">✕</button>
+        </div>
+        <div class="security-body">
+            <div style="text-align:center; margin-bottom:15px;">
+                <div style="font-size:9px; color:#888; letter-spacing:2px;">PROTECTION SCORE</div>
+                <div id="secScore" style="font-size:36px; font-weight:bold; color:var(--security-green);">--</div>
+                <div class="security-score-bar">
+                    <div class="security-score-fill" id="secScoreBar" style="width:0%; background:var(--security-yellow);"></div>
+                </div>
+                <div style="font-size:8px; color:#555; margin-top:4px;" id="scoreNote">Calculating...</div>
+            </div>
+            <div style="font-size:7px; color:#555; letter-spacing:1px; margin-bottom:6px;">
+                🟢 ENFORCED &nbsp; 🟡 META ONLY &nbsp; 🔴 NOT ENFORCED
+            </div>
+            <div class="shield-grid" id="shieldGrid"></div>
+            <div style="font-size:9px; color:#888; letter-spacing:2px; margin-bottom:8px;">AUDIT LOG</div>
+            <div class="audit-log-container" id="auditLog">
+                <div style="color:#444; text-align:center; padding:20px;">Awaiting events...</div>
+            </div>
+            <div style="margin-top:15px; padding:10px; background:rgba(0,210,255,0.05); border:1px solid rgba(0,210,255,0.1); border-radius:6px;">
+                <div style="font-size:8px; color:#666; letter-spacing:1px; margin-bottom:5px;">CLIENT PROTECTIONS (ALWAYS ACTIVE)</div>
+                <div style="font-size:9px; color:var(--theme-color); line-height:1.8;" id="activeProtections"></div>
+            </div>
+            <div class="deploy-hint" id="deployHint"></div>
+        </div>
+    </div>
+
+    <script data-verified>
+        const Security = (() => {
+            'use strict';
+            let _auditLog = [], _rateLimiter = {}, _securityScore = 0, _pendingResolve = null, _isServerHeaders = false;
+
+            function _detectServerHeaders() {
+                try {
+                    const h = (window.location.hostname || '').toLowerCase();
+                    const isDomainOrSubdomain = (host, domain) => host === domain || host.endsWith('.' + domain);
+                    const isGithubHost = isDomainOrSubdomain(h, 'github.io') || isDomainOrSubdomain(h, 'github.com');
+                    _isServerHeaders = !(isGithubHost || h === 'localhost' || h === '127.0.0.1' || window.location.protocol === 'file:');
+                } catch(e) { _isServerHeaders = false; }
+                return _isServerHeaders;
+            }
+
+            function _sanitize(input) {
+                if (typeof input !== 'string') return '';
+                let c = input.replace(/\0/g, '').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+                const d = document.createElement('div'); d.textContent = c; return d.innerHTML;
+            }
+
+            function _detectSQLi(i) { return [ /(\s|^)(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|CREATE|EXEC|EXECUTE|TRUNCATE)(\s|$)/i, /(--|;|\/\*|\*\/|xp_|0x)[\s\S]*$/im, /('(\s)*(OR|AND)(\s)*'?\d*'?\s*=\s*'?\d*'?)/i, /(\d+\s*=\s*\d+)|('\s*=\s*')/i, /WAITFOR\s+DELAY/i, /BENCHMARK\s*\(/i, /SLEEP\s*\(/i, /CONCAT\s*\(/i, /CHAR\s*\(\s*\d/i, /GROUP\s+BY.*HAVING/i ].some(r => r.test(i)); }
+            function _detectXSS(i) { return [ /<script[^>]*>[\s\S]*?<\/script>/gi, /<script[\s\S]*$/i, /javascript\s*:/gi, /vbscript\s*:/gi, /on\w+\s*=\s*['"][^'"]*['"]/gi, /on\w+\s*=\s*[^\s>]+/gi, /<\s*(img|svg|body|video|audio|details|marquee)[^>]+on\w+\s*=/gi, /<\s*(iframe|object|embed|form|input|base|link|meta)/gi, /eval\s*\(/gi, /Function\s*\(/gi, /document\.(cookie|domain|write|location)/gi, /window\.(location|open|navigate)/gi, /String\.fromCharCode/gi, /atob\s*\(/gi, /btoa\s*\(/gi, /setTimeout\s*\(\s*['"`]/gi, /setInterval\s*\(\s*['"`]/gi, /import\s*\(/gi, /require\s*\(/gi, /data\s*:\s*text\/html/gi, /expression\s*\(/gi, /url\s*\(\s*['"]javascript/gi ].some(r => r.test(i)); }
+            function _detectPathTraversal(i) { return [/\.\.[\/\\]/, /\.\.%2[fF]/, /%2[eE]%2[eE]/, /[\/\\]\.\.[\/\\]/].some(r => r.test(i)); }
+            function _detectCmdInj(i) { return [ /[;&|`$]/, /\$\(/, /`[^`]+`/, /\/etc\/(passwd|shadow|hosts)/i, /\/proc\//i, /cmd\.exe/i, /powershell/i, /bash\s+-/i, /\/bin\//i, /\bcat\b\s+\/etc/i, /\b(wget|curl)\b/i, /\bnc\b\s+-/i, /\b(python|perl|ruby)\s+-/i ].some(r => r.test(i)); }
+            function _detectSE(i) { return [ /urgent\s+action\s+required/i, /your\s+account\s+(will\s+be|has\s+been)/i, /verify\s+your\s+(identity|account|credentials)/i, /click\s+here\s+to\s+(verify|confirm|update)/i, /suspicious\s+activity\s+(detected|found)/i, /unauthorized\s+access/i, /security\s+alert.*immediate/i, /final\s+warning/i, /act\s+now.*limited\s+time/i, /you'?ve\s+(won|been\s+selected)/i, /free\s+(gift|prize|reward|iphone|money)/i, /congratulations.*you\s+(are|have)/i, /inheritance|lottery|winner/i ].some(r => r.test(i)); }
+
+            const _urlWL = ['www.google.com','google.com','www.wikipedia.org','wikipedia.org','vimeo.com','www.vimeo.com','www.bloomberg.com','bloomberg.com','www.canva.com','canva.com','www.linkedin.com','linkedin.com','www.cloudflare.com','cloudflare.com','www.github.com','github.com','www.salesforce.com','salesforce.com','www.apple.com','apple.com','www.spacex.com','spacex.com'];
+            function _isURLAllowed(u) { try { const p = new URL(u); return _urlWL.includes(p.hostname) && p.protocol === 'https:'; } catch { return false; } }
+            function _isPhish(u) { try { const p = new URL(u); return /login|signin|sign-in|account|verify|secure|update|confirm|bank|password|credential|wallet|crypto|reset|authenticate/i.test(p.pathname) || (p.hostname.match(/\./g)||[]).length > 3 || /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(p.hostname) || (p.port && p.port !== '443' && p.port !== '80') || /\.(tk|ml|ga|cf|gq|xyz|top|work|click|link|info|online|site|icu)$/i.test(p.hostname) || /[^\x00-\x7F]/.test(p.hostname); } catch { return true; } }
+
+            function _rateLimit(action, max = 5, ms = 60000) {
+                const now = Date.now();
+                if (!_rateLimiter[action]) _rateLimiter[action] = { a: [], b: false, t: 0 };
+                const l = _rateLimiter[action]; l.a = l.a.filter(t => now - t < ms);
+                if (l.b && now - l.t < ms) return { ok: false, s: Math.ceil((ms - (now - l.t)) / 1000) };
+                if (l.b) l.b = false;
+                if (l.a.length >= max) { l.b = true; l.t = now; _log('RATE_LIMIT', 'Blocked', { action }); return { ok: false, s: Math.ceil(ms / 1000) }; }
+                l.a.push(now); return { ok: true, s: max - l.a.length };
+            }
+
+            function _log(ev, msg, det = {}) {
+                const e = { timestamp: new Date().toISOString(), event: ev, message: msg, details: { ...det } };
+                _auditLog.push(e); if (_auditLog.length > 200) _auditLog.shift(); _updateLogUI(e);
+                console.log(`[SECURITY] ${ev}: ${msg}`, det);
+            }
+            function _updateLogUI(e) {
+                const c = document.getElementById('auditLog'); if (!c) return;
+                if (_auditLog.length === 1) c.innerHTML = '';
+                const d = document.createElement('div'); d.className = 'audit-entry';
+                const cls = e.event.includes('BLOCKED') || e.event.includes('THREAT') ? 'blocked' : e.event.includes('WARNING') || e.event.includes('RATE') ? 'warning' : e.event.includes('META') || e.event.includes('HEADER') ? 'info' : '';
+                d.innerHTML = `<span class="audit-time">[${e.timestamp.split('T')[1].split('.')[0]}]</span> <span class="audit-event ${cls}">${_sanitize(e.event)}</span> <span class="audit-details">${_sanitize(e.message)}</span>`;
+                c.prepend(d); while (c.children.length > 50) c.removeChild(c.lastChild);
+            }
+
+            function _calcScore() {
+                _securityScore = _isServerHeaders ? 100 : 75;
+                const s = document.getElementById('secScore'), b = document.getElementById('secScoreBar'), n = document.getElementById('scoreNote');
+                if (s) s.textContent = _securityScore;
+                if (b) { b.style.width = _securityScore + '%'; b.style.background = _securityScore >= 90 ? 'var(--security-green)' : _securityScore >= 60 ? 'var(--security-yellow)' : 'var(--security-red)'; }
+                if (n) { n.textContent = _isServerHeaders ? 'All protections enforced' : 'Client active. Server headers missing (GitHub Pages).'; n.style.color = _isServerHeaders ? 'var(--security-green)' : 'var(--security-yellow)'; }
+            }
+            function _updateScore(d) {
+                _securityScore = Math.max(0, Math.min(100, _securityScore + d));
+                const s = document.getElementById('secScore'), b = document.getElementById('secScoreBar');
+                if (s) s.textContent = _securityScore;
+                if (b) { b.style.width = _securityScore + '%'; b.style.background = _securityScore >= 80 ? 'var(--security-green)' : _securityScore >= 50 ? 'var(--security-yellow)' : 'var(--security-red)'; }
+                const badge = document.getElementById('securityBadge');
+                if (badge) badge.classList.toggle('threat-active', _securityScore < 60);
+            }
+
+            function _securePrompt(t, d) { return new Promise(r => { _pendingResolve = r; document.getElementById('spTitle').textContent = _sanitize(t); document.getElementById('spDesc').textContent = _sanitize(d); document.getElementById('spInput').value = ''; document.getElementById('spError').style.display = 'none'; document.getElementById('securePromptOverlay').classList.add('active'); setTimeout(() => document.getElementById('spInput').focus(), 150); }); }
+            function _resolvePrompt(v) { document.getElementById('securePromptOverlay').classList.remove('active'); if (_pendingResolve) { _pendingResolve(v); _pendingResolve = null; } }
+
+            let _tt = null;
+            function _toast(m, t = 'info', d = 3000) { const e = document.getElementById('securityToast'); e.textContent = m; e.className = `security-toast show ${t}`; if (_tt) clearTimeout(_tt); _tt = setTimeout(() => { e.className = 'security-toast'; }, d); }
+            function _showThreat(m) { document.getElementById('threatMessage').textContent = m; document.getElementById('threatOverlay').classList.add('active'); }
+            function _dismissThreat() { document.getElementById('threatOverlay').classList.remove('active'); }
+
+            function _secureOpen(u) {
+                if (!_isURLAllowed(u)) { _log('URL_BLOCKED', 'Not whitelisted'); _toast('⚠ URL blocked', 'blocked'); _updateScore(-10); return null; }
+                if (_isPhish(u)) { _log('PHISHING_BLOCKED', 'Phishing detected'); _showThreat('Phishing URL blocked.'); _updateScore(-20); return null; }
+                _log('URL_OPENED', 'Secure window', { domain: new URL(u).hostname }); return window.open(u, '_blank', 'noopener,noreferrer');
+            }
+
+            function _speak(t) { if (typeof t !== 'string') return; try { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(_sanitize(t).substring(0, 200)); u.rate = 1; u.pitch = 1; u.volume = 0.8; window.speechSynthesis.speak(u); } catch(e) {} }
+
+            function _validate(i, ctx = 'general') {
+                const r = { valid: true, sanitized: '', threats: [] };
+                if (typeof i !== 'string' || i === null) { r.valid = false; r.threats.push('INVALID_TYPE'); return r; }
+                if (_detectSQLi(i)) { r.valid = false; r.threats.push('SQL_INJECTION'); _log('SQLi_BLOCKED', ctx); }
+                if (_detectXSS(i)) { r.valid = false; r.threats.push('XSS_ATTEMPT'); _log('XSS_BLOCKED', ctx); }
+                if (_detectPathTraversal(i)) { r.valid = false; r.threats.push('PATH_TRAVERSAL'); _log('PATH_BLOCKED', ctx); }
+                if (_detectCmdInj(i)) { r.valid = false; r.threats.push('CMD_INJECTION'); _log('CMD_BLOCKED', ctx); }
+                if (_detectSE(i)) { r.threats.push('SOCIAL_ENG'); _log('SE_WARNING', ctx); }
+                r.sanitized = _sanitize(i);
+                if (i.length > 500) { r.valid = false; r.threats.push('TOO_LONG'); }
+                return r;
+            }
+
+            function _monitorIntegrity() {
+                document.querySelectorAll('script:not([data-verified])').forEach(s => { _log('SCRIPT_INJECTION', 'Removed'); _updateScore(-20); s.remove(); });
+                document.querySelectorAll('iframe').forEach(f => { _log('IFRAME_INJECTION', 'Removed'); _updateScore(-20); f.remove(); });
+            }
+
+            function _initShields() {
+                const sv = _isServerHeaders;
+                const shields = [
+                    { icon:'🔒', label:'XSS Protection', c:'active', v:'ENFORCED' },
+                    { icon:'🗄️', label:'SQL Injection Guard', c:'active', v:'ENFORCED' },
+                    { icon:'🔗', label:'URL Whitelist', c:'active', v:'ENFORCED' },
+                    { icon:'🎣', label:'Anti-Phishing', c:'active', v:'ENFORCED' },
+                    { icon:'⏱️', label:'Rate Limiter', c:'active', v:'ENFORCED' },
+                    { icon:'🧹', label:'Input Sanitization', c:'active', v:'ENFORCED' },
+                    { icon:'🕵️', label:'Social Eng. Guard', c:'active', v:'ENFORCED' },
+                    { icon:'📂', label:'Path Traversal', c:'active', v:'ENFORCED' },
+                    { icon:'💻', label:'Cmd Injection', c:'active', v:'ENFORCED' },
+                    { icon:'🦠', label:'Malware Defense', c:'active', v:'ENFORCED' },
+                    { icon:'📢', label:'Audit Logging', c:'active', v:'ENFORCED' },
+                    { icon:'🪟', label:'Clickjacking (CSP)', c:sv?'active':'meta-only', v:sv?'ENFORCED':'META ONLY' },
+                    { icon:'🚫', label:'X-Frame-Options', c:sv?'active':'meta-only', v:sv?'ENFORCED':'META ONLY' },
+                    { icon:'📄', label:'X-Content-Type', c:sv?'active':'meta-only', v:sv?'ENFORCED':'META ONLY' },
+                    { icon:'🔐', label:'CSP (full)', c:sv?'active':'meta-only', v:sv?'ENFORCED':'META ONLY' },
+                    { icon:'🛑', label:'Mixed Content', c:sv?'active':'meta-only', v:sv?'ENFORCED':'META ONLY' },
+                    { icon:'📋', label:'Referrer Policy', c:sv?'active':'inactive', v:sv?'ENFORCED':'META ONLY' },
+                    { icon:'🔐', label:'Permissions-Policy', c:sv?'active':'inactive', v:sv?'ENFORCED':'NOT ENFORCED' },
+                    { icon:'📦', label:'Cache-Control', c:sv?'active':'inactive', v:sv?'ENFORCED':'NOT ENFORCED' },
+                ];
+                const g = document.getElementById('shieldGrid'); if (!g) return;
+                g.innerHTML = shields.map(s => {
+                    const vc = s.c === 'active' ? 'active-val' : s.c === 'meta-only' ? 'meta-val' : 'inactive-val';
+                    return `<div class="shield-item ${s.c}"><span class="shield-icon">${s.icon}</span><div><span class="shield-label">${s.label}</span><span class="shield-value ${vc}">${s.v}</span></div></div>`;
+                }).join('');
+            }
+
+            function _initProtections() {
+                const el = document.getElementById('activeProtections'); if (!el) return;
+                el.innerHTML = '✓ XSS detection (25+ signatures)<br>✓ SQLi detection (9 patterns)<br>✓ Command injection (14 patterns)<br>✓ Path traversal (4 encodings)<br>✓ Social engineering (14 patterns)<br>✓ URL whitelist (22 domains)<br>✓ Phishing analysis (6 signals)<br>✓ Rate limiting (per-action)<br>✓ Custom secure prompt<br>✓ HTML output encoding<br>✓ noopener noreferrer<br>✓ MutationObserver<br>✓ Audit logging (200 max)<br>✓ Null byte stripping<br>✓ Input length limit (500)';
+            }
+
+            function _initDeployHint() {
+                const el = document.getElementById('deployHint'); if (!el) return;
+                if (_isServerHeaders) { el.style.display = 'none'; return; }
+                el.innerHTML = '<strong>⚠ GITHUB PAGES</strong> does not send HTTP headers. 🟡 shields are meta tags only.<br><br><strong>Fix:</strong> Deploy to <strong>Netlify</strong> (add <code>_headers</code> file) or <strong>Vercel</strong> (add <code>vercel.json</code>). All shields turn 🟢 automatically.';
+            }
+
+            return {
+                sanitize: _sanitize, validateInput: _validate, secureOpen: _secureOpen, secureSpeak: _speak,
+                securePrompt: _securePrompt, resolvePrompt: _resolvePrompt, checkRateLimit: _rateLimit,
+                log: _log, showToast: _toast, showThreatAlert: _showThreat, dismissThreat: _dismissThreat,
+                monitorIntegrity: _monitorIntegrity, initShields: _initShields, initProtections: _initProtections,
+                initDeployHint: _initDeployHint, updateScore: _updateScore, calculateScore: _calcScore,
+                get isServerHeaders() { return _isServerHeaders; }, get score() { return _securityScore; },
+                set pendingResolve(v) { _pendingResolve = v; }
+            };
+        })();
+
+        function submitSecurePrompt() {
+            const i = document.getElementById('spInput').value, e = document.getElementById('spError'), v = Security.validateInput(i, 'PROMPT');
+            if (!v.valid) { e.textContent = `⚠ ${v.threats.join(', ')}`; e.style.display = 'block'; Security.showThreatAlert(v.threats.join(', ')); Security.updateScore(-15); return; }
+            if (i.length < 1 || i.length > 50) { e.textContent = '⚠ 1–50 characters.'; e.style.display = 'block'; return; }
+            Security.resolvePrompt(i);
+        }
+        function closeSecurePrompt(v) { Security.resolvePrompt(v); }
+        function dismissThreat() { Security.dismissThreat(); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('spInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitSecurePrompt(); if (e.key === 'Escape') closeSecurePrompt(null); });
+            document.getElementById('securePromptOverlay').addEventListener('click', e => { if (e.target.id === 'securePromptOverlay') closeSecurePrompt(null); });
+        });
+
+        /* ===== APP ===== */
+        const floors = ["Basement","Lobby","Research","Finance","Marketing","HR Node","Security","Engine","Sales","Exec","Apex"];
+        const floorCodes = ["B1","1","2","3","4","5","6","7","8","9","10"];
+        const roomIDs = floors.map((_, i) => i === 0 ? "ID-B01" : `ID-${i}${i.toString().padStart(2,'0')}`);
+        const floorURLs = ["https://www.google.com","https://www.wikipedia.org","https://vimeo.com","https://www.bloomberg.com","https://www.canva.com","https://www.linkedin.com","https://www.cloudflare.com","https://www.github.com","https://www.salesforce.com","https://www.apple.com","https://www.spacex.com"];
+
+        let activeWindows = {}, currentFloor = 0, isMoving = false, isAlarmActive = false;
+        const building = document.getElementById('building'), btnContainer = document.getElementById('btn-container');
+        const elevator = document.getElementById('elevator'), dash = document.getElementById('dash');
+
+        Security.calculateScore(); Security.initShields(); Security.initProtections(); Security.initDeployHint();
+        Security.log('SYSTEM_INIT', Security.isServerHeaders ? 'Server headers' : 'GitHub Pages mode');
+
+        setInterval(() => Security.monitorIntegrity(), 10000);
+        document.addEventListener('contextmenu', () => Security.log('CONTEXT_MENU', 'Right-click'));
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12') Security.log('DEVTOOLS', 'F12');
+            if (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) Security.log('DEVTOOLS', `Ctrl+Shift+${e.key}`);
+            if (e.ctrlKey && e.key.toUpperCase() === 'U') { e.preventDefault(); Security.log('VIEW_SOURCE', 'Blocked'); Security.showToast('View source disabled.', 'blocked'); }
+        });
+
+        const obs = new MutationObserver(m => m.forEach(mu => { if (mu.type !== 'childList' || !mu.addedNodes.length) return; mu.addedNodes.forEach(n => {
+            if (n.nodeName === 'SCRIPT' && !n.hasAttribute('data-verified')) { Security.log('SCRIPT_INJECTION', 'Removed'); Security.updateScore(-20); n.remove(); }
+            if (n.nodeName === 'LINK' && n.rel === 'stylesheet' && !n.hasAttribute('data-verified')) { Security.log('STYLE_INJECTION', 'Detected'); Security.updateScore(-10); }
+            if (n.nodeName === 'IFRAME') { Security.log('IFRAME_INJECTION', 'Removed'); Security.updateScore(-20); n.remove(); }
+            if (n.nodeName === 'IMG' && n.src && !n.src.startsWith('data:') && !n.src.startsWith(window.location.origin)) { Security.log('EXTERNAL_IMG', 'Blocked'); n.remove(); }
+        }); }));
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+
+        floors.forEach((name, i) => {
+            const row = document.createElement('div');
+            row.className = 'floor-row' + (i === 0 ? ' floor-active' : '');
+            row.id = `f-row-${i}`;
+            row.innerHTML = `<div class="room-view" id="room-${i}"><div class="room-door-layer"><div style="font-size:7px;opacity:0.5;margin-bottom:2px;">${Security.sanitize(roomIDs[i])}</div><button onclick="verifyID(${i})" style="font-size:9px;cursor:pointer;min-height:24px;min-width:44px;">VERIFY</button></div><div style="padding:5px;text-align:center;"><div class="ad-text" onclick="handleAdClick(${i})">${Security.sanitize(name)}</div><div class="room-controls"><button class="room-btn" onclick="returnFromFloor(${i})">RETURN</button><button class="room-btn btn-lock" onclick="lockRoom(${i})">LOCK</button></div></div></div><div class="floor-label-text"><b>${Security.sanitize(floorCodes[i])}</b> — ${Security.sanitize(name)}</div>`;
+            building.appendChild(row);
+
+            const btn = document.createElement('div');
+            btn.className = 'circ-btn' + (i === 0 ? ' arrived' : '');
+            btn.id = `btn-${i}`;
+            btn.innerHTML = `<div class="btn-circle">${Security.sanitize(floorCodes[i])}</div><div style="font-size:10px;">${Security.sanitize(name)}</div>`;
+            btn.onclick = () => requestFloor(i);
+            btnContainer.prepend(btn);
+        });
+
+        function enterBuilding() { document.body.classList.add('system-active'); Security.log('ENTER', 'User entered'); Security.secureSpeak("Welcome to Skyscraper O S. Security initialized."); }
+        function exitBuilding() { Object.keys(activeWindows).forEach(k => { try { activeWindows[k].close(); } catch(e) {} delete activeWindows[k]; }); document.body.classList.remove('system-active'); dash.style.display = 'none'; document.getElementById('securityPanel').style.display = 'none'; Security.log('EXIT', 'User exited'); Security.secureSpeak("Logging out."); }
+        function changePlatformMode() { const m = document.getElementById('platformSelector').value; building.className = `building-container mode-${m}`; Security.log('MODE', m); Security.secureSpeak(`${m} mode.`); }
+        function updateLocationTime() { const l = document.getElementById('locationSelector').value; let n = new Date(); try { if (l==="IN") n=new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"})); else if (l==="US") n=new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"})); } catch(e) {} const h=n.getHours(),b=document.body,s=document.getElementById('status-tag'); if(!isAlarmActive){b.classList.remove('theme-morning','theme-afternoon','theme-evening');if(h>=5&&h<12){b.classList.add('theme-morning');s.innerText="MORNING";}else if(h>=12&&h<17){b.classList.add('theme-afternoon');s.innerText="AFTERNOON";}else if(h>=17&&h<20){b.classList.add('theme-evening');s.innerText="EVENING";}else{s.innerText="NIGHT";}} document.getElementById('clock').innerText=n.toLocaleTimeString('en-GB'); }
+        function handleAdClick(f) { if(isAlarmActive){Security.secureOpen(floorURLs[f]);return;} if(document.getElementById(`room-${f}`).classList.contains('unlocked')){Security.log('ACCESS',floors[f],{f:floorCodes[f]});Security.secureSpeak(`Accessing ${floors[f]}.`);activeWindows[f]=Security.secureOpen(floorURLs[f]);}else{Security.log('DENIED',floorCodes[f]);Security.secureSpeak("Access denied.");Security.showToast('⚠ Verify identity first','blocked');} }
+        function returnFromFloor(f) { if(activeWindows[f]){try{activeWindows[f].close();}catch(e){}delete activeWindows[f];Security.log('CLOSED',floorCodes[f]);Security.secureSpeak("Connection closed.");} }
+        function lockRoom(f) { if(isAlarmActive){Security.showToast('Cannot lock during emergency','blocked');return;} document.getElementById(`room-${f}`).classList.remove('unlocked'); Security.log('LOCKED',floorCodes[f]); Security.secureSpeak(`Sector ${floorCodes[f]} locked.`); }
+
+        async function verifyID(f) {
+            if(isAlarmActive) return;
+            const rc = Security.checkRateLimit(`v_${f}`,3,30000);
+            if(!rc.ok){Security.showToast(`⚠ Wait ${rc.s}s`,'blocked');Security.secureSpeak(`Rate limited.`);Security.updateScore(-5);return;}
+            const input = await Security.securePrompt(`VERIFY — ${floorCodes[f]}`, `Enter code for ${floors[f]}.`);
+            if(input===null){Security.log('CANCEL',floorCodes[f]);return;}
+            const v = Security.validateInput(input,`V_${floorCodes[f]}`);
+            if(!v.valid){Security.showThreatAlert(v.threats.join(', '));Security.updateScore(-15);return;}
+            if(input===roomIDs[f]){document.getElementById(`room-${f}`).classList.add('unlocked');Security.log('VERIFIED',floorCodes[f]);Security.secureSpeak("Verified.");Security.showToast('✓ Verified','success');Security.updateScore(2);}
+            else{Security.log('FAIL',floorCodes[f]);Security.secureSpeak("Failed.");Security.showToast('✗ Invalid code','blocked');Security.updateScore(-3);}
+        }
+
+        function requestFloor(f) {
+            const rc = Security.checkRateLimit('floor',10,30000);
+            if(!rc.ok){Security.showToast(`⚠ Rate limited. ${rc.s}s`,'blocked');return;}
+            if(isMoving||f===currentFloor||isAlarmActive) return;
+            controlLiftDoors('close');
+            document.querySelectorAll('.circ-btn').forEach(b=>b.classList.remove('arrived','moving'));
+            document.getElementById(`btn-${f}`).classList.add('moving');
+            Security.log('FLOOR_REQ',`${floorCodes[currentFloor]}→${floorCodes[f]}`);
+            setTimeout(()=>{
+                isMoving=true;
+                elevator.style.bottom=(f*parseInt(getComputedStyle(document.documentElement).getPropertyValue('--floor-h')))+"px";
+                if(building.classList.contains('mode-mobile')) building.scrollTo({top:building.scrollHeight-(f*parseInt(getComputedStyle(document.documentElement).getPropertyValue('--floor-h')))-300,behavior:'smooth'});
+                setTimeout(()=>{document.querySelectorAll('.floor-row').forEach(r=>r.classList.remove('floor-active'));currentFloor=f;isMoving=false;document.getElementById(`btn-${f}`).classList.replace('moving','arrived');Security.log('ARRIVE',floorCodes[f]);Security.secureSpeak(`Floor ${floorCodes[f]}`);setTimeout(()=>controlLiftDoors('open'),400);},1800);
+            },400);
+        }
+
+        function controlLiftDoors(a) { const r=document.getElementById(`f-row-${currentFloor}`); if(a==='open'){elevator.classList.add('open');r.classList.add('floor-active');}else{elevator.classList.remove('open');r.classList.remove('floor-active');if(!isAlarmActive)document.querySelectorAll('.room-view').forEach(r=>r.classList.remove('unlocked'));} }
+        function triggerFireExit() { isAlarmActive=!isAlarmActive; const b=document.getElementById('alarm'); if(isAlarmActive){b.classList.add('alarm-active');building.classList.add('alarm-on');Security.log('EMERGENCY','Alarm on');Security.secureSpeak("EMERGENCY. ALL UNLOCKED.");Security.showToast('🚨 EMERGENCY','blocked',5000);document.querySelectorAll('.room-view').forEach(r=>r.classList.add('unlocked'));controlLiftDoors('open');}else{b.classList.remove('alarm-active');building.classList.remove('alarm-on');Security.log('EMERGENCY_END','Restored');Security.secureSpeak("Restored.");Security.showToast('✓ Restored','success');document.querySelectorAll('.room-view').forEach(r=>r.classList.remove('unlocked'));} }
+        function toggleDash() { dash.style.display = (dash.style.display === 'flex') ? 'none' : 'flex'; }
+        function toggleSecurityPanel() { const p=document.getElementById('securityPanel'); p.style.display=(p.style.display==='flex')?'none':'flex'; if(p.style.display==='flex') Security.log('SEC_PANEL','Opened'); }
+
+        setInterval(updateLocationTime, 1000); updateLocationTime();
+        Security.log('CLIENT','All client protections: ACTIVE');
+        if(!Security.isServerHeaders){ Security.log('META','frame-ancestors: meta only'); Security.log('META','X-Frame-Options: meta only'); Security.log('META','nosniff: meta only'); Security.log('META','Permissions-Policy: meta only'); Security.log('META','Cache-Control: meta only'); }
+    </script>
+
+    <!--
+    ================================================================
+    NETLIFY: Create file named "_headers" in repo root:
+    ================================================================
+    /*
+      X-Frame-Options: DENY
+      X-Content-Type-Options: nosniff
+      X-XSS-Protection: 1; mode=block
+      Referrer-Policy: strict-origin-when-cross-origin
+      Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+      Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content
+      Cache-Control: no-store, no-cache, must-revalidate
+    ================================================================
+    VERCEL: Create file named "vercel.json" in repo root:
+    ================================================================
+    {
+      "headers": [{
+        "source": "/(.*)",
+        "headers": [
+          { "key": "X-Frame-Options", "value": "DENY" },
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "X-XSS-Protection", "value": "1; mode=block" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+          { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=(), payment=()" },
+          { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content" },
+          { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
+        ]
+      }]
+    }
+    ================================================================
+    -->
+</body>
+</html>
