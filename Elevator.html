@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Skyscraper OS - Ultimate Hybrid Edition</title>
 
+    <!--
+    ================================================================
+    SECURITY HEADERS — Updated for GTM compatibility
+    ================================================================
+    CHANGES FROM PREVIOUS VERSION:
+      - script-src: added https://www.googletagmanager.com
+      - connect-src: added https://www.googletagmanager.com
+      - img-src: added https://www.google-analytics.com (tracking pixel)
+      These are REQUIRED for GTM to function.
+    ================================================================
+    -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -13,7 +24,24 @@
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://www.google-analytics.com; connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content;">
+
+    <!--
+    ================================================================
+    GOOGLE TAG MANAGER
+    ================================================================
+    NOTE: data-verified attribute is REQUIRED on this script tag.
+    Without it, the MutationObserver will detect it as an injection
+    attempt and remove it from the DOM.
+    ================================================================
+    -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ" data-verified></script>
+    <script data-verified>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'GT-NC6T5LRJ');
+    </script>
 
     <style>
         :root {
@@ -39,7 +67,6 @@
         body.theme-evening { --bg-color: #263238; --building-bg: rgba(38, 50, 56, 0.95); --theme-color: #ffb300; --text-main: #eceff1; }
 
         *, *::before, *::after { box-sizing: border-box; }
-
         html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
 
         body {
@@ -47,270 +74,71 @@
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            height: 100vh;
-            height: 100dvh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 100vh; height: 100dvh;
+            display: flex; align-items: center; justify-content: center;
             overflow: hidden;
             transition: background 1s ease;
         }
 
-        /* ========== EXTERIOR ========== */
         #exterior-view {
-            position: fixed;
-            top: 0; left: 0;
+            position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh; height: 100dvh;
             background: url('elevatorbuilding.jpg') no-repeat center center / cover,
                         linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
             z-index: 1000;
-            display: flex;
-            justify-content: flex-end;
-            align-items: flex-end;
+            display: flex; justify-content: flex-end; align-items: flex-end;
             transition: opacity 0.8s ease, visibility 0.8s;
         }
-
-        .enter-btn-ui {
-            margin: 4% 6%;
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.3s;
-            z-index: 1;
-        }
+        .enter-btn-ui { margin: 4% 6%; cursor: pointer; text-align: center; transition: transform 0.3s; z-index: 1; }
         .enter-btn-ui:hover { transform: scale(1.1); }
         .enter-btn-ui:active { transform: scale(0.95); }
-        .enter-btn-ui .glow-circle {
-            width: 70px; height: 70px;
-            background: var(--theme-color);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 25px var(--theme-color);
-            margin-bottom: 10px;
-        }
-        .enter-btn-ui span {
-            font-size: 11px; font-weight: bold; color: #fff;
-            text-shadow: 0 0 5px #000, 0 0 10px #000;
-            letter-spacing: 1px;
-        }
-
+        .enter-btn-ui .glow-circle { width: 70px; height: 70px; background: var(--theme-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px var(--theme-color); margin-bottom: 10px; }
+        .enter-btn-ui span { font-size: 11px; font-weight: bold; color: #fff; text-shadow: 0 0 5px #000, 0 0 10px #000; letter-spacing: 1px; }
         .system-active #exterior-view { opacity: 0; visibility: hidden; pointer-events: none; }
 
-        /* ========== BUILDING ========== */
         .building-container {
-            position: relative;
-            width: 100%;
-            max-width: 650px;
-            background: var(--building-bg);
-            border-left: 3px solid var(--theme-color);
-            border-bottom: 20px solid #111;
-            display: flex;
-            flex-direction: column-reverse;
-            transition: all 0.5s ease;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            position: relative; width: 100%; max-width: 650px;
+            background: var(--building-bg); border-left: 3px solid var(--theme-color);
+            border-bottom: 20px solid #111; display: flex; flex-direction: column-reverse;
+            transition: all 0.5s ease; box-shadow: 0 10px 50px rgba(0,0,0,0.5);
             visibility: hidden; opacity: 0; transform: scale(0.95);
         }
         .system-active .building-container { visibility: visible; opacity: 1; transform: scale(1); }
+        .mode-desktop { height: auto; max-height: 95vh; max-height: 95dvh; }
+        .mode-mobile { height: 90vh; height: 90dvh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--theme-color) #111; -webkit-overflow-scrolling: touch; }
 
-        .mode-desktop {
-            height: auto;
-            max-height: 95vh;
-            max-height: 95dvh;
-        }
-        .mode-mobile {
-            height: 90vh;
-            height: 90dvh;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--theme-color) #111;
-            -webkit-overflow-scrolling: touch;
-        }
+        .floor-row { height: var(--floor-h); min-height: var(--floor-h); border-top: 1px solid rgba(128,128,128,0.1); display: flex; align-items: center; padding-left: var(--shaft-width); position: relative; }
+        .floor-label-text { margin-left: 15px; font-size: 11px; opacity: 0.5; transition: 0.3s; white-space: nowrap; }
+        .floor-active .floor-label-text, .alarm-on .floor-label-text { opacity: 1; color: var(--theme-color); font-weight: bold; }
 
-        .floor-row {
-            height: var(--floor-h);
-            min-height: var(--floor-h);
-            border-top: 1px solid rgba(128,128,128,0.1);
-            display: flex;
-            align-items: center;
-            padding-left: var(--shaft-width);
-            position: relative;
-        }
-        .floor-label-text {
-            margin-left: 15px;
-            font-size: 11px;
-            opacity: 0.5;
-            transition: 0.3s;
-            white-space: nowrap;
-        }
-        .floor-active .floor-label-text,
-        .alarm-on .floor-label-text { opacity: 1; color: var(--theme-color); font-weight: bold; }
-
-        /* ========== ROOMS ========== */
-        .room-view {
-            width: var(--room-width);
-            height: 50px;
-            background: rgba(0,0,0,0.05);
-            border: 1px solid var(--theme-color);
-            position: relative;
-            overflow: hidden;
-            opacity: 0;
-            transform: scale(0.9);
-            transition: 0.4s;
-            flex-shrink: 0;
-        }
-        .floor-active .room-view,
-        .alarm-on .room-view { opacity: 1; transform: scale(1); }
-
-        .room-door-layer {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: #1e272e;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            z-index: 10;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .room-view { width: var(--room-width); height: 50px; background: rgba(0,0,0,0.05); border: 1px solid var(--theme-color); position: relative; overflow: hidden; opacity: 0; transform: scale(0.9); transition: 0.4s; flex-shrink: 0; }
+        .floor-active .room-view, .alarm-on .room-view { opacity: 1; transform: scale(1); }
+        .room-door-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1e272e; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .room-view.unlocked .room-door-layer { transform: translateY(-100%); }
-
-        .ad-text {
-            font-size: 10px;
-            font-weight: bold;
-            color: var(--theme-color);
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .ad-text { font-size: 10px; font-weight: bold; color: var(--theme-color); cursor: pointer; transition: 0.2s; }
         .ad-text:hover { text-shadow: 0 0 8px var(--theme-color); }
-
         .room-controls { display: flex; gap: 4px; justify-content: center; margin-top: 2px; }
-        .room-btn {
-            background: none;
-            font-size: 8px;
-            cursor: pointer;
-            border: 1px solid var(--theme-color);
-            color: var(--theme-color);
-            padding: 2px 6px;
-            border-radius: 2px;
-            min-height: 20px;
-            min-width: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .room-btn { background: none; font-size: 8px; cursor: pointer; border: 1px solid var(--theme-color); color: var(--theme-color); padding: 2px 6px; border-radius: 2px; min-height: 20px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center; }
         .room-btn:active { background: rgba(0,210,255,0.2); }
         .btn-lock { border-color: var(--emergency); color: var(--emergency); }
 
-        /* ========== ELEVATOR ========== */
-        .elevator {
-            position: absolute;
-            left: 10px;
-            bottom: 0;
-            width: 100px;
-            height: calc(var(--floor-h) - 2px);
-            background: #000;
-            border: 2px solid var(--theme-color);
-            transition: bottom 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-            z-index: 20;
-            cursor: pointer;
-        }
+        .elevator { position: absolute; left: 10px; bottom: 0; width: 100px; height: calc(var(--floor-h) - 2px); background: #000; border: 2px solid var(--theme-color); transition: bottom 1.8s cubic-bezier(0.45, 0.05, 0.55, 0.95); z-index: 20; cursor: pointer; }
         .lift-door { position: absolute; width: 50%; height: 100%; background: #222; transition: 0.6s; }
         .lift-door-l { left: 0; border-right: 1px solid var(--theme-color); }
         .lift-door-r { right: 0; border-left: 1px solid var(--theme-color); }
         .open .lift-door-l { transform: translateX(-85%); }
         .open .lift-door-r { transform: translateX(85%); }
 
-        /* ========== DASHBOARD PANEL ========== */
-        .dashboard-panel {
-            position: fixed;
-            right: 15px;
-            bottom: 15px;
-            width: 310px;
-            background: #000;
-            color: #fff;
-            border: 2px solid var(--theme-color);
-            padding: 15px;
-            display: none;
-            flex-direction: column;
-            border-radius: var(--panel-radius);
-            z-index: 100;
-            box-shadow: 0 0 30px #000;
-            max-height: 88vh;
-            max-height: 88dvh;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .select-input {
-            background: #111;
-            color: var(--theme-color);
-            border: 1px solid var(--theme-color);
-            padding: 10px;
-            width: 100%;
-            margin-bottom: 10px;
-            font-family: monospace;
-            font-size: 12px;
-            outline: none;
-            border-radius: 6px;
-            min-height: 40px;
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300d2ff'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 32px;
-        }
-        .num-pad {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            margin-bottom: 10px;
-            overflow-y: auto;
-            max-height: 180px;
-        }
-        .circ-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 6px;
-            transition: 0.2s;
-            min-height: 36px;
-        }
+        .dashboard-panel { position: fixed; right: 15px; bottom: 15px; width: 310px; background: #000; color: #fff; border: 2px solid var(--theme-color); padding: 15px; display: none; flex-direction: column; border-radius: var(--panel-radius); z-index: 100; box-shadow: 0 0 30px #000; max-height: 88vh; max-height: 88dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .select-input { background: #111; color: var(--theme-color); border: 1px solid var(--theme-color); padding: 10px; width: 100%; margin-bottom: 10px; font-family: monospace; font-size: 12px; outline: none; border-radius: 6px; min-height: 40px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300d2ff'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+        .num-pad { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; overflow-y: auto; max-height: 180px; }
+        .circ-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 6px; transition: 0.2s; min-height: 36px; }
         .circ-btn:active { background: rgba(255,255,255,0.05); }
-        .btn-circle {
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            border: 1px solid #333;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: bold;
-            flex-shrink: 0;
-        }
+        .btn-circle { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; flex-shrink: 0; }
         .circ-btn.moving .btn-circle { border-color: var(--moving-glow); color: var(--moving-glow); box-shadow: 0 0 8px var(--moving-glow); }
         .circ-btn.arrived .btn-circle { border-color: var(--active-glow); color: var(--active-glow); }
-
-        .control-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            padding-top: 10px;
-            border-top: 1px solid #222;
-        }
-        .ctrl-btn {
-            background: #111;
-            border: 1px solid var(--theme-color);
-            color: var(--theme-color);
-            padding: 12px 8px;
-            cursor: pointer;
-            font-size: 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: 0.2s;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            line-height: 1.2;
-        }
+        .control-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 10px; border-top: 1px solid #222; }
+        .ctrl-btn { background: #111; border: 1px solid var(--theme-color); color: var(--theme-color); padding: 12px 8px; cursor: pointer; font-size: 10px; border-radius: 6px; font-weight: bold; transition: 0.2s; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.2; }
         .ctrl-btn:active { background: rgba(0,210,255,0.2); transform: scale(0.97); }
         .alarm-btn { border-color: var(--emergency); color: var(--emergency); grid-column: span 2; }
         .exit-btn { border-color: #fff; color: #fff; background: #333; grid-column: span 2; }
@@ -318,57 +146,15 @@
         .alarm-active { background: var(--emergency) !important; color: #fff !important; animation: blink 0.5s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* ========== SECURITY PANEL ========== */
-        .security-panel {
-            position: fixed;
-            left: 15px;
-            top: 15px;
-            width: 370px;
-            max-height: 85vh;
-            max-height: 85dvh;
-            background: #000;
-            color: #fff;
-            border: 2px solid var(--security-green);
-            padding: 0;
-            display: none;
-            flex-direction: column;
-            border-radius: var(--panel-radius);
-            z-index: 200;
-            box-shadow: 0 0 40px rgba(0,255,136,0.2);
-            overflow: hidden;
-        }
-        .security-header {
-            background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,210,255,0.1));
-            padding: 14px 15px;
-            border-bottom: 1px solid var(--security-green);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            min-height: 48px;
-        }
+        .security-panel { position: fixed; left: 15px; top: 15px; width: 370px; max-height: 85vh; max-height: 85dvh; background: #000; color: #fff; border: 2px solid var(--security-green); padding: 0; display: none; flex-direction: column; border-radius: var(--panel-radius); z-index: 200; box-shadow: 0 0 40px rgba(0,255,136,0.2); overflow: hidden; }
+        .security-header { background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,210,255,0.1)); padding: 14px 15px; border-bottom: 1px solid var(--security-green); display: flex; justify-content: space-between; align-items: center; min-height: 48px; }
         .security-header h3 { margin: 0; font-size: 13px; color: var(--security-green); letter-spacing: 2px; }
-        .security-close {
-            background: none;
-            border: 1px solid var(--security-red);
-            color: var(--security-red);
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 11px;
-            min-height: 32px;
-            min-width: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .security-close { background: none; border: 1px solid var(--security-red); color: var(--security-red); cursor: pointer; padding: 6px 12px; border-radius: 4px; font-size: 11px; min-height: 32px; min-width: 32px; display: flex; align-items: center; justify-content: center; }
         .security-close:active { background: rgba(255,0,51,0.2); }
         .security-body { padding: 15px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
 
         .shield-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 15px; }
-        .shield-item {
-            display: flex; align-items: center; gap: 5px;
-            padding: 6px; border-radius: 6px; font-size: 9px;
-        }
+        .shield-item { display: flex; align-items: center; gap: 5px; padding: 6px; border-radius: 6px; font-size: 9px; }
         .shield-item.active { background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.2); }
         .shield-item.meta-only { background: rgba(255,179,0,0.05); border: 1px solid rgba(255,179,0,0.2); }
         .shield-item.inactive { background: rgba(255,0,51,0.05); border: 1px solid rgba(255,0,51,0.2); }
@@ -379,12 +165,7 @@
         .shield-value.meta-val { color: var(--security-yellow); }
         .shield-value.inactive-val { color: var(--security-red); }
 
-        .audit-log-container {
-            background: #0a0a0a; border: 1px solid #222; border-radius: 6px;
-            padding: 10px; max-height: 180px; overflow-y: auto;
-            font-family: 'Courier New', monospace; font-size: 9px;
-            -webkit-overflow-scrolling: touch;
-        }
+        .audit-log-container { background: #0a0a0a; border: 1px solid #222; border-radius: 6px; padding: 10px; max-height: 180px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 9px; -webkit-overflow-scrolling: touch; }
         .audit-entry { padding: 4px 0; border-bottom: 1px solid #111; }
         .audit-time { color: #555; }
         .audit-event { color: var(--security-green); }
@@ -396,236 +177,99 @@
         .security-score-bar { height: 6px; background: #111; border-radius: 3px; margin: 10px 0; overflow: hidden; }
         .security-score-fill { height: 100%; border-radius: 3px; transition: width 0.5s, background 0.5s; }
 
-        .deploy-hint {
-            margin-top: 15px; padding: 10px;
-            background: rgba(255,179,0,0.05); border: 1px dashed rgba(255,179,0,0.3);
-            border-radius: 6px; font-size: 8px; color: var(--security-yellow); line-height: 1.7;
-        }
+        .deploy-hint { margin-top: 15px; padding: 10px; background: rgba(255,179,0,0.05); border: 1px dashed rgba(255,179,0,0.3); border-radius: 6px; font-size: 8px; color: var(--security-yellow); line-height: 1.7; }
 
-        /* ========== THREAT OVERLAY ========== */
-        .threat-overlay {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh; height: 100dvh;
-            background: rgba(255,0,0,0.1); z-index: 9999;
-            display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px); padding: 20px;
-        }
+        .threat-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; background: rgba(255,0,0,0.1); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
         .threat-overlay.active { display: flex; }
-        .threat-modal {
-            background: #000; border: 2px solid var(--security-red);
-            padding: 30px; border-radius: var(--panel-radius); text-align: center;
-            max-width: 400px; width: 100%; box-shadow: 0 0 60px rgba(255,0,51,0.3);
-        }
+        .threat-modal { background: #000; border: 2px solid var(--security-red); padding: 30px; border-radius: var(--panel-radius); text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 60px rgba(255,0,51,0.3); }
         .threat-modal h2 { color: var(--security-red); margin: 0 0 10px 0; font-size: 16px; letter-spacing: 3px; }
         .threat-modal p { color: #ccc; font-size: 13px; margin: 10px 0; line-height: 1.5; }
-        .threat-modal button {
-            background: var(--security-red); color: #fff; border: none;
-            padding: 14px 30px; cursor: pointer; border-radius: 6px;
-            font-weight: bold; margin-top: 15px; font-size: 13px; min-height: 48px;
-        }
+        .threat-modal button { background: var(--security-red); color: #fff; border: none; padding: 14px 30px; cursor: pointer; border-radius: 6px; font-weight: bold; margin-top: 15px; font-size: 13px; min-height: 48px; }
 
-        /* ========== BADGE ========== */
-        .security-badge {
-            position: fixed; left: 12px; bottom: 12px;
-            width: 44px; height: 44px; border-radius: 50%;
-            background: #000; border: 2px solid var(--security-green);
-            display: none; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 150; transition: 0.3s; font-size: 18px;
-        }
+        .security-badge { position: fixed; left: 12px; bottom: 12px; width: 44px; height: 44px; border-radius: 50%; background: #000; border: 2px solid var(--security-green); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 150; transition: 0.3s; font-size: 18px; }
         .system-active .security-badge { display: flex; }
         .security-badge:active { transform: scale(0.9); }
         .security-badge.threat-active { border-color: var(--security-red); animation: pulse-red 1s infinite; }
         @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 5px rgba(255,0,51,0.3); } 50% { box-shadow: 0 0 25px rgba(255,0,51,0.6); } }
 
-        /* ========== TOAST ========== */
-        .security-toast {
-            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            padding: 12px 20px; border-radius: 8px; z-index: 10000;
-            font-size: 12px; font-weight: bold; display: none; animation: slideDown 0.3s ease;
-            max-width: 90vw; text-align: center;
-        }
+        .security-toast { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; z-index: 10000; font-size: 12px; font-weight: bold; display: none; animation: slideDown 0.3s ease; max-width: 90vw; text-align: center; }
         .security-toast.show { display: block; }
         .security-toast.blocked { background: rgba(255,0,51,0.95); color: #fff; border: 1px solid var(--security-red); }
         .security-toast.info { background: rgba(0,210,255,0.95); color: #000; border: 1px solid var(--theme-color); }
         .security-toast.success { background: rgba(0,255,136,0.95); color: #000; border: 1px solid var(--security-green); }
         @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
-        /* ========== SECURE PROMPT ========== */
-        .secure-prompt-overlay {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh; height: 100dvh;
-            background: rgba(0,0,0,0.7); z-index: 500;
-            display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(3px); padding: 20px;
-        }
+        .secure-prompt-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); padding: 20px; }
         .secure-prompt-overlay.active { display: flex; }
-        .secure-prompt-box {
-            background: #111; border: 2px solid var(--theme-color);
-            padding: 25px; border-radius: var(--panel-radius);
-            width: 100%; max-width: 340px;
-        }
+        .secure-prompt-box { background: #111; border: 2px solid var(--theme-color); padding: 25px; border-radius: var(--panel-radius); width: 100%; max-width: 340px; }
         .secure-prompt-box h4 { margin: 0 0 5px 0; color: var(--theme-color); font-size: 13px; }
         .secure-prompt-box p { margin: 0 0 15px 0; color: #888; font-size: 11px; line-height: 1.4; }
-        .secure-prompt-input {
-            width: 100%; padding: 14px; background: #000;
-            border: 1px solid var(--theme-color); color: #fff;
-            font-family: monospace; font-size: 16px; outline: none;
-            border-radius: 6px; min-height: 48px;
-        }
+        .secure-prompt-input { width: 100%; padding: 14px; background: #000; border: 1px solid var(--theme-color); color: #fff; font-family: monospace; font-size: 16px; outline: none; border-radius: 6px; min-height: 48px; }
         .secure-prompt-input:focus { box-shadow: 0 0 10px rgba(0,210,255,0.3); }
         .secure-prompt-actions { display: flex; gap: 10px; margin-top: 18px; }
-        .secure-prompt-actions button {
-            padding: 14px 20px; cursor: pointer; border-radius: 6px;
-            font-size: 12px; font-weight: bold; border: 1px solid; min-height: 48px;
-            flex: 1;
-        }
+        .secure-prompt-actions button { padding: 14px 20px; cursor: pointer; border-radius: 6px; font-size: 12px; font-weight: bold; border: 1px solid; min-height: 48px; flex: 1; }
         .sp-confirm { background: var(--theme-color); color: #000; border-color: var(--theme-color); }
         .sp-cancel { background: transparent; color: #888; border-color: #444; }
         .sp-error { color: var(--security-red); font-size: 10px; margin-top: 8px; display: none; line-height: 1.4; }
 
-        /* ========== MOBILE FLOATING BUTTONS ========== */
-        .mobile-fab-row {
-            position: fixed;
-            bottom: 15px; right: 15px;
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 150;
-        }
-        .mobile-fab {
-            width: 52px; height: 52px;
-            border-radius: 50%;
-            border: 2px solid var(--theme-color);
-            background: #000;
-            color: var(--theme-color);
-            font-size: 20px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: 0.2s;
-        }
+        .mobile-fab-row { position: fixed; bottom: 15px; right: 15px; display: none; flex-direction: column; gap: 10px; z-index: 150; }
+        .mobile-fab { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--theme-color); background: #000; color: var(--theme-color); font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s; }
         .mobile-fab:active { transform: scale(0.9); background: rgba(0,210,255,0.1); }
         .mobile-fab.fab-security { border-color: var(--security-green); color: var(--security-green); }
 
-        /* ============================================================
-           RESPONSIVE BREAKPOINTS
-           ============================================================ */
+        /* GTM status indicator */
+        .gtm-status { font-size: 8px; color: #555; text-align: center; margin-top: 8px; }
+        .gtm-status.active { color: var(--security-green); }
 
-        /* --- Tablets & small laptops (768px - 1024px) --- */
-        @media (max-width: 1024px) {
-            .dashboard-panel { width: 290px; right: 10px; bottom: 10px; padding: 12px; }
-            .security-panel { width: 340px; left: 10px; top: 10px; }
-        }
-
-        /* --- Large phones & small tablets (< 768px) --- */
+        @media (max-width: 1024px) { .dashboard-panel { width: 290px; right: 10px; bottom: 10px; padding: 12px; } .security-panel { width: 340px; left: 10px; top: 10px; } }
         @media (max-width: 768px) {
-            :root {
-                --floor-h: 60px;
-                --shaft-width: 100px;
-                --room-width: 130px;
-            }
-
+            :root { --floor-h: 60px; --shaft-width: 100px; --room-width: 130px; }
             .elevator { width: 80px; left: 8px; }
-
             .room-view { height: 46px; }
             .ad-text { font-size: 9px; }
             .room-btn { font-size: 7px; padding: 1px 4px; min-height: 18px; min-width: 28px; }
             .floor-label-text { font-size: 10px; margin-left: 10px; }
-
-            .dashboard-panel {
-                position: fixed;
-                right: 0; bottom: 0; left: 0;
-                width: 100%;
-                max-height: 85vh;
-                max-height: 85dvh;
-                border-radius: var(--panel-radius) var(--panel-radius) 0 0;
-                border-right: none;
-                border-bottom: none;
-                border-left: none;
-            }
-            .security-panel {
-                position: fixed;
-                left: 0; top: 0; right: 0;
-                width: 100%;
-                max-height: 90vh;
-                max-height: 90dvh;
-                border-radius: 0 0 var(--panel-radius) var(--panel-radius);
-                border-left: none; border-right: none; border-top: none;
-            }
-
+            .dashboard-panel { position: fixed; right: 0; bottom: 0; left: 0; width: 100%; max-height: 85vh; max-height: 85dvh; border-radius: var(--panel-radius) var(--panel-radius) 0 0; border-right: none; border-bottom: none; border-left: none; }
+            .security-panel { position: fixed; left: 0; top: 0; right: 0; width: 100%; max-height: 90vh; max-height: 90dvh; border-radius: 0 0 var(--panel-radius) var(--panel-radius); border-left: none; border-right: none; border-top: none; }
             .mobile-fab-row { display: flex; }
             .security-badge { display: none !important; }
         }
-
-        /* --- Small phones (< 480px) --- */
         @media (max-width: 480px) {
-            :root {
-                --floor-h: 54px;
-                --shaft-width: 85px;
-                --room-width: 110px;
-            }
-
+            :root { --floor-h: 54px; --shaft-width: 85px; --room-width: 110px; }
             .elevator { width: 68px; left: 6px; }
-
             .room-view { height: 42px; }
             .ad-text { font-size: 8px; }
             .room-btn { font-size: 7px; padding: 1px 3px; min-height: 16px; min-width: 24px; }
             .floor-label-text { font-size: 9px; margin-left: 8px; }
-
             .control-row { gap: 6px; }
             .ctrl-btn { padding: 10px 6px; font-size: 9px; min-height: 42px; }
             .circ-btn { padding: 6px; min-height: 32px; gap: 6px; }
             .btn-circle { width: 22px; height: 22px; font-size: 9px; }
-
             .enter-btn-ui .glow-circle { width: 60px; height: 60px; }
-            .enter-btn-ui span { font-size: 10px; }
-
             .secure-prompt-box { padding: 20px; }
             .secure-prompt-input { font-size: 14px; padding: 12px; }
         }
-
-        /* --- Very small phones (< 360px) --- */
         @media (max-width: 360px) {
-            :root {
-                --floor-h: 48px;
-                --shaft-width: 75px;
-                --room-width: 95px;
-            }
-
+            :root { --floor-h: 48px; --shaft-width: 75px; --room-width: 95px; }
             .elevator { width: 60px; left: 5px; }
-
             .room-view { height: 38px; }
             .ad-text { font-size: 7px; }
             .room-btn { font-size: 6px; min-height: 14px; min-width: 22px; }
             .floor-label-text { font-size: 8px; margin-left: 6px; }
         }
-
-        /* --- Landscape phones (h < 500px) --- */
         @media (max-height: 500px) and (orientation: landscape) {
-            :root {
-                --floor-h: 44px;
-                --shaft-width: 85px;
-                --room-width: 110px;
-            }
-
+            :root { --floor-h: 44px; --shaft-width: 85px; --room-width: 110px; }
             .elevator { width: 72px; height: calc(var(--floor-h) - 2px); }
-
             .room-view { height: 36px; }
-            .room-door-layer { font-size: 7px; }
             .ad-text { font-size: 8px; }
             .room-btn { font-size: 6px; min-height: 14px; }
             .floor-label-text { font-size: 8px; margin-left: 8px; }
-
             .dashboard-panel { max-height: 95vh; max-height: 95dvh; }
             .security-panel { max-height: 95vh; max-height: 95dvh; }
             .security-body { padding: 10px; }
             .shield-grid { gap: 3px; }
-            .shield-item { padding: 4px; font-size: 8px; }
-            .shield-icon { font-size: 10px; }
             .audit-log-container { max-height: 80px; }
         }
-
-        /* --- Safe area insets (notch phones) --- */
         @supports (padding: env(safe-area-inset-bottom)) {
             .dashboard-panel { padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
             .mobile-fab-row { bottom: calc(15px + env(safe-area-inset-bottom)); }
@@ -650,8 +294,7 @@
         <div class="secure-prompt-box">
             <h4 id="spTitle">SECURITY VERIFICATION</h4>
             <p id="spDesc">Enter your security code.</p>
-            <input type="password" class="secure-prompt-input" id="spInput"
-                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="password" class="secure-prompt-input" id="spInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             <div class="sp-error" id="spError"></div>
             <div class="secure-prompt-actions">
                 <button class="sp-cancel" onclick="closeSecurePrompt(null)">CANCEL</button>
@@ -663,12 +306,7 @@
     <div id="exterior-view">
         <div class="enter-btn-ui" onclick="enterBuilding()">
             <div class="glow-circle">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                    <polyline points="10 17 15 12 10 7"/>
-                    <line x1="15" y1="12" x2="3" y2="12"/>
-                </svg>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
             </div>
             <span>ENTER | EXIT SYSTEM</span>
         </div>
@@ -681,7 +319,6 @@
         </div>
     </div>
 
-    <!-- Mobile FABs -->
     <div class="mobile-fab-row" id="mobileFabs">
         <div class="mobile-fab fab-security" onclick="toggleSecurityPanel()" title="Security">🛡</div>
         <div class="mobile-fab" onclick="toggleDash()" title="Controls">⚙</div>
@@ -730,9 +367,7 @@
                 </div>
                 <div style="font-size:8px; color:#555; margin-top:4px;" id="scoreNote">Calculating...</div>
             </div>
-            <div style="font-size:7px; color:#555; letter-spacing:1px; margin-bottom:6px;">
-                🟢 ENFORCED &nbsp; 🟡 META ONLY &nbsp; 🔴 NOT ENFORCED
-            </div>
+            <div style="font-size:7px; color:#555; letter-spacing:1px; margin-bottom:6px;">🟢 ENFORCED &nbsp; 🟡 META ONLY &nbsp; 🔴 NOT ENFORCED</div>
             <div class="shield-grid" id="shieldGrid"></div>
             <div style="font-size:9px; color:#888; letter-spacing:2px; margin-bottom:8px;">AUDIT LOG</div>
             <div class="audit-log-container" id="auditLog">
@@ -751,12 +386,28 @@
             'use strict';
             let _auditLog = [], _rateLimiter = {}, _securityScore = 0, _pendingResolve = null, _isServerHeaders = false;
 
+            /* --- GTM script whitelist: domains allowed to inject scripts --- */
+            const _GTM_ALLOWED_DOMAINS = [
+                'www.googletagmanager.com',
+                'googletagmanager.com',
+                'www.google-analytics.com',
+                'google-analytics.com',
+                'www.google.com',
+                'google.com'
+            ];
+
+            function _isGTMAllowed(src) {
+                if (!src || typeof src !== 'string') return false;
+                try {
+                    const hostname = new URL(src, window.location.origin).hostname;
+                    return _GTM_ALLOWED_DOMAINS.includes(hostname);
+                } catch { return false; }
+            }
+
             function _detectServerHeaders() {
                 try {
-                    const h = (window.location.hostname || '').toLowerCase();
-                    const isDomainOrSubdomain = (host, domain) => host === domain || host.endsWith('.' + domain);
-                    const isGithubHost = isDomainOrSubdomain(h, 'github.io') || isDomainOrSubdomain(h, 'github.com');
-                    _isServerHeaders = !(isGithubHost || h === 'localhost' || h === '127.0.0.1' || window.location.protocol === 'file:');
+                    const h = window.location.hostname;
+                    _isServerHeaders = !(h.includes('github.io') || h.includes('github.com') || h === 'localhost' || h === '127.0.0.1' || window.location.protocol === 'file:');
                 } catch(e) { _isServerHeaders = false; }
                 return _isServerHeaders;
             }
@@ -767,11 +418,11 @@
                 const d = document.createElement('div'); d.textContent = c; return d.innerHTML;
             }
 
-            function _detectSQLi(i) { return [ /(\s|^)(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|CREATE|EXEC|EXECUTE|TRUNCATE)(\s|$)/i, /(--|;|\/\*|\*\/|xp_|0x)[\s\S]*$/im, /('(\s)*(OR|AND)(\s)*'?\d*'?\s*=\s*'?\d*'?)/i, /(\d+\s*=\s*\d+)|('\s*=\s*')/i, /WAITFOR\s+DELAY/i, /BENCHMARK\s*\(/i, /SLEEP\s*\(/i, /CONCAT\s*\(/i, /CHAR\s*\(\s*\d/i, /GROUP\s+BY.*HAVING/i ].some(r => r.test(i)); }
-            function _detectXSS(i) { return [ /<script[^>]*>[\s\S]*?<\/script>/gi, /<script[\s\S]*$/i, /javascript\s*:/gi, /vbscript\s*:/gi, /on\w+\s*=\s*['"][^'"]*['"]/gi, /on\w+\s*=\s*[^\s>]+/gi, /<\s*(img|svg|body|video|audio|details|marquee)[^>]+on\w+\s*=/gi, /<\s*(iframe|object|embed|form|input|base|link|meta)/gi, /eval\s*\(/gi, /Function\s*\(/gi, /document\.(cookie|domain|write|location)/gi, /window\.(location|open|navigate)/gi, /String\.fromCharCode/gi, /atob\s*\(/gi, /btoa\s*\(/gi, /setTimeout\s*\(\s*['"`]/gi, /setInterval\s*\(\s*['"`]/gi, /import\s*\(/gi, /require\s*\(/gi, /data\s*:\s*text\/html/gi, /expression\s*\(/gi, /url\s*\(\s*['"]javascript/gi ].some(r => r.test(i)); }
+            function _detectSQLi(i) { return [/(\s|^)(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|CREATE|EXEC|EXECUTE|TRUNCATE)(\s|$)/i, /(--|;|\/\*|\*\/|xp_|0x)[\s\S]*$/im, /('(\s)*(OR|AND)(\s)*'?\d*'?\s*=\s*'?\d*'?)/i, /(\d+\s*=\s*\d+)|('\s*=\s*')/i, /WAITFOR\s+DELAY/i, /BENCHMARK\s*\(/i, /SLEEP\s*\(/i, /CONCAT\s*\(/i, /CHAR\s*\(\s*\d/i, /GROUP\s+BY.*HAVING/i].some(r => r.test(i)); }
+            function _detectXSS(i) { return [/<script[^>]*>[\s\S]*?<\/script>/gi, /<script[\s\S]*$/i, /javascript\s*:/gi, /vbscript\s*:/gi, /on\w+\s*=\s*['"][^'"]*['"]/gi, /on\w+\s*=\s*[^\s>]+/gi, /<\s*(img|svg|body|video|audio|details|marquee)[^>]+on\w+\s*=/gi, /<\s*(iframe|object|embed|form|input|base|link|meta)/gi, /eval\s*\(/gi, /Function\s*\(/gi, /document\.(cookie|domain|write|location)/gi, /window\.(location|open|navigate)/gi, /String\.fromCharCode/gi, /atob\s*\(/gi, /btoa\s*\(/gi, /setTimeout\s*\(\s*['"`]/gi, /setInterval\s*\(\s*['"`]/gi, /import\s*\(/gi, /require\s*\(/gi, /data\s*:\s*text\/html/gi, /expression\s*\(/gi, /url\s*\(\s*['"]javascript/gi].some(r => r.test(i)); }
             function _detectPathTraversal(i) { return [/\.\.[\/\\]/, /\.\.%2[fF]/, /%2[eE]%2[eE]/, /[\/\\]\.\.[\/\\]/].some(r => r.test(i)); }
-            function _detectCmdInj(i) { return [ /[;&|`$]/, /\$\(/, /`[^`]+`/, /\/etc\/(passwd|shadow|hosts)/i, /\/proc\//i, /cmd\.exe/i, /powershell/i, /bash\s+-/i, /\/bin\//i, /\bcat\b\s+\/etc/i, /\b(wget|curl)\b/i, /\bnc\b\s+-/i, /\b(python|perl|ruby)\s+-/i ].some(r => r.test(i)); }
-            function _detectSE(i) { return [ /urgent\s+action\s+required/i, /your\s+account\s+(will\s+be|has\s+been)/i, /verify\s+your\s+(identity|account|credentials)/i, /click\s+here\s+to\s+(verify|confirm|update)/i, /suspicious\s+activity\s+(detected|found)/i, /unauthorized\s+access/i, /security\s+alert.*immediate/i, /final\s+warning/i, /act\s+now.*limited\s+time/i, /you'?ve\s+(won|been\s+selected)/i, /free\s+(gift|prize|reward|iphone|money)/i, /congratulations.*you\s+(are|have)/i, /inheritance|lottery|winner/i ].some(r => r.test(i)); }
+            function _detectCmdInj(i) { return [/[;&|`$]/, /\$\(/, /`[^`]+`/, /\/etc\/(passwd|shadow|hosts)/i, /\/proc\//i, /cmd\.exe/i, /powershell/i, /bash\s+-/i, /\/bin\//i, /\bcat\b\s+\/etc/i, /\b(wget|curl)\b/i, /\bnc\b\s+-/i, /\b(python|perl|ruby)\s+-/i].some(r => r.test(i)); }
+            function _detectSE(i) { return [/urgent\s+action\s+required/i, /your\s+account\s+(will\s+be|has\s+been)/i, /verify\s+your\s+(identity|account|credentials)/i, /click\s+here\s+to\s+(verify|confirm|update)/i, /suspicious\s+activity\s+(detected|found)/i, /unauthorized\s+access/i, /security\s+alert.*immediate/i, /final\s+warning/i, /act\s+now.*limited\s+time/i, /you'?ve\s+(won|been\s+selected)/i, /free\s+(gift|prize|reward|iphone|money)/i, /congratulations.*you\s+(are|have)/i, /inheritance|lottery|winner/i].some(r => r.test(i)); }
 
             const _urlWL = ['www.google.com','google.com','www.wikipedia.org','wikipedia.org','vimeo.com','www.vimeo.com','www.bloomberg.com','bloomberg.com','www.canva.com','canva.com','www.linkedin.com','linkedin.com','www.cloudflare.com','cloudflare.com','www.github.com','github.com','www.salesforce.com','salesforce.com','www.apple.com','apple.com','www.spacex.com','spacex.com'];
             function _isURLAllowed(u) { try { const p = new URL(u); return _urlWL.includes(p.hostname) && p.protocol === 'https:'; } catch { return false; } }
@@ -796,7 +447,7 @@
                 const c = document.getElementById('auditLog'); if (!c) return;
                 if (_auditLog.length === 1) c.innerHTML = '';
                 const d = document.createElement('div'); d.className = 'audit-entry';
-                const cls = e.event.includes('BLOCKED') || e.event.includes('THREAT') ? 'blocked' : e.event.includes('WARNING') || e.event.includes('RATE') ? 'warning' : e.event.includes('META') || e.event.includes('HEADER') ? 'info' : '';
+                const cls = e.event.includes('BLOCKED') || e.event.includes('THREAT') ? 'blocked' : e.event.includes('WARNING') || e.event.includes('RATE') ? 'warning' : e.event.includes('META') || e.event.includes('HEADER') || e.event.includes('GTM') ? 'info' : '';
                 d.innerHTML = `<span class="audit-time">[${e.timestamp.split('T')[1].split('.')[0]}]</span> <span class="audit-event ${cls}">${_sanitize(e.event)}</span> <span class="audit-details">${_sanitize(e.message)}</span>`;
                 c.prepend(d); while (c.children.length > 50) c.removeChild(c.lastChild);
             }
@@ -846,9 +497,51 @@
                 return r;
             }
 
+            /* ============================================================
+               DOM INTEGRITY — Updated for GTM compatibility
+               ============================================================
+               GTM dynamically injects <script> tags for Google Analytics
+               and other configured tags. Without this whitelist, the
+               MutationObserver would remove them as "injections".
+
+               Logic:
+               1. Has data-verified? → Skip (our trusted scripts)
+               2. src matches GTM/Google Analytics domain? → Skip (GTM)
+               3. Otherwise → Remove as injection attempt
+               ============================================================ */
             function _monitorIntegrity() {
-                document.querySelectorAll('script:not([data-verified])').forEach(s => { _log('SCRIPT_INJECTION', 'Removed'); _updateScore(-20); s.remove(); });
-                document.querySelectorAll('iframe').forEach(f => { _log('IFRAME_INJECTION', 'Removed'); _updateScore(-20); f.remove(); });
+                document.querySelectorAll('script:not([data-verified])').forEach(s => {
+                    const src = s.getAttribute('src') || '';
+                    if (_isGTMAllowed(src)) {
+                        // GTM-injected script — allow it
+                        return;
+                    }
+                    _log('SCRIPT_INJECTION', `Removed: ${src ? 'external' : 'inline'}`);
+                    _updateScore(-20);
+                    s.remove();
+                });
+                document.querySelectorAll('iframe').forEach(f => {
+                    _log('IFRAME_INJECTION', 'Removed');
+                    _updateScore(-20);
+                    f.remove();
+                });
+            }
+
+            /* --- Check if GTM loaded successfully --- */
+            function _checkGTM() {
+                const loaded = typeof gtag === 'function' && window.dataLayer && window.dataLayer.length > 0;
+                const el = document.getElementById('gtmStatus');
+                if (el) {
+                    if (loaded) {
+                        el.textContent = '✓ Google Tag Manager active (GT-NC6T5LRJ)';
+                        el.className = 'gtm-status active';
+                    } else {
+                        el.textContent = '✗ Google Tag Manager not loaded (blocked by CSP?)';
+                        el.className = 'gtm-status';
+                    }
+                }
+                _log('GTM_CHECK', loaded ? 'GTM loaded successfully' : 'GTM failed to load', { id: 'GT-NC6T5LRJ' });
+                return loaded;
             }
 
             function _initShields() {
@@ -865,6 +558,7 @@
                     { icon:'💻', label:'Cmd Injection', c:'active', v:'ENFORCED' },
                     { icon:'🦠', label:'Malware Defense', c:'active', v:'ENFORCED' },
                     { icon:'📢', label:'Audit Logging', c:'active', v:'ENFORCED' },
+                    { icon:'📊', label:'GTM Script Filter', c:'active', v:'ENFORCED' },
                     { icon:'🪟', label:'Clickjacking (CSP)', c:sv?'active':'meta-only', v:sv?'ENFORCED':'META ONLY' },
                     { icon:'🚫', label:'X-Frame-Options', c:sv?'active':'meta-only', v:sv?'ENFORCED':'META ONLY' },
                     { icon:'📄', label:'X-Content-Type', c:sv?'active':'meta-only', v:sv?'ENFORCED':'META ONLY' },
@@ -883,21 +577,22 @@
 
             function _initProtections() {
                 const el = document.getElementById('activeProtections'); if (!el) return;
-                el.innerHTML = '✓ XSS detection (25+ signatures)<br>✓ SQLi detection (9 patterns)<br>✓ Command injection (14 patterns)<br>✓ Path traversal (4 encodings)<br>✓ Social engineering (14 patterns)<br>✓ URL whitelist (22 domains)<br>✓ Phishing analysis (6 signals)<br>✓ Rate limiting (per-action)<br>✓ Custom secure prompt<br>✓ HTML output encoding<br>✓ noopener noreferrer<br>✓ MutationObserver<br>✓ Audit logging (200 max)<br>✓ Null byte stripping<br>✓ Input length limit (500)';
+                el.innerHTML = '✓ XSS detection (25+ signatures)<br>✓ SQLi detection (9 patterns)<br>✓ Command injection (14 patterns)<br>✓ Path traversal (4 encodings)<br>✓ Social engineering (14 patterns)<br>✓ URL whitelist (22 domains)<br>✓ Phishing analysis (6 signals)<br>✓ Rate limiting (per-action)<br>✓ Custom secure prompt<br>✓ HTML output encoding<br>✓ noopener noreferrer<br>✓ MutationObserver (GTM-aware)<br>✓ GTM script domain whitelist<br>✓ Audit logging (200 max)<br>✓ Null byte stripping<br>✓ Input length limit (500)';
             }
 
             function _initDeployHint() {
                 const el = document.getElementById('deployHint'); if (!el) return;
                 if (_isServerHeaders) { el.style.display = 'none'; return; }
-                el.innerHTML = '<strong>⚠ GITHUB PAGES</strong> does not send HTTP headers. 🟡 shields are meta tags only.<br><br><strong>Fix:</strong> Deploy to <strong>Netlify</strong> (add <code>_headers</code> file) or <strong>Vercel</strong> (add <code>vercel.json</code>). All shields turn 🟢 automatically.';
+                el.innerHTML = '<strong>⚠ GITHUB PAGES</strong> does not send HTTP headers. 🟡 shields are meta tags only. GTM may work via meta CSP but server headers are recommended.<br><br><strong>Fix:</strong> Deploy to <strong>Netlify</strong> (<code>_headers</code>) or <strong>Vercel</strong> (<code>vercel.json</code>).';
             }
 
             return {
                 sanitize: _sanitize, validateInput: _validate, secureOpen: _secureOpen, secureSpeak: _speak,
                 securePrompt: _securePrompt, resolvePrompt: _resolvePrompt, checkRateLimit: _rateLimit,
                 log: _log, showToast: _toast, showThreatAlert: _showThreat, dismissThreat: _dismissThreat,
-                monitorIntegrity: _monitorIntegrity, initShields: _initShields, initProtections: _initProtections,
-                initDeployHint: _initDeployHint, updateScore: _updateScore, calculateScore: _calcScore,
+                monitorIntegrity: _monitorIntegrity, checkGTM: _checkGTM, isGTMAllowed: _isGTMAllowed,
+                initShields: _initShields, initProtections: _initProtections, initDeployHint: _initDeployHint,
+                updateScore: _updateScore, calculateScore: _calcScore,
                 get isServerHeaders() { return _isServerHeaders; }, get score() { return _securityScore; },
                 set pendingResolve(v) { _pendingResolve = v; }
             };
@@ -930,6 +625,9 @@
         Security.calculateScore(); Security.initShields(); Security.initProtections(); Security.initDeployHint();
         Security.log('SYSTEM_INIT', Security.isServerHeaders ? 'Server headers' : 'GitHub Pages mode');
 
+        /* Check GTM after a short delay (async script needs time to load) */
+        setTimeout(() => Security.checkGTM(), 2000);
+
         setInterval(() => Security.monitorIntegrity(), 10000);
         document.addEventListener('contextmenu', () => Security.log('CONTEXT_MENU', 'Right-click'));
         document.addEventListener('keydown', e => {
@@ -939,10 +637,15 @@
         });
 
         const obs = new MutationObserver(m => m.forEach(mu => { if (mu.type !== 'childList' || !mu.addedNodes.length) return; mu.addedNodes.forEach(n => {
-            if (n.nodeName === 'SCRIPT' && !n.hasAttribute('data-verified')) { Security.log('SCRIPT_INJECTION', 'Removed'); Security.updateScore(-20); n.remove(); }
+            if (n.nodeName === 'SCRIPT' && !n.hasAttribute('data-verified')) {
+                const src = n.getAttribute('src') || '';
+                if (Security.isGTMAllowed(src)) return; // Allow GTM scripts
+                Security.log('SCRIPT_INJECTION', `Removed: ${src ? 'external' : 'inline'}`);
+                Security.updateScore(-20); n.remove();
+            }
             if (n.nodeName === 'LINK' && n.rel === 'stylesheet' && !n.hasAttribute('data-verified')) { Security.log('STYLE_INJECTION', 'Detected'); Security.updateScore(-10); }
             if (n.nodeName === 'IFRAME') { Security.log('IFRAME_INJECTION', 'Removed'); Security.updateScore(-20); n.remove(); }
-            if (n.nodeName === 'IMG' && n.src && !n.src.startsWith('data:') && !n.src.startsWith(window.location.origin)) { Security.log('EXTERNAL_IMG', 'Blocked'); n.remove(); }
+            if (n.nodeName === 'IMG' && n.src && !n.src.startsWith('data:') && !n.src.startsWith(window.location.origin) && !Security.isGTMAllowed(n.src)) { Security.log('EXTERNAL_IMG', 'Blocked'); n.remove(); }
         }); }));
         obs.observe(document.documentElement, { childList: true, subtree: true });
 
@@ -952,7 +655,6 @@
             row.id = `f-row-${i}`;
             row.innerHTML = `<div class="room-view" id="room-${i}"><div class="room-door-layer"><div style="font-size:7px;opacity:0.5;margin-bottom:2px;">${Security.sanitize(roomIDs[i])}</div><button onclick="verifyID(${i})" style="font-size:9px;cursor:pointer;min-height:24px;min-width:44px;">VERIFY</button></div><div style="padding:5px;text-align:center;"><div class="ad-text" onclick="handleAdClick(${i})">${Security.sanitize(name)}</div><div class="room-controls"><button class="room-btn" onclick="returnFromFloor(${i})">RETURN</button><button class="room-btn btn-lock" onclick="lockRoom(${i})">LOCK</button></div></div></div><div class="floor-label-text"><b>${Security.sanitize(floorCodes[i])}</b> — ${Security.sanitize(name)}</div>`;
             building.appendChild(row);
-
             const btn = document.createElement('div');
             btn.className = 'circ-btn' + (i === 0 ? ' arrived' : '');
             btn.id = `btn-${i}`;
@@ -961,7 +663,17 @@
             btnContainer.prepend(btn);
         });
 
-        function enterBuilding() { document.body.classList.add('system-active'); Security.log('ENTER', 'User entered'); Security.secureSpeak("Welcome to Skyscraper O S. Security initialized."); }
+        /* Add GTM status line after active protections */
+        const protEl = document.getElementById('activeProtections');
+        if (protEl) {
+            const gtmDiv = document.createElement('div');
+            gtmDiv.id = 'gtmStatus';
+            gtmDiv.className = 'gtm-status';
+            gtmDiv.textContent = '⏳ Checking GTM...';
+            protEl.parentNode.insertBefore(gtmDiv, protEl.nextSibling.nextSibling);
+        }
+
+        function enterBuilding() { document.body.classList.add('system-active'); Security.log('ENTER', 'User entered'); Security.secureSpeak("Welcome to Skyscraper O S."); }
         function exitBuilding() { Object.keys(activeWindows).forEach(k => { try { activeWindows[k].close(); } catch(e) {} delete activeWindows[k]; }); document.body.classList.remove('system-active'); dash.style.display = 'none'; document.getElementById('securityPanel').style.display = 'none'; Security.log('EXIT', 'User exited'); Security.secureSpeak("Logging out."); }
         function changePlatformMode() { const m = document.getElementById('platformSelector').value; building.className = `building-container mode-${m}`; Security.log('MODE', m); Security.secureSpeak(`${m} mode.`); }
         function updateLocationTime() { const l = document.getElementById('locationSelector').value; let n = new Date(); try { if (l==="IN") n=new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"})); else if (l==="US") n=new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"})); } catch(e) {} const h=n.getHours(),b=document.body,s=document.getElementById('status-tag'); if(!isAlarmActive){b.classList.remove('theme-morning','theme-afternoon','theme-evening');if(h>=5&&h<12){b.classList.add('theme-morning');s.innerText="MORNING";}else if(h>=12&&h<17){b.classList.add('theme-afternoon');s.innerText="AFTERNOON";}else if(h>=17&&h<20){b.classList.add('theme-evening');s.innerText="EVENING";}else{s.innerText="NIGHT";}} document.getElementById('clock').innerText=n.toLocaleTimeString('en-GB'); }
@@ -1004,6 +716,7 @@
 
         setInterval(updateLocationTime, 1000); updateLocationTime();
         Security.log('CLIENT','All client protections: ACTIVE');
+        Security.log('GTM_CONFIG','GTM container GT-NC6T5LRJ added to CSP whitelist');
         if(!Security.isServerHeaders){ Security.log('META','frame-ancestors: meta only'); Security.log('META','X-Frame-Options: meta only'); Security.log('META','nosniff: meta only'); Security.log('META','Permissions-Policy: meta only'); Security.log('META','Cache-Control: meta only'); }
     </script>
 
@@ -1017,7 +730,7 @@
       X-XSS-Protection: 1; mode=block
       Referrer-Policy: strict-origin-when-cross-origin
       Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
-      Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content
+      Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://www.google-analytics.com; connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content
       Cache-Control: no-store, no-cache, must-revalidate
     ================================================================
     VERCEL: Create file named "vercel.json" in repo root:
@@ -1031,7 +744,7 @@
           { "key": "X-XSS-Protection", "value": "1; mode=block" },
           { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
           { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=(), payment=()" },
-          { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content" },
+          { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://www.google-analytics.com; connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; block-all-mixed-content" },
           { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
         ]
       }]
