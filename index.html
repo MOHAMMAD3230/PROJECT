@@ -3,26 +3,24 @@
 <head>
 
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GT-NC6T5LRJ');
+  </script>
 
-  gtag('config', 'GT-NC6T5LRJ');
-</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
   <!-- ── Security Meta Tags ── -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-  <!--
-    NOTE: noindex + Google Analytics is contradictory.
-    If you want traffic/tracking, remove noindex.
-    If you want full privacy, remove the GA/AdSense scripts.
-  -->
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="nofollow" />
+
+  <!-- ── Third-Party Verification ── -->
+  <meta name="algolia-site-verification" content="4D0E88B9A4BE8C12" />
 
   <!--
     Content Security Policy (meta-tag — best-effort on GitHub Pages).
@@ -33,28 +31,33 @@
           For full CSP XSS mitigation, move all JS/CSS to external files
           and remove 'unsafe-inline'.
 
-    TRADE-OFF: frame-src and connect-src include Google Ads domains so that
-    AdSense can serve ads via iframes. If you remove AdSense, you can
-    restore frame-src 'none' for stronger clickjacking defense.
+    TRADE-OFF: frame-src and connect-src include Google Ads and DocuScout
+    domains so those services can function. If you remove them, restore
+    frame-src 'none' for stronger clickjacking defense.
   -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self';
              script-src 'self' 'unsafe-inline'
                https://pagead2.googlesyndication.com
-               https://www.googletagmanager.com;
+               https://www.googletagmanager.com
+               https://cdn.metered.ca;
              frame-src
                https://googleads.g.doubleclick.net
-               https://tpc.googlesyndication.com;
+               https://tpc.googlesyndication.com
+               https://cdn.metered.ca;
              connect-src 'self'
                https://www.google-analytics.com
                https://www.googletagmanager.com
                https://googleads.g.doubleclick.net
                https://tpc.googlesyndication.com
                https://pagead2.googlesyndication.com
-               https://stats.g.doubleclick.net;
-             style-src 'self' 'unsafe-inline';
-             img-src 'self' data: https:;
-             media-src https://actions.google.com;
+               https://stats.g.doubleclick.net
+               https://*.metered.ca
+               https://*.algolia.net
+               https://*.algolianet.com;
+             style-src 'self' 'unsafe-inline'
+               https://cdn.metered.ca;
+             img-src 'self' https:;
              font-src 'self';
              object-src 'none';
              base-uri 'self';
@@ -65,9 +68,13 @@
   <link rel="dns-prefetch" href="//www.googletagmanager.com" />
   <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
   <link rel="dns-prefetch" href="//www.google-analytics.com" />
-  <link rel="dns-prefetch" href="//actions.google.com" />
   <link rel="dns-prefetch" href="//googleads.g.doubleclick.net" />
   <link rel="dns-prefetch" href="//tpc.googlesyndication.com" />
+  <link rel="dns-prefetch" href="//cdn.metered.ca" />
+  <link rel="dns-prefetch" href="//www.algolia.com" />
+
+  <!-- DocuScout CSS -->
+  <link rel="stylesheet" href="https://cdn.metered.ca/docuscout/1.0/docuscout.css">
 
   <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
   <title>MY_STUFF</title>
@@ -143,10 +150,8 @@
         0 0 5px #f9fbfb, 0 0 8px #f2f4f5, 0 0 10px #f9fbfb, 0 0 15px #f4f5f6;
     }
 
-    /* ── Categories Box ── */
-    .categories-box {
-      max-width: 420px;
-      margin: 16px auto;
+    /* ── Shared Box Style (Categories & DocuScout) ── */
+    .glow-box {
       background: rgba(0, 0, 20, 0.1);
       border: 2px solid #00bfff;
       border-radius: 10px;
@@ -158,7 +163,16 @@
       position: relative;
       z-index: 1;
     }
-    .categories-box h3 { margin-bottom: 10px; }
+    .glow-box h3 {
+      margin-bottom: 10px;
+      color: #00eaff;
+    }
+
+    /* ── Categories Box ── */
+    .categories-box {
+      max-width: 420px;
+      margin: 16px auto;
+    }
     .categories-box a {
       color: #00bfff;
       text-decoration: none;
@@ -178,6 +192,27 @@
       line-height: 1.8;
     }
 
+    /* ── DocuScout Box ── */
+    .docuscout-box {
+      max-width: 600px;
+      margin: 16px auto;
+    }
+    .docuscout-box p {
+      margin-bottom: 12px;
+      color: #b7b7b7;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .docuscout-box .docuscout-status {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: #555;
+      text-align: right;
+    }
+    .docuscout-box .docuscout-status .active {
+      color: #00ff41;
+    }
+
     /* ── Main Content Layout ── */
     .page-container {
       display: flex;
@@ -192,7 +227,7 @@
 
     /* ── Left Panel ── */
     #left-panel {
-      flex: 0 0 220px;
+      flex: 0 0 260px;
       background: rgba(0, 0, 0, 0.3);
       border-radius: 12px;
       padding: 20px;
@@ -206,20 +241,46 @@
       font-weight: 600;
       font-size: 1rem;
     }
-    #left-panel p { margin-bottom: 12px; line-height: 1.4; font-size: 0.95rem; }
-    #left-panel a {
+
+    /* ── Engine Links (block-level tap targets) ── */
+    .engine-link {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 12px 14px;
+      min-height: 52px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.05);
       color: #ffffff;
       font-weight: bold;
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: background 0.2s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
-    #left-panel a:hover { color: #00e5ff; text-decoration: underline; }
-    #left-panel a:focus-visible {
+    .engine-link:hover {
+      background: rgba(255, 255, 255, 0.12);
+      text-decoration: none;
+    }
+    .engine-link:focus-visible {
       outline: 2px solid #00eaff;
       outline-offset: 2px;
-      border-radius: 3px;
     }
-    #left-panel small { color: #bbbbff; font-weight: normal; font-style: italic; font-size: 0.82rem; }
+    .engine-link:active {
+      background: rgba(0, 191, 255, 0.15);
+    }
+    .engine-name {
+      font-size: 0.95rem;
+      color: #fff;
+    }
+    .engine-desc {
+      color: #bbbbff;
+      font-weight: normal;
+      font-style: italic;
+      font-size: 0.82rem;
+      margin-top: 2px;
+    }
 
     /* ── Footer ── */
     .site-footer {
@@ -232,7 +293,7 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin-top: 40px;
       user-select: none;
-      box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
+      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.05);
       position: relative;
       z-index: 1;
     }
@@ -246,429 +307,18 @@
       position: relative;
       z-index: 1;
     }
-    .policy-links a { color: #00bfff; text-decoration: none; }
+    .policy-links a {
+      color: #00bfff;
+      text-decoration: none;
+      padding: 6px 8px;
+      display: inline-block;
+    }
     .policy-links a:hover { text-decoration: underline; }
     .policy-links a:focus-visible {
       outline: 2px solid #00eaff;
       outline-offset: 2px;
       border-radius: 3px;
     }
-
-    /* ── Floating Action Button (mobile) ── */
-    #fab {
-      display: none;
-      position: fixed;
-      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-      right: 24px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #00bfff, #0080ff);
-      border: none;
-      color: white;
-      font-size: 1.6rem;
-      cursor: pointer;
-      box-shadow: 0 4px 18px rgba(0, 191, 255, 0.6);
-      z-index: 10001;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      line-height: 56px;
-      text-align: center;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #fab:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 24px rgba(0, 191, 255, 0.8);
-    }
-    #fab:active { transform: scale(0.95); }
-    #fab:focus-visible {
-      outline: 3px solid #fff;
-      outline-offset: 3px;
-    }
-
-    /* ── Mobile Panel Overlay ── */
-    #mobile-panel-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      z-index: 10002;
-      visibility: hidden;
-      opacity: 0;
-      transition: visibility 0s 0.35s, opacity 0.35s ease;
-    }
-    #mobile-panel-overlay.active {
-      visibility: visible;
-      opacity: 1;
-      transition: visibility 0s, opacity 0.35s ease;
-    }
-
-    /* ── Mobile Slide Panel ── */
-    #mobile-panel {
-      position: fixed;
-      top: 0; right: -100%;
-      width: 90vw;
-      max-width: 380px;
-      height: 100vh;
-      height: 100dvh;
-      background: rgba(0, 5, 25, 0.97);
-      z-index: 10003;
-      overflow-y: auto;
-      overflow-x: hidden;
-      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: 20px 16px;
-      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-      -webkit-overflow-scrolling: touch;
-    }
-    #mobile-panel.open { right: 0; }
-
-    #mobile-panel-close {
-      position: sticky;
-      top: 0;
-      float: right;
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: white;
-      width: 40px;
-      height: 40px;
-      min-width: 40px;
-      min-height: 40px;
-      border-radius: 50%;
-      font-size: 1.3rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      z-index: 5;
-    }
-    #mobile-panel-close:focus-visible {
-      outline: 2px solid #00eaff;
-      outline-offset: 2px;
-    }
-
-    /* ── Shared Widget Styles ── */
-    .widget {
-      border-radius: 24px;
-      background: rgba(255,255,255,0.12);
-      box-shadow: 0 8px 32px rgba(255,255,255,0.20), inset 0 0 40px rgba(255,255,255,0.12);
-      backdrop-filter: saturate(180%) blur(18px);
-      -webkit-backdrop-filter: saturate(180%) blur(18px);
-      border: 1.5px solid rgba(255,255,255,0.25);
-      color: white;
-      user-select: none;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    .toggle-container {
-      text-align: right;
-      padding: 12px 22px;
-      cursor: pointer;
-      background: rgba(255,255,255,0.10);
-      border-radius: 24px 24px 0 0;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .toggle-btn {
-      font-size: 1rem;
-      border-radius: 16px;
-      border: none;
-      cursor: pointer;
-      padding: 7px 18px;
-      min-height: 40px;
-      font-weight: 700;
-      backdrop-filter: saturate(180%) blur(15px);
-      background: rgba(255,255,255,0.25);
-      color: #eee;
-      transition: background-color 0.3s ease;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .toggle-btn:hover { background: rgba(255,255,255,0.45); }
-    .toggle-btn:focus-visible {
-      outline: 2px solid #00eaff;
-      outline-offset: 2px;
-    }
-
-    .widget-content {
-      padding: 16px 24px 24px 24px;
-      display: none;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    label {
-      font-size: 0.9rem;
-      color: #b7b7b7;
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 8px;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="date"],
-    input[type="time"] {
-      font-size: 16px;
-      border-radius: 16px;
-      border: none;
-      padding: 10px 14px;
-      min-height: 44px;
-      background: rgba(255,255,255,0.15);
-      color: #eee;
-      width: 100%;
-      transition: background-color 0.3s ease;
-      -webkit-appearance: none;
-      appearance: none;
-      touch-action: manipulation;
-    }
-    input:focus {
-      outline: 2px solid rgba(255,255,255,0.45);
-      background: rgba(255,255,255,0.3);
-    }
-
-    .flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .flex-row > div { flex: 1; min-width: 70px; }
-
-    #countdown, #countdownMobile {
-      font-size: 1.5rem;
-      margin-top: 14px;
-      text-align: center;
-      text-shadow: 0 0 6px rgba(255,255,255,0.8);
-      user-select: none;
-      color: #eee;
-      word-break: break-all;
-    }
-
-    .countdown-target {
-      text-align: center;
-      font-size: 0.82rem;
-      color: #88aacc;
-      margin-top: 4px;
-    }
-
-    .action-btn {
-      font-size: 0.85rem;
-      border-radius: 16px;
-      border: none;
-      cursor: pointer;
-      padding: 10px 14px;
-      min-height: 44px;
-      font-weight: 700;
-      backdrop-filter: saturate(180%) blur(12px);
-      background: rgba(255,255,255,0.25);
-      color: #eee;
-      transition: background-color 0.3s ease;
-      white-space: nowrap;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .action-btn:hover { background: rgba(255,255,255,0.45); }
-    .action-btn:focus-visible {
-      outline: 2px solid #00eaff;
-      outline-offset: 2px;
-    }
-
-    /* ── Clock Widget ── */
-    .clock {
-      background: rgba(255,255,255,0.12);
-      border-radius: 18px;
-      padding: 14px;
-      text-align: center;
-      margin-bottom: 16px;
-      color: #eee;
-    }
-    .city { font-weight: 800; font-size: 1.5rem; }
-    .time { font-size: 2rem; font-variant-numeric: tabular-nums; }
-    .date { font-size: 1.1rem; opacity: 0.75; }
-
-    /* ── Tasks ── */
-    #tasks, #tasksMobile { max-height: 400px; overflow-y: auto; }
-    #tasks h2, #tasksMobile h2 {
-      margin-top: 0;
-      font-weight: 800;
-      font-size: 1.3rem;
-      color: #eee;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .task-count {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 191, 255, 0.3);
-      color: #00eaff;
-      font-size: 0.75rem;
-      font-weight: 700;
-      min-width: 22px;
-      height: 22px;
-      border-radius: 11px;
-      padding: 0 6px;
-    }
-    .tasks-empty {
-      color: #777;
-      font-size: 0.85rem;
-      font-style: italic;
-      padding: 10px 0;
-      text-align: center;
-    }
-    #tasksList, #tasksListMobile {
-      list-style: none;
-      padding-left: 0;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    #tasksList li, #tasksListMobile li {
-      padding: 12px 14px;
-      min-height: 44px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.12);
-      margin-bottom: 10px;
-      cursor: pointer;
-      user-select: none;
-      color: #eee;
-      transition: background-color 0.25s ease, opacity 0.25s ease;
-      word-break: break-word;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #tasksList li:hover, #tasksListMobile li:hover { background: rgba(255,255,255,0.25); }
-    #tasksList li:focus-visible, #tasksListMobile li:focus-visible {
-      outline: 2px solid #00eaff;
-      outline-offset: -2px;
-    }
-    #tasksList li.completed, #tasksListMobile li.completed {
-      text-decoration: line-through;
-      opacity: 0.55;
-      color: #bbb;
-    }
-    #tasksList li.completed::before, #tasksListMobile li.completed::before {
-      content: '\2713';
-      color: #4caf50;
-      font-weight: 900;
-      flex-shrink: 0;
-      font-size: 1rem;
-    }
-    #tasksList li:not(.completed)::before, #tasksListMobile li:not(.completed)::before {
-      content: '\25CB';
-      color: #00bfff;
-      flex-shrink: 0;
-      font-size: 1rem;
-    }
-    .task-text { flex: 1; }
-    .task-due {
-      font-size: 0.75rem;
-      color: #999;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    #tasksList li.completed .task-due, #tasksListMobile li.completed .task-due {
-      color: #666;
-    }
-
-    /* ── Calculator ── */
-    #calc-content, #calc-content-mobile {
-      display: none;
-      padding: 16px 24px 24px 24px;
-    }
-    .calc-display {
-      background: rgba(52, 78, 134, 0.8);
-      color: white;
-      padding: 8px 15px;
-      border-radius: 10px;
-      min-height: 70px;
-      user-select: none;
-      word-break: break-all;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-    .calc-expression {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.5);
-      text-align: right;
-      min-height: 1.2em;
-      font-variant-numeric: tabular-nums;
-    }
-    .calc-value {
-      font-size: 2rem;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .calc-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .calc-btn {
-      background: rgba(227, 232, 247, 0.9);
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      padding: 14px 0;
-      min-height: 48px;
-      font-weight: 600;
-      font-size: 1.05rem;
-      color: #222;
-      transition: background 0.2s ease, transform 0.1s ease;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .calc-btn:active { transform: scale(0.95); }
-    .calc-btn:focus-visible {
-      outline: 2px solid #00eaff;
-      outline-offset: 2px;
-    }
-    .calc-btn.operator { background: rgba(90, 115, 244, 0.9); color: white; }
-    .calc-btn.clear { background: rgba(245, 98, 98, 0.9); color: white; }
-    .calc-btn.equal { background: rgba(80, 120, 225, 0.9); color: white; }
-
-    /* ── Desktop Widget Container ── */
-    .widget-container {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 320px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 9999;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-height: calc(100vh - 20px);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .widget-container::-webkit-scrollbar { width: 4px; }
-    .widget-container::-webkit-scrollbar-track { background: transparent; }
-    .widget-container::-webkit-scrollbar-thumb { background: rgba(0,191,255,0.3); border-radius: 4px; }
-
-    /* ── Toast Notification ── */
-    .toast {
-      position: fixed;
-      bottom: calc(30px + env(safe-area-inset-bottom, 0px));
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: rgba(245, 98, 98, 0.95);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 0.9rem;
-      z-index: 99999;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
-      max-width: 90vw;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); }
 
     /* ── No-JS fallback ── */
     .noscript-msg {
@@ -685,41 +335,43 @@
        RESPONSIVE BREAKPOINTS
        ═══════════════════════════════════════ */
 
-    @media (min-width: 769px) and (max-width: 1100px) {
-      .widget-container { width: 270px; }
-      .categories-box { margin-right: 290px; margin-left: 20px; }
-      .page-container { justify-content: flex-start; }
-    }
-
     @media (max-width: 768px) {
       .page-title { font-size: 1.5rem; letter-spacing: 2px; margin-top: 14px; }
-      .categories-box { margin: 12px 16px; padding: 14px 16px; }
+
+      .categories-box {
+        margin: 12px 16px;
+        padding: 14px 16px;
+      }
       .categories-box pre { font-size: 0.9rem; }
-      .page-container { flex-direction: column; align-items: center; padding: 0 12px; }
-      #left-panel { flex: none; width: 100%; }
+
+      /* 44px+ tap targets for category links on mobile */
+      .categories-box a {
+        display: block;
+        padding: 10px 0;
+        line-height: 1.6;
+      }
+
+      .docuscout-box {
+        margin: 12px 16px;
+        padding: 14px 16px;
+      }
+
+      .page-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 12px;
+      }
+      #left-panel {
+        flex: none;
+        width: 100%;
+      }
+
       .site-footer { font-size: 0.78rem; padding: 12px 8px; }
-      .widget-container { display: none !important; }
-      #fab { display: block; }
-      .widget { border-radius: 18px; }
-      .toggle-container { border-radius: 18px 18px 0 0; padding: 10px 18px; }
-      .widget-content { padding: 14px 18px 20px 18px; }
-      #countdown, #countdownMobile { font-size: 1.25rem; }
-      .time { font-size: 1.6rem; }
-      .city { font-size: 1.2rem; }
-      .calc-value { font-size: 1.6rem; }
-      .calc-btn { font-size: 1rem; padding: 12px 0; min-height: 46px; }
     }
 
     @media (max-width: 380px) {
       .page-title { font-size: 1.25rem; letter-spacing: 1px; }
-      .flex-row { gap: 6px; }
-      .action-btn { font-size: 0.8rem; padding: 8px 10px; }
-      .calc-btn { font-size: 0.95rem; min-height: 44px; padding: 10px 0; }
-    }
-
-    @media (min-width: 769px) {
-      #fab { display: none !important; }
-      #mobile-panel, #mobile-panel-overlay { display: none !important; }
+      .docuscout-box { padding: 12px; }
     }
   </style>
 
@@ -755,15 +407,10 @@
     <h1 class="page-title">MY_STUFF</h1>
   </header>
 
-  <!-- Toast for validation messages -->
-  <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
-
-  <!-- Shared beep audio — both desktop and mobile countdowns reference this -->
-  <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-
   <!-- ═══════════ MAIN CONTENT ═══════════ -->
   <main id="main-content">
-    <section class="categories-box" aria-label="Categories">
+
+    <section class="categories-box glow-box" aria-label="Categories">
       <h3>Categories</h3>
       <pre>
 <a href="Elevator.html">Elevator</a>
@@ -774,216 +421,57 @@
    rel="noopener noreferrer"
    target="_blank">MY_STUFF_AIO v2.0</a>
 
-        
       </pre>
+    </section>
+
+    <!-- DocuScout Integration -->
+    <section class="docuscout-box glow-box" aria-label="System documentation search">
+      <h3>&gt; SYSTEM_DOCUMENTATION_SEARCH</h3>
+      <p>Enter a query to search local repositories or chat with the AI assistant.</p>
+      <div id="docuscout-search-bar" role="search"></div>
+      <div class="docuscout-status">
+        CONNECTION_STATUS: <span class="active">ENCRYPTED</span> | KEY_ACTIVE: TRUE
+      </div>
     </section>
 
     <section class="page-container" aria-label="Search engines">
       <div id="left-panel">
         <h5>Search Engines for more</h5>
-        <p>
-          <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Google</a><br>
-          <small>Google will Track You</small>
-        </p>
-        <p>
-          <a href="https://www.startpage.com" target="_blank" rel="noopener noreferrer">Start page</a><br>
-          <small>Most Private search Engine</small>
-        </p>
-        <p>
-          <a href="https://www.ecosia.org" target="_blank" rel="noopener noreferrer">Ecosia</a><br>
-          <small>Save Trees</small>
-        </p>
+
+        <a href="https://www.google.com"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="engine-link">
+          <span class="engine-name">Google</span>
+          <span class="engine-desc">Google will Track You</span>
+        </a>
+
+        <a href="https://www.algolia.com"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="engine-link">
+          <span class="engine-name">Algolia</span>
+          <span class="engine-desc">Fast Search-as-a-Service</span>
+        </a>
+
+        <a href="https://www.startpage.com"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="engine-link">
+          <span class="engine-name">Start page</span>
+          <span class="engine-desc">Most Private search Engine</span>
+        </a>
+
+        <a href="https://www.ecosia.org"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="engine-link">
+          <span class="engine-name">Ecosia</span>
+          <span class="engine-desc">Save Trees</span>
+        </a>
       </div>
     </section>
   </main>
-
-  <!-- ═══════════ MOBILE FAB ═══════════ -->
-  <button id="fab" type="button" aria-label="Open tools panel">&#9881;</button>
-
-  <!-- Mobile panel overlay -->
-  <div id="mobile-panel-overlay" aria-hidden="true"></div>
-
-  <!-- Mobile slide-in panel -->
-  <nav id="mobile-panel" role="dialog" aria-label="Tools" aria-hidden="true">
-    <button id="mobile-panel-close" type="button" aria-label="Close tools panel">&times;</button>
-    <div style="clear:both;"></div>
-
-    <!-- Calculator (mobile) -->
-    <div class="widget">
-      <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="calc-content-mobile" data-label="Calculator" aria-expanded="false">Calculator</button>
-      </div>
-      <div id="calc-content-mobile" class="widget-content" style="display:none;">
-        <div class="calc-display" aria-live="polite" aria-atomic="true">
-          <div class="calc-expression" id="calcExprMobile"></div>
-          <div class="calc-value" id="display-mobile">0</div>
-        </div>
-        <div class="calc-grid" data-calc="mobile">
-          <button class="calc-btn clear" type="button">C</button>
-          <button class="calc-btn backspace" type="button">&larr;</button>
-          <button class="calc-btn operator" data-op="%" type="button">%</button>
-          <button class="calc-btn operator" data-op="/" type="button">&divide;</button>
-          <button class="calc-btn number" data-num="7" type="button">7</button>
-          <button class="calc-btn number" data-num="8" type="button">8</button>
-          <button class="calc-btn number" data-num="9" type="button">9</button>
-          <button class="calc-btn operator" data-op="*" type="button">&times;</button>
-          <button class="calc-btn number" data-num="4" type="button">4</button>
-          <button class="calc-btn number" data-num="5" type="button">5</button>
-          <button class="calc-btn number" data-num="6" type="button">6</button>
-          <button class="calc-btn operator" data-op="-" type="button">&minus;</button>
-          <button class="calc-btn number" data-num="1" type="button">1</button>
-          <button class="calc-btn number" data-num="2" type="button">2</button>
-          <button class="calc-btn number" data-num="3" type="button">3</button>
-          <button class="calc-btn operator" data-op="+" type="button">+</button>
-          <button class="calc-btn number" data-num="0" type="button" style="grid-column: span 2;">0</button>
-          <button class="calc-btn number" data-num="." type="button">.</button>
-          <button class="calc-btn equal" type="button">=</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Countdown (mobile) -->
-    <div class="widget">
-      <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="countdownContentMobile" data-label="Countdown" aria-expanded="false">Countdown</button>
-      </div>
-      <div class="widget-content" id="countdownContentMobile" style="display:none;">
-        <strong style="font-size:1.2rem; font-weight:700;">Mohammad Countdown Timer</strong>
-        <div class="flex-row" style="margin-top:10px;">
-          <div>
-            <label for="addDaysMobile">Days</label>
-            <input type="number" id="addDaysMobile" min="0" max="365" value="0" inputmode="numeric" />
-          </div>
-          <div>
-            <label for="addHoursMobile">Hours</label>
-            <input type="number" id="addHoursMobile" min="0" max="23" value="0" inputmode="numeric" />
-          </div>
-          <div>
-            <label for="addMinutesMobile">Minutes</label>
-            <input type="number" id="addMinutesMobile" min="0" max="59" value="0" inputmode="numeric" />
-          </div>
-        </div>
-        <div class="flex-row" style="margin-top:12px;">
-          <button class="action-btn countdown-apply" type="button" data-calc-id="mobile">Apply</button>
-          <button class="action-btn countdown-start" type="button" data-calc-id="mobile">Start</button>
-          <button class="action-btn countdown-pause" type="button" data-calc-id="mobile">Pause</button>
-          <button class="action-btn countdown-reset" type="button" data-calc-id="mobile">Reset</button>
-        </div>
-        <div id="countdownMobile" aria-live="polite" aria-atomic="true">0d 0h 0m 0s</div>
-        <div class="countdown-target" id="countdownTargetMobile">Not set</div>
-      </div>
-    </div>
-
-    <!-- Delhi Widget (mobile) -->
-    <div class="widget">
-      <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="delhiContentMobile" data-label="Delhi Clock &amp; Tasks" aria-expanded="false">Delhi Clock &amp; Tasks</button>
-      </div>
-      <div class="widget-content" id="delhiContentMobile" style="display:none;">
-        <div class="clock">
-          <div class="city">Delhi</div>
-          <div id="delhiTimeMobile" class="time" aria-live="polite" aria-atomic="true">--:--:--</div>
-          <div id="delhiDateMobile" class="date">--/--/----</div>
-        </div>
-        <div id="tasksMobile">
-          <h2>Tasks <span class="task-count" id="taskCountMobile">0</span></h2>
-          <input type="text" id="taskInputMobile" placeholder="Task description" maxlength="120" autocomplete="off" spellcheck="false" />
-          <input type="date" id="dateInputMobile" />
-          <input type="time" id="timeInputMobile" />
-          <button class="action-btn task-add" type="button" data-panel="mobile">Add Task</button>
-          <ul id="tasksListMobile" role="list" aria-label="Task list"></ul>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ═══════════ DESKTOP WIDGETS ═══════════ -->
-  <aside class="widget-container" aria-label="Desktop tools">
-    <div id="calc-widget" class="widget">
-      <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="calc-content" data-label="Calculator" aria-expanded="false">Calculator</button>
-      </div>
-      <div id="calc-content" class="widget-content" style="display:none;">
-        <div class="calc-display" aria-live="polite" aria-atomic="true">
-          <div class="calc-expression" id="calcExprDesktop"></div>
-          <div class="calc-value" id="display">0</div>
-        </div>
-        <div class="calc-grid" data-calc="desktop">
-          <button class="calc-btn clear" type="button">C</button>
-          <button class="calc-btn backspace" type="button">&larr;</button>
-          <button class="calc-btn operator" data-op="%" type="button">%</button>
-          <button class="calc-btn operator" data-op="/" type="button">&divide;</button>
-          <button class="calc-btn number" data-num="7" type="button">7</button>
-          <button class="calc-btn number" data-num="8" type="button">8</button>
-          <button class="calc-btn number" data-num="9" type="button">9</button>
-          <button class="calc-btn operator" data-op="*" type="button">&times;</button>
-          <button class="calc-btn number" data-num="4" type="button">4</button>
-          <button class="calc-btn number" data-num="5" type="button">5</button>
-          <button class="calc-btn number" data-num="6" type="button">6</button>
-          <button class="calc-btn operator" data-op="-" type="button">&minus;</button>
-          <button class="calc-btn number" data-num="1" type="button">1</button>
-          <button class="calc-btn number" data-num="2" type="button">2</button>
-          <button class="calc-btn number" data-num="3" type="button">3</button>
-          <button class="calc-btn operator" data-op="+" type="button">+</button>
-          <button class="calc-btn number" data-num="0" type="button" style="grid-column: span 2;">0</button>
-          <button class="calc-btn number" data-num="." type="button">.</button>
-          <button class="calc-btn equal" type="button">=</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="mohammad_countdown" class="widget">
-      <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="countdownContent" data-label="Countdown" aria-expanded="false">Countdown</button>
-      </div>
-      <div class="widget-content" id="countdownContent" style="display:none;">
-        <strong style="font-size:1.3rem; font-weight:700;">Mohammad Countdown Timer</strong>
-        <div class="flex-row" style="margin-top:10px;">
-          <div>
-            <label for="addDays">Days</label>
-            <input type="number" id="addDays" min="0" max="365" value="0" inputmode="numeric" />
-          </div>
-          <div>
-            <label for="addHours">Hours</label>
-            <input type="number" id="addHours" min="0" max="23" value="0" inputmode="numeric" />
-          </div>
-          <div>
-            <label for="addMinutes">Minutes</label>
-            <input type="number" id="addMinutes" min="0" max="59" value="0" inputmode="numeric" />
-          </div>
-        </div>
-        <div class="flex-row" style="margin-top:12px;">
-          <button class="action-btn countdown-apply" type="button" data-calc-id="desktop">Apply</button>
-          <button class="action-btn countdown-start" type="button" data-calc-id="desktop">Start</button>
-          <button class="action-btn countdown-pause" type="button" data-calc-id="desktop">Pause</button>
-          <button class="action-btn countdown-reset" type="button" data-calc-id="desktop">Reset</button>
-        </div>
-        <div id="countdown" aria-live="polite" aria-atomic="true">0d 0h 0m 0s</div>
-        <div class="countdown-target" id="countdownTarget">Not set</div>
-      </div>
-    </div>
-
-    <div id="delhi_widget" class="widget">
-      <div class="toggle-container">
-        <button class="toggle-btn" type="button" data-target="delhiContent" data-label="Delhi Clock &amp; Tasks" aria-expanded="false">Delhi Clock &amp; Tasks</button>
-      </div>
-      <div class="widget-content" id="delhiContent" style="display:none;">
-        <div class="clock">
-          <div class="city">Delhi</div>
-          <div id="delhiTime" class="time" aria-live="polite" aria-atomic="true">--:--:--</div>
-          <div id="delhiDate" class="date">--/--/----</div>
-        </div>
-        <div id="tasks">
-          <h2>Tasks <span class="task-count" id="taskCountDesktop">0</span></h2>
-          <input type="text" id="taskInput" placeholder="Task description" maxlength="120" autocomplete="off" spellcheck="false" />
-          <input type="date" id="dateInput" />
-          <input type="time" id="timeInput" />
-          <button class="action-btn task-add" type="button" data-panel="desktop">Add Task</button>
-          <ul id="tasksList" role="list" aria-label="Task list"></ul>
-        </div>
-      </div>
-    </div>
-  </aside>
 
   <!-- ═══════════ FOOTER ═══════════ -->
   <footer>
@@ -995,6 +483,9 @@
       <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a>
     </div>
   </footer>
+
+  <!-- DocuScout JS -->
+  <script src="https://cdn.metered.ca/docuscout/1.0/docuscout.js"></script>
 
   <!-- ═══════════════════════════════════════════════════════════════
        APPLICATION LOGIC
@@ -1031,14 +522,6 @@
        SECURITY UTILITIES
        ================================================================ */
 
-    /** Escape HTML entities to prevent XSS when inserting into DOM */
-    function escapeHTML(str) {
-      if (typeof str !== 'string') return '';
-      var div = document.createElement('div');
-      div.appendChild(document.createTextNode(str));
-      return div.innerHTML;
-    }
-
     /** Validate that a URL uses http: or https: protocol only */
     function isSafeURL(url) {
       if (typeof url !== 'string') return false;
@@ -1050,86 +533,6 @@
       } catch (e) {
         return false;
       }
-    }
-
-    /** Maximum number of tasks to prevent localStorage abuse */
-    var MAX_TASKS = 50;
-
-    /**
-     * Safely parse tasks from localStorage.
-     * Rejects any object that doesn't match the exact expected shape:
-     *   { desc: string (1-120 chars), datetime: number (finite) }
-     * Also rejects arrays with unexpected extra keys (prototype pollution guard).
-     */
-    function safeParseTasks(raw) {
-      if (typeof raw !== 'string' || raw.length === 0) return [];
-      try {
-        var parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return [];
-        return parsed.filter(function(t) {
-          if (t === null || typeof t !== 'object' || Array.isArray(t)) return false;
-          if (Object.prototype.toString.call(t) !== '[object Object]') return false;
-          return (
-            Object.keys(t).length === 2 &&
-            typeof t.desc === 'string' &&
-            typeof t.datetime === 'number' &&
-            t.desc.length <= 120 &&
-            t.desc.length > 0 &&
-            isFinite(t.datetime)
-          );
-        }).map(function(t) {
-          return { desc: t.desc.substring(0, 120), datetime: Number(t.datetime) };
-        });
-      } catch (e) {
-        console.warn('[Security] Corrupted tasks data cleared.');
-        safeRemoveItem('tasks');
-        return [];
-      }
-    }
-
-    /** localStorage wrappers — fail gracefully if storage is blocked */
-    function safeGetItem(key) {
-      try { return localStorage.getItem(key); } catch (e) { return null; }
-    }
-    function safeSetItem(key, value) {
-      try { localStorage.setItem(key, value); }
-      catch (e) { showToast('Storage unavailable — data was not saved.'); }
-    }
-    function safeRemoveItem(key) {
-      try { localStorage.removeItem(key); } catch (e) {}
-    }
-
-    /** Toast notification system */
-    var _toastTimer = null;
-    function showToast(msg, duration) {
-      duration = (typeof duration === 'number' && duration > 0) ? duration : 3000;
-      var el = document.getElementById('toast');
-      if (!el) return;
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(_toastTimer);
-      _toastTimer = setTimeout(function() { el.classList.remove('show'); }, duration);
-    }
-
-    /** Clamp a numeric input value between min and max */
-    function clamp(val, min, max) {
-      var n = parseInt(val, 10);
-      if (isNaN(n)) return min;
-      return Math.min(max, Math.max(min, n));
-    }
-
-    /**
-     * Validate a date+time string combination produces a valid Date.
-     * Rejects NaN dates and dates too far in the past or future.
-     */
-    function isValidTaskDateTime(dateStr, timeStr) {
-      if (!dateStr || !timeStr) return false;
-      var dt = new Date(dateStr + 'T' + timeStr + ':00');
-      if (!isFinite(dt.getTime())) return false;
-      var now = Date.now();
-      /* Reject dates more than 10 years in the past or 100 years in future */
-      if (dt.getTime() < now - 315360000000 || dt.getTime() > now + 3153600000000) return false;
-      return true;
     }
 
     /* ================================================================
@@ -1144,7 +547,6 @@
         var href = link.getAttribute('href');
         if (!isSafeURL(href)) {
           e.preventDefault();
-          showToast('Blocked: unsafe link detected.');
           return;
         }
       });
@@ -1152,6 +554,10 @@
 
     /* ================================================================
        MATRIX BACKGROUND
+       Uses requestAnimationFrame instead of setInterval for:
+         - Automatic pause when tab is hidden (saves CPU/battery)
+         - No flash/stutter when returning to a backgrounded tab
+         - Smoother frame timing aligned with display refresh rate
        ================================================================ */
     function initializeMatrix() {
       var canvas = document.getElementById('matrix');
@@ -1160,29 +566,34 @@
       if (!ctx) return;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-      function resize() {
-        canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      resize();
-
       var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?';
       var fontSize = 20;
       var columns, drops;
+      var lastTime = 0;
+      var frameInterval = 50; /* ~20fps — matches original visual speed */
 
-      function buildDrops() {
+      function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
         columns = Math.floor(canvas.width / fontSize);
         drops = [];
         for (var i = 0; i < columns; i++) {
           drops[i] = Math.random() * (canvas.height / fontSize) | 0;
         }
       }
-      buildDrops();
+      resize();
 
-      var matrixInterval = setInterval(function() {
+      function animate(timestamp) {
+        requestAnimationFrame(animate);
+
+        /* Throttle to ~20fps to keep the classic matrix drip speed */
+        if (timestamp - lastTime < frameInterval) return;
+        lastTime = timestamp;
+
         ctx.fillStyle = 'rgba(0, 0, 16, 0.1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.font = fontSize + 'px monospace';
+
         for (var i = 0; i < drops.length; i++) {
           var text = chars.charAt(Math.floor(Math.random() * chars.length));
           ctx.fillStyle = (i % 2 === 0) ? '#00bfff' : '#e0f7ff';
@@ -1192,479 +603,30 @@
           }
           drops[i]++;
         }
-      }, 50);
+      }
+
+      requestAnimationFrame(animate);
 
       var rt;
       window.addEventListener('resize', function() {
         clearTimeout(rt);
-        rt = setTimeout(function() { resize(); buildDrops(); }, 200);
+        rt = setTimeout(resize, 200);
       });
     }
 
     /* ================================================================
-       CALCULATOR
-       Supports click and keyboard input (desktop only).
-       Shows pending expression above the current value.
+       DOCUSCOUT INITIALIZATION
        ================================================================ */
-    var OP_SYMBOLS = { '+': '+', '-': '−', '*': '×', '/': '÷', '%': '%' };
-
-    function createCalculator(gridEl, valueEl, exprEl) {
-      var current = '0', prev = '', op = null, resetNext = false;
-      var MAX_LEN = 20;
-
-      function updateDisplay() {
-        valueEl.textContent = current;
-      }
-
-      function updateExpression() {
-        if (op && prev !== '') {
-          exprEl.textContent = prev + ' ' + (OP_SYMBOLS[op] || op);
-        } else {
-          exprEl.textContent = '';
-        }
-      }
-
-      gridEl.addEventListener('click', function(e) {
-        var btn = e.target.closest('.calc-btn');
-        if (!btn) return;
-        handleButton(btn);
-      });
-
-      function handleButton(btn) {
-        if (btn.classList.contains('number')) {
-          var num = btn.getAttribute('data-num');
-          if (num === null || num === undefined) return;
-          if (resetNext) { current = num; resetNext = false; }
-          else {
-            if (num === '.' && current.indexOf('.') !== -1) return;
-            current = (current === '0' && num !== '.') ? num : current + num;
-          }
-          if (current.length > MAX_LEN) current = current.substring(0, MAX_LEN);
-          updateDisplay();
-
-        } else if (btn.classList.contains('operator')) {
-          var opVal = btn.getAttribute('data-op');
-          if (opVal === null) return;
-          /* Chain operations: if there's a pending op, evaluate first */
-          if (op && prev !== '' && !resetNext) {
-            evaluate();
-          }
-          op = opVal;
-          prev = current;
-          resetNext = true;
-          updateExpression();
-
-        } else if (btn.classList.contains('clear')) {
-          current = '0'; prev = ''; op = null; resetNext = false;
-          updateDisplay();
-          updateExpression();
-
-        } else if (btn.classList.contains('backspace')) {
-          if (resetNext) return;
-          current = current.slice(0, -1) || '0';
-          updateDisplay();
-
-        } else if (btn.classList.contains('equal')) {
-          evaluate();
-          updateExpression();
-        }
-      }
-
-      function evaluate() {
-        if (op && prev !== '') {
-          var a = parseFloat(prev), b = parseFloat(current), r;
-          switch (op) {
-            case '+': r = a + b; break;
-            case '-': r = a - b; break;
-            case '*': r = a * b; break;
-            case '/': case '%':
-              if (b === 0) {
-                valueEl.textContent = 'Error';
-                current = '0'; prev = ''; op = null; resetNext = true;
-                return;
-              }
-              r = (op === '/') ? a / b : a % b;
-              break;
-            default: r = b;
-          }
-          if (!isFinite(r) || isNaN(r)) {
-            valueEl.textContent = 'Error'; current = '0';
-          } else {
-            r = Math.round(r * 1e12) / 1e12;
-            current = String(r);
-            if (current.length > MAX_LEN) current = current.substring(0, MAX_LEN);
-            updateDisplay();
-          }
-          prev = ''; op = null; resetNext = true;
-        }
-      }
-
-      /* Expose handleButton for keyboard support */
-      return { handleButton: handleButton };
-    }
-
-    /* ================================================================
-       CALCULATOR KEYBOARD SUPPORT (desktop only)
-       Only captures keys when a calculator widget is open and
-       focus is not in a text input.
-       ================================================================ */
-    function initCalcKeyboard(desktopCalc, mobileCalc) {
-      document.addEventListener('keydown', function(e) {
-        /* Don't intercept when user is typing in inputs */
-        var tag = e.target.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-
-        /* Determine which calculator is open */
-        var desktopOpen = document.getElementById('calc-content').style.display === 'flex';
-        var mobileOpen = document.getElementById('calc-content-mobile').style.display === 'flex';
-        if (!desktopOpen && !mobileOpen) return;
-
-        var calc = desktopOpen ? desktopCalc : mobileCalc;
-        if (!calc) return;
-
-        /* Map keys to button selectors */
-        var selector = null;
-        if (e.key >= '0' && e.key <= '9') {
-          selector = '[data-num="' + e.key + '"]';
-        } else if (e.key === '.') {
-          selector = '[data-num="."]';
-        } else if (e.key === '+') {
-          selector = '[data-op="+"]';
-        } else if (e.key === '-') {
-          selector = '[data-op="-"]';
-        } else if (e.key === '*') {
-          selector = '[data-op="*"]';
-        } else if (e.key === '/') {
-          e.preventDefault(); /* Prevent Firefox quick-find */
-          selector = '[data-op="/"]';
-        } else if (e.key === '%') {
-          selector = '[data-op="%"]';
-        } else if (e.key === 'Enter' || e.key === '=') {
-          selector = '.equal';
-        } else if (e.key === 'Backspace') {
-          selector = '.backspace';
-        } else if (e.key === 'Escape' || e.key === 'Delete') {
-          selector = '.clear';
-        }
-
-        if (!selector) return;
-
-        var grid = desktopOpen
-          ? document.querySelector('.calc-grid[data-calc="desktop"]')
-          : document.querySelector('.calc-grid[data-calc="mobile"]');
-        if (!grid) return;
-
-        var btn = grid.querySelector(selector);
-        if (btn) {
-          e.preventDefault();
-          calc.handleButton(btn);
-        }
-      });
-    }
-
-    /* ================================================================
-       COUNTDOWN TIMER
-       "Apply" sets target = now + specified duration (consistent behavior).
-       "Start" begins the countdown interval.
-       "Pause" freezes the countdown (resumes from where it left off).
-       "Reset" clears everything to zero.
-       ================================================================ */
-    function createCountdown(cfg) {
-      var el = document.getElementById(cfg.displayId);
-      var targetEl = document.getElementById(cfg.targetId);
-      var dIn = document.getElementById(cfg.daysId);
-      var hIn = document.getElementById(cfg.hoursId);
-      var mIn = document.getElementById(cfg.minutesId);
-      var beep = document.getElementById('beepSound');
-
-      var target = 0;
-      var interval = null, paused = false, pauseRemaining = 0;
-
-      function formatTargetDate(ts) {
-        if (!ts || ts <= 0) return 'Not set';
-        return 'Target: ' + new Date(ts).toLocaleString();
-      }
-
-      function update() {
-        var diff = target - Date.now();
-        if (diff <= 0) {
-          clearInterval(interval); interval = null;
-          el.textContent = "Time's up!";
-          if (targetEl) targetEl.textContent = 'Finished';
-          if (beep) { beep.play().catch(function() {}); }
-          return;
-        }
-        var d = Math.floor(diff / 86400000);
-        var h = Math.floor((diff % 86400000) / 3600000);
-        var m = Math.floor((diff % 3600000) / 60000);
-        var s = Math.floor((diff % 60000) / 1000);
-        el.textContent = d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
-      }
-
-      return {
-        start: function() {
-          if (interval) return;
-          if (target <= 0) {
-            showToast('Set a duration first, then click Apply.');
-            return;
-          }
-          if (paused && pauseRemaining > 0) {
-            /* Resume from paused state */
-            target = Date.now() + pauseRemaining;
-            paused = false;
-          }
-          interval = setInterval(update, 1000);
-          update();
-        },
-        pause: function() {
-          if (!interval) return;
-          clearInterval(interval); interval = null;
-          pauseRemaining = Math.max(0, target - Date.now());
-          paused = true;
-        },
-        reset: function() {
-          clearInterval(interval); interval = null;
-          paused = false; pauseRemaining = 0; target = 0;
-          if (dIn) dIn.value = 0;
-          if (hIn) hIn.value = 0;
-          if (mIn) mIn.value = 0;
-          el.textContent = '0d 0h 0m 0s';
-          if (targetEl) targetEl.textContent = 'Not set';
-        },
-        apply: function() {
-          /* Stop any running countdown */
-          clearInterval(interval); interval = null;
-          paused = false; pauseRemaining = 0;
-
-          var d = clamp(dIn ? dIn.value : 0, 0, 365);
-          var h = clamp(hIn ? hIn.value : 0, 0, 23);
-          var m = clamp(mIn ? mIn.value : 0, 0, 59);
-          if (dIn) dIn.value = d;
-          if (hIn) hIn.value = h;
-          if (mIn) mIn.value = m;
-
-          var totalMs = d * 86400000 + h * 3600000 + m * 60000;
-          if (totalMs <= 0) {
-            showToast('Enter a duration greater than zero.');
-            return;
-          }
-          target = Date.now() + totalMs;
-          update();
-          if (targetEl) targetEl.textContent = formatTargetDate(target);
-        }
-      };
-    }
-
-    /* ================================================================
-       DELHI CLOCK
-       ================================================================ */
-    function startDelhiClock(timeEl, dateEl) {
-      if (!timeEl || !dateEl) return;
-      function tick() {
-        var now = new Date();
-        timeEl.textContent = now.toLocaleTimeString('en-US', {
-          timeZone: 'Asia/Kolkata', hour12: false
+    function initializeDocuScout() {
+      try {
+        var docuscout = new DocuScout();
+        docuscout.init({
+          key: "20cb457b0c285be48c99ae98728892bb1ba1d78a",
+          container: "docuscout-search-bar"
         });
-        dateEl.textContent = now.toLocaleDateString('en-US', {
-          timeZone: 'Asia/Kolkata'
-        });
+      } catch (error) {
+        /* Fail silently — DocuScout is non-critical functionality */
       }
-      tick();
-      setInterval(tick, 1000);
-    }
-
-    /* ================================================================
-       TASK MANAGER
-       Both desktop and mobile instances share the same localStorage key.
-       Changes in one panel trigger a 'tasks-updated' custom event so
-       the other panel stays in sync without a page reload.
-       ================================================================ */
-    function createTaskManager(cfg) {
-      var inputEl = document.getElementById(cfg.inputId);
-      var dateEl  = document.getElementById(cfg.dateId);
-      var timeEl  = document.getElementById(cfg.timeId);
-      var listEl  = document.getElementById(cfg.listId);
-      var countEl = document.getElementById(cfg.countId);
-
-      function load() {
-        if (!listEl) return;
-        var tasks = safeParseTasks(safeGetItem('tasks'));
-        listEl.innerHTML = '';
-
-        /* Update count badge */
-        if (countEl) countEl.textContent = String(tasks.length);
-
-        if (tasks.length === 0) {
-          var empty = document.createElement('li');
-          empty.className = 'tasks-empty';
-          empty.textContent = 'No tasks yet. Add one above.';
-          empty.setAttribute('role', 'listitem');
-          empty.style.cursor = 'default';
-          empty.style.background = 'none';
-          empty.style.padding = '10px 0';
-          empty.style.minHeight = 'auto';
-          listEl.appendChild(empty);
-          return;
-        }
-
-        var now = Date.now();
-        tasks.forEach(function(task, i) {
-          var li = document.createElement('li');
-          li.setAttribute('role', 'listitem');
-          li.setAttribute('tabindex', '0');
-          li.setAttribute('aria-label', 'Task: ' + task.desc + '. Click to remove.');
-
-          var isCompleted = task.datetime <= now;
-          if (isCompleted) li.classList.add('completed');
-
-          var textSpan = document.createElement('span');
-          textSpan.className = 'task-text';
-          textSpan.textContent = task.desc;
-          li.appendChild(textSpan);
-
-          var dueSpan = document.createElement('span');
-          dueSpan.className = 'task-due';
-          dueSpan.textContent = new Date(task.datetime).toLocaleString();
-          li.appendChild(dueSpan);
-
-          function remove() {
-            var currentTasks = safeParseTasks(safeGetItem('tasks'));
-            if (i < currentTasks.length) {
-              currentTasks.splice(i, 1);
-              safeSetItem('tasks', JSON.stringify(currentTasks));
-            }
-            /* Notify other panel instances */
-            window.dispatchEvent(new CustomEvent('tasks-updated'));
-          }
-
-          li.addEventListener('click', remove);
-          li.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); remove(); }
-          });
-          listEl.appendChild(li);
-        });
-      }
-
-      function add() {
-        if (!inputEl || !dateEl || !timeEl) return;
-        var desc = inputEl.value.trim();
-        var date = dateEl.value;
-        var time = timeEl.value;
-
-        if (!desc) { showToast('Please enter a task description.'); inputEl.focus(); return; }
-        if (!date) { showToast('Please select a date.'); dateEl.focus(); return; }
-        if (!time) { showToast('Please select a time.'); timeEl.focus(); return; }
-
-        if (!isValidTaskDateTime(date, time)) {
-          showToast('Invalid date or time value.');
-          return;
-        }
-
-        var tasks = safeParseTasks(safeGetItem('tasks'));
-        if (tasks.length >= MAX_TASKS) {
-          showToast('Maximum ' + MAX_TASKS + ' tasks reached. Remove some first.');
-          return;
-        }
-
-        var dt = new Date(date + 'T' + time + ':00').getTime();
-        tasks.push({ desc: desc.substring(0, 120), datetime: dt });
-        safeSetItem('tasks', JSON.stringify(tasks));
-
-        inputEl.value = ''; dateEl.value = ''; timeEl.value = '';
-        inputEl.focus();
-
-        /* Notify other panel instances */
-        window.dispatchEvent(new CustomEvent('tasks-updated'));
-      }
-
-      /* Listen for changes from the other panel */
-      window.addEventListener('tasks-updated', function() { load(); });
-
-      return { load: load, add: add };
-    }
-
-    /* ================================================================
-       WIDGET TOGGLES
-       On mobile, scrolls the opened widget into view so it isn't
-       hidden behind the keyboard or off-screen.
-       ================================================================ */
-    function initToggles() {
-      document.querySelectorAll('.toggle-btn[data-target]').forEach(function(btn) {
-        var origLabel = btn.getAttribute('data-label') || 'Widget';
-        btn._origLabel = origLabel;
-
-        btn.addEventListener('click', function() {
-          var targetId = btn.getAttribute('data-target');
-          var t = document.getElementById(targetId);
-          if (!t) return;
-          var isOpen = t.style.display === 'flex';
-          t.style.display = isOpen ? 'none' : 'flex';
-          btn.textContent = isOpen ? btn._origLabel : 'Hide';
-          btn.setAttribute('aria-expanded', String(!isOpen));
-
-          /* On mobile, scroll the opened widget into view */
-          if (!isOpen && window.innerWidth <= 768) {
-            setTimeout(function() {
-              t.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 80);
-          }
-        });
-      });
-    }
-
-    /* ================================================================
-       MOBILE PANEL
-       Includes focus trapping for accessibility when the panel is open.
-       ================================================================ */
-    function initMobilePanel() {
-      var fab      = document.getElementById('fab');
-      var panel    = document.getElementById('mobile-panel');
-      var overlay  = document.getElementById('mobile-panel-overlay');
-      var closeBtn = document.getElementById('mobile-panel-close');
-      if (!fab || !panel || !overlay || !closeBtn) return;
-
-      function getFocusable() {
-        return panel.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-      }
-
-      function trapFocus(e) {
-        if (e.key !== 'Tab') return;
-        var focusable = getFocusable();
-        if (focusable.length === 0) return;
-        var first = focusable[0], last = focusable[focusable.length - 1];
-        if (e.shiftKey) {
-          if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-        } else {
-          if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-        }
-      }
-
-      function open() {
-        panel.classList.add('open');
-        overlay.classList.add('active');
-        panel.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        setTimeout(function() { closeBtn.focus(); }, 100);
-        panel.addEventListener('keydown', trapFocus);
-      }
-
-      function close() {
-        panel.classList.remove('open');
-        overlay.classList.remove('active');
-        panel.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        panel.removeEventListener('keydown', trapFocus);
-        fab.focus();
-      }
-
-      fab.addEventListener('click', open);
-      closeBtn.addEventListener('click', close);
-      overlay.addEventListener('click', close);
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && panel.classList.contains('open')) close();
-      });
     }
 
     /* ================================================================
@@ -1672,112 +634,7 @@
        ================================================================ */
     document.addEventListener('DOMContentLoaded', function() {
       initializeMatrix();
-      initToggles();
-      initMobilePanel();
-
-      /* ── Desktop Calculator ── */
-      var dg = document.querySelector('.calc-grid[data-calc="desktop"]');
-      var dv = document.getElementById('display');
-      var de = document.getElementById('calcExprDesktop');
-      var desktopCalc = null;
-      if (dg && dv && de) desktopCalc = createCalculator(dg, dv, de);
-
-      /* ── Mobile Calculator ── */
-      var mg = document.querySelector('.calc-grid[data-calc="mobile"]');
-      var mv = document.getElementById('display-mobile');
-      var me = document.getElementById('calcExprMobile');
-      var mobileCalc = null;
-      if (mg && mv && me) mobileCalc = createCalculator(mg, mv, me);
-
-      /* ── Keyboard support (desktop only) ── */
-      initCalcKeyboard(desktopCalc, mobileCalc);
-
-      /* ── Desktop Countdown ── */
-      var dc = createCountdown({
-        displayId: 'countdown',
-        targetId: 'countdownTarget',
-        daysId: 'addDays',
-        hoursId: 'addHours',
-        minutesId: 'addMinutes'
-      });
-
-      /* ── Mobile Countdown ── */
-      var mc = createCountdown({
-        displayId: 'countdownMobile',
-        targetId: 'countdownTargetMobile',
-        daysId: 'addDaysMobile',
-        hoursId: 'addHoursMobile',
-        minutesId: 'addMinutesMobile'
-      });
-
-      /* ── Wire countdown buttons ── */
-      document.querySelectorAll('.countdown-apply').forEach(function(b) {
-        b.addEventListener('click', function() {
-          (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).apply();
-        });
-      });
-      document.querySelectorAll('.countdown-start').forEach(function(b) {
-        b.addEventListener('click', function() {
-          (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).start();
-        });
-      });
-      document.querySelectorAll('.countdown-pause').forEach(function(b) {
-        b.addEventListener('click', function() {
-          (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).pause();
-        });
-      });
-      document.querySelectorAll('.countdown-reset').forEach(function(b) {
-        b.addEventListener('click', function() {
-          (b.getAttribute('data-calc-id') === 'desktop' ? dc : mc).reset();
-        });
-      });
-
-      /* ── Delhi clocks ── */
-      startDelhiClock(
-        document.getElementById('delhiTime'),
-        document.getElementById('delhiDate')
-      );
-      startDelhiClock(
-        document.getElementById('delhiTimeMobile'),
-        document.getElementById('delhiDateMobile')
-      );
-
-      /* ── Task managers (shared localStorage, synced via custom events) ── */
-      var dt = createTaskManager({
-        inputId: 'taskInput', dateId: 'dateInput',
-        timeId: 'timeInput', listId: 'tasksList',
-        countId: 'taskCountDesktop'
-      });
-      dt.load();
-
-      var mt = createTaskManager({
-        inputId: 'taskInputMobile', dateId: 'dateInputMobile',
-        timeId: 'timeInputMobile', listId: 'tasksListMobile',
-        countId: 'taskCountMobile'
-      });
-      mt.load();
-
-      /* ── Wire task-add buttons ── */
-      document.querySelectorAll('.task-add').forEach(function(b) {
-        b.addEventListener('click', function() {
-          (b.getAttribute('data-panel') === 'desktop' ? dt : mt).add();
-        });
-      });
-
-      /* ── Allow Enter key to submit tasks from the text input ── */
-      var taskInputs = [
-        document.getElementById('taskInput'),
-        document.getElementById('taskInputMobile')
-      ];
-      taskInputs.forEach(function(inp, idx) {
-        if (!inp) return;
-        inp.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            (idx === 0 ? dt : mt).add();
-          }
-        });
-      });
+      initializeDocuScout();
     });
   </script>
 </body>
