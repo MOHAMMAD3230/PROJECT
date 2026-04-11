@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TAC/COM v12.4.1 | ASHRAF ALI MASTER</title>
+    <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.4/dist/mqtt.min.js"></script>
+    <style>
+        :root {
+            --g: #39ff14; --b: #00d4ff; --r: #ff3131; --y: #ffcc00;
+            --case: #1a1a1a; --chassis-w: clamp(320px, 95vw, 380px);
+        }
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        body { background: #000; color: var(--g); font-family: 'Courier New', monospace; margin: 0; padding: 20px; min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
+        
+        #scannerCanvas { position: fixed; inset: 0; z-index: -1; opacity: 0.1; }
+
+        .chassis {
+            width: var(--chassis-w); min-height: 95vh; 
+            background: linear-gradient(180deg, #1e1e1e 0%, #0a0a0a 100%);
+            border: 12px solid #2a2a2a; border-radius: 35px 35px 75px 75px;
+            padding: 20px; box-shadow: 0 50px 100px rgba(0,0,0,1);
+            position: relative; border-bottom: 35px solid #050505;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        /* HARDWARE STYLES */
+        .antenna-stub { position: absolute; top: -60px; left: 40px; width: 12px; height: 70px; background: #111; border: 3px solid #333; border-radius: 4px 4px 0 0; z-index: -1; }
+        
+        .top-deck { height: 50px; display: flex; align-items: center; justify-content: space-between; position: relative; padding: 0 5px; margin-bottom: 5px; }
+        .sig-bars { display: flex; gap: 3px; align-items: flex-end; height: 22px; }
+        .bar { width: 5px; background: #111; border-radius: 1px; transition: 0.2s; }
+        
+        .indicator-cluster { display: flex; align-items: center; gap: 15px; }
+        .nozzle-dial { 
+            width: 42px; height: 42px; 
+            background: conic-gradient(#222 0deg 90deg, #111 90deg 180deg, #222 180deg 270deg, #111 270deg 360deg); 
+            border-radius: 50%; border: 4px solid #444; cursor: pointer; 
+            position: relative; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .nozzle-dial::after { content: ''; position: absolute; top: 4px; left: 50%; width: 4px; height: 8px; background: var(--r); transform: translateX(-50%); border-radius: 2px; }
+        .status-led { width: 18px; height: 18px; background: #000; border-radius: 50%; border: 2px solid #333; }
+
+        @keyframes blink-r { 0%, 49% { background: var(--r); } 50%, 100% { background: #300; } }
+        @keyframes blink-g { 0%, 49% { background: var(--g); } 50%, 100% { background: #030; } }
+        @keyframes blink-y { 0%, 49% { background: var(--y); } 50%, 100% { background: #330; } }
+        .led-red, .sig-red .bar { animation: blink-r 1s steps(1) infinite; }
+        .led-green, .sig-green .bar { animation: blink-g 1s steps(1) infinite; }
+        .led-orange, .sig-orange .bar { animation: blink-y 1s steps(1) infinite; }
+
+        .speaker-grille { width: 100%; height: 40px; background: radial-gradient(circle, #222 1.5px, transparent 2px); background-size: 7px 7px; border: 1px solid #1a1a1a; border-radius: 4px; opacity: 0.4; margin: 5px 0; }
+        
+        .pwr-strip { display: flex; gap: 10px; }
+        .mech-btn { flex: 1; padding: 12px; background: #151515; color: #444; font-weight: 900; font-size: 0.65rem; border: 1px solid #333; border-bottom: 5px solid #000; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+        .pwr-on.active { color: var(--g); border-color: var(--g); }
+        .pwr-off.active { color: var(--r); border-color: var(--r); }
+
+        .screen { background: #050505; border: 4px solid #222; border-radius: 6px; height: 110px; position: relative; padding: 10px; overflow: hidden; }
+        .screen::before { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03)); background-size: 100% 2px, 3px 100%; pointer-events: none; z-index: 2; }
+        .lit.screen { background: #000a00; border-color: #333; }
+        #scope { width: 100%; height: 45px; opacity: 0; }
+        .lit #scope { opacity: 1; }
+
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .field { background: #000; border: 1px solid #333; color: var(--b); padding: 10px; font-family: inherit; text-align: center; width: 100%; font-weight: bold; border-radius: 4px; font-size: 1rem; }
+
+        .action-bay { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; border: 1px solid #222; margin-top: auto; }
+        .anc-stack { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .anc-led { width: 12px; height: 12px; background: #111; border-radius: 50%; border: 2px solid #333; }
+        .anc-toggle { width: 60px; padding: 8px 0; background: #111; border: 1px solid #333; border-bottom: 3px solid #000; border-radius: 4px; color: #444; font-size: 0.5rem; font-weight: 900; cursor: pointer; }
+        .anc-toggle.on { color: var(--b); border-color: var(--b); }
+
+        .ptt-lever { flex-grow: 1; margin-left: 15px; height: 70px; background: #111; border: 3px solid #222; border-bottom: 8px solid #000; border-radius: 12px; color: #222; font-weight: 900; font-size: 1.1rem; cursor: not-allowed; transition: 0.1s; }
+        .ptt-lever.unlocked { background: #1a0a0a; border-color: #333; color: #333; cursor: pointer; pointer-events: auto; }
+        .ptt-lever.unlocked.ready { border-color: var(--r); color: var(--r); }
+        .ptt-lever.unlocked:active { transform: translateY(4px); border-bottom-width: 2px; background: var(--r); color: #000; }
+
+        /* FOOTER MODULE */
+        .stats-footer { border-top: 1px solid #222; padding-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .stat-line { display: flex; justify-content: space-between; align-items: center; }
+        .stat-label { font-size: 0.55rem; font-weight: 900; color: #444; }
+        .val-norm { font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; }
+        
+        /* OFFICIAL PROJECT FOOTER */
+        .official-footer { margin-top: 12px; border-top: 1px dashed #1a1a1a; padding-top: 8px; text-align: center; }
+        .footer-text { font-size: 0.6rem; color: #333; letter-spacing: 1px; font-weight: bold; text-transform: uppercase; }
+        .footer-sub { font-size: 0.45rem; color: #222; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+<canvas id="scannerCanvas"></canvas>
+
+<div class="chassis">
+    <div class="antenna-stub"></div>
+
+    <div class="top-deck">
+        <div id="rssi" class="signal-block">
+            <div class="sig-bars">
+                <div class="bar" style="height:6px"></div><div class="bar" style="height:10px"></div><div class="bar" style="height:14px"></div><div class="bar" style="height:18px"></div><div class="bar" style="height:22px"></div>
+            </div>
+        </div>
+        <div class="indicator-cluster">
+            <div id="nozzle" class="nozzle-dial" onclick="handleNoz(event)"></div>
+            <div id="led" class="status-led"></div>
+        </div>
+    </div>
+
+    <div class="module-controls">
+        <div class="pwr-strip">
+            <button id="bOn" class="mech-btn pwr-on" onclick="pwr(true)">Master On</button>
+            <button id="bOff" class="mech-btn pwr-off active" onclick="pwr(false)">Master Off</button>
+        </div>
+        <div class="screen" id="scr">
+            <canvas id="scope"></canvas>
+            <div id="sys" style="height:35px; overflow-y:auto; font-size:0.55rem; opacity:0; color:var(--g); padding:2px;"></div>
+        </div>
+    </div>
+
+    <div class="speaker-grille"></div>
+
+    <div class="input-grid">
+        <input type="number" id="ch" class="field" value="88">
+        <input type="password" id="key" class="field" value="TAC">
+        <button id="hBtn" class="mech-btn" onclick="conn('host')">Host</button>
+        <button id="jBtn" class="mech-btn" onclick="conn('client')">Join</button>
+    </div>
+
+    <div class="action-bay">
+        <div class="anc-stack">
+            <div id="ancLed" class="anc-led"></div>
+            <button id="ancBtn" class="anc-toggle" onclick="toggleAnc()">ANC OFF</button>
+        </div>
+        <button id="ptt" class="ptt-lever">LOCKED</button>
+    </div>
+
+    <div class="stats-footer">
+        <div class="stat-line">
+            <span class="stat-label">LINK_SECURE:</span>
+            <span id="rfSt" class="val-norm" style="color:var(--r)">OFFLINE</span>
+        </div>
+        <div class="stat-line">
+            <span class="stat-label">BATT_VOLTS:</span>
+            <span id="vlt" class="val-norm" style="color:var(--y)">0.00V</span>
+        </div>
+    </div>
+
+    <div class="official-footer">
+        <div class="footer-text">© 2026 ASHRAF ALI</div>
+        <div class="footer-sub">TAC/COM v12.4.1 | ENCRYPTED RELAY PROTOCOL</div>
+    </div>
+</div>
+
+<script>
+let mc, mic, actx, ana, pG, ck, isTx=false, isPwr=false, isConn=false, isAnc=false, nxt=0, rotA=0;
+const SR=12000, TP='ashraf_v12_4_1/';
+
+function handleNoz(e) {
+    if(!isPwr) return;
+    const r = e.target.getBoundingClientRect();
+    const cin = document.getElementById('ch');
+    if ((e.clientX - r.left) > (r.width/2)) { rotA += 30; cin.value++; log("FREQ_INC"); }
+    else { rotA -= 30; cin.value--; log("FREQ_DEC"); }
+    document.getElementById('nozzle').style.transform = `rotate(${rotA}deg)`;
+}
+
+function updateUI(mode, noise = 0) {
+    const rf = document.getElementById('rfSt'), led = document.getElementById('led'), rssi = document.getElementById('rssi'), al = document.getElementById('ancLed');
+    rf.className = "val-norm"; led.className = "status-led"; rssi.className = "signal-block"; al.className = "anc-led";
+    if (!isPwr) return;
+    if (mode === 'idle') { rf.innerText = "OFFLINE"; rf.style.color = "var(--r)"; led.classList.add('led-red'); rssi.classList.add('sig-red'); }
+    else if (mode === 'connecting') { rf.innerText = "SYNCING"; rf.style.color = "var(--y)"; led.classList.add('led-orange'); rssi.classList.add('sig-orange'); }
+    else if (mode === 'connected') {
+        rf.innerText = "ONLINE"; rf.style.color = "var(--g)"; led.classList.add('led-green'); rssi.classList.add('sig-green');
+        if (noise > 0.5) al.classList.add('led-red'); else al.classList.add('led-green');
+    }
+}
+
+function pwr(s) {
+    isPwr = s;
+    document.getElementById('bOn').classList.toggle('active', s);
+    document.getElementById('bOff').classList.toggle('active', !s);
+    if(s) {
+        document.getElementById('scr').classList.add('lit');
+        document.getElementById('sys').style.opacity = "1";
+        updateUI('idle');
+        log("FIELD_OS_BOOT_v12.4.1");
+        setInterval(() => { if(isPwr) document.getElementById('vlt').innerText = (11.8 + Math.random()*0.4).toFixed(2) + "V"; }, 2000);
+    } else location.reload();
+}
+
+function toggleAnc() {
+    if(!isPwr) return;
+    isAnc = !isAnc;
+    const b = document.getElementById('ancBtn');
+    b.innerText = isAnc ? "ANC ON" : "ANC OFF";
+    b.classList.toggle('on', isAnc);
+}
+
+function log(m) {
+    const el = document.getElementById("sys");
+    const d = document.createElement('div'); d.innerText = `> ${m}`;
+    el.appendChild(d); el.scrollTop = el.scrollHeight;
+}
+
+const bcvs = document.getElementById('scannerCanvas'), bctx = bcvs.getContext('2d');
+let bgCols = [];
+function initBg() { bcvs.width = window.innerWidth; bcvs.height = window.innerHeight; bgCols = new Array(Math.floor(bcvs.width/20)).fill(0).map(()=>Math.random()*bcvs.height); }
+window.onresize = initBg; initBg();
+
+function draw() {
+    bctx.fillStyle = 'rgba(0,0,0,0.1)'; bctx.fillRect(0,0,bcvs.width,bcvs.height);
+    bctx.font = '12px monospace'; bctx.fillStyle = '#010';
+    bgCols.forEach((y, i) => { bctx.fillText(Math.random()>0.8?"1":"0", i*20, y); bgCols[i] = y > bcvs.height ? 0 : y + 10; });
+    if(ana && isPwr) {
+        const scvs = document.getElementById('scope'), sctx = scvs.getContext('2d'), data = new Uint8Array(ana.frequencyBinCount);
+        ana.getByteTimeDomainData(data);
+        let sum = 0; for(let i=0; i<data.length; i++) sum += Math.abs(data[i]-128);
+        if(isTx) updateUI('connected', sum/data.length/50);
+        sctx.clearRect(0,0,scvs.width,scvs.height);
+        sctx.lineWidth = 3; sctx.strokeStyle = isAnc ? '#00d4ff' : '#39ff14';
+        sctx.beginPath(); let x = 0, step = scvs.width/data.length;
+        for(let i=0; i<data.length; i++) { let v = data[i]/128.0, y = v * scvs.height/2; if(i===0) sctx.moveTo(x,y); else sctx.lineTo(x,y); x += step; }
+        sctx.stroke();
+    }
+    requestAnimationFrame(draw);
+}
+draw();
+
+async function conn(role) {
+    if(!isPwr || isConn) return;
+    updateUI('connecting');
+    try {
+        mic = await navigator.mediaDevices.getUserMedia({audio:true});
+        actx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = actx.createMediaStreamSource(mic);
+        ana = actx.createAnalyser(); src.connect(ana);
+        const proc = actx.createScriptProcessor(2048, 1, 1);
+        proc.onaudioprocess = (e) => { if(isTx) transmit(e.inputBuffer.getChannelData(0), document.getElementById('ch').value, role); };
+        ana.connect(proc); proc.connect(actx.destination);
+        pG = actx.createGain(); pG.gain.value = 2.5; pG.connect(actx.destination);
+        const enc = new TextEncoder(), km = await crypto.subtle.importKey('raw', enc.encode(document.getElementById('key').value), 'PBKDF2', false, ['deriveKey']);
+        ck = await crypto.subtle.deriveKey({name:'PBKDF2', salt:enc.encode('X'), iterations:1000, hash:'SHA-256'}, km, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']);
+        mc = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+        mc.on('connect', () => {
+            isConn = true; updateUI('connected');
+            document.getElementById('ptt').innerText = "PUSH TO TALK";
+            document.getElementById('ptt').classList.add('unlocked', 'ready');
+            mc.subscribe(`${TP}${document.getElementById('ch').value}/${role==='host'?'client':'host'}`);
+            log("NET_HANDSHAKE_OK");
+        });
+        mc.on('message', async (t, pay) => { try { const iv = pay.slice(0, 12), dec = await crypto.subtle.decrypt({name:'AES-GCM', iv}, ck, pay.slice(12)); play(dec); } catch(e){} });
+        const ptt = document.getElementById('ptt');
+        const down = (e) => { if(isConn) { e.preventDefault(); isTx = true; } };
+        const up = (e) => { if(isConn) { e.preventDefault(); isTx = false; } };
+        ptt.onmousedown = down; ptt.onmouseup = up; ptt.ontouchstart = down; ptt.ontouchend = up;
+    } catch(e) { log("SYS_HW_FAILURE"); }
+}
+
+async function transmit(s, ch, role) {
+    if(isAnc) { for(let i=0; i<s.length; i++) if(Math.abs(s[i]) < 0.02) s[i] = 0; }
+    const i16 = new Int16Array(s.length); for(let i=0; i<s.length; i++) i16[i] = s[i] * 32767;
+    const iv = crypto.getRandomValues(new Uint8Array(12)), enc = await crypto.subtle.encrypt({name:'AES-GCM', iv}, ck, i16.buffer);
+    const pkt = new Uint8Array(12 + enc.byteLength); pkt.set(iv); pkt.set(new Uint8Array(enc), 12);
+    mc.publish(`${TP}${ch}/${role}`, pkt);
+}
+
+function play(d) {
+    const i16 = new Int16Array(d), f32 = new Float32Array(i16.length);
+    for(let i=0; i<i16.length; i++) f32[i] = i16[i] / 32768;
+    const b = actx.createBuffer(1, f32.length, SR); b.getChannelData(0).set(f32);
+    const s = actx.createBufferSource(); s.buffer = b; s.connect(pG);
+    let st = Math.max(actx.currentTime + 0.05, nxt); s.start(st); nxt = st + b.duration;
+}
+</script>
+</body>
+</html>
