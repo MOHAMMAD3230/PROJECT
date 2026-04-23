@@ -4,17 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <!-- ═══ SECURITY FIX #1: Removed external tracking script (GA) to comply with own CSP ═══ -->
-  <!-- 
-    SECURITY NOTE: Original code loaded Google Analytics, but CSP only allows 'self' scripts.
-    Options:
-    A) Remove GA entirely (privacy-first approach - RECOMMENDED)
-    B) Add 'https://www.googletagmanager.com' to CSP script-src if analytics needed
-    Chose option A for maximum security & privacy alignment with "Privacy First" branding.
-  -->
-
-  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
-
+  <!-- ✅ Google Tag Manager (保留分析功能) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -22,28 +12,29 @@
     gtag('js', new Date());
     gtag('config', 'GT-NC6T5LRJ');
   </script>
-  
-  
-  <!-- ═══ ENHANCED Content Security Policy ═══ -->
+
+  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
+
+  <!-- ✅ Content Security Policy (已更新：允许 GTM) -->
   <meta http-equiv="Content-Security-Policy" 
         content="default-src 'self'; 
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
                  font-src https://fonts.gstatic.com; 
-                 script-src 'self' 'unsafe-inline';
+                 script-src 'self' 'unsafe-inline' https://www.googletagmanager.com;
                  img-src 'self' data: https:;
-                 connect-src 'self';
+                 connect-src 'self' https://www.google-analytics.com;
                  frame-ancestors 'none';
                  base-uri 'self';
                  form-action 'self';
                  upgrade-insecure-requests;">
   
-  <!-- ═══ Additional Security Headers ═══ -->
+  <!-- Additional Security Headers -->
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="x-dns-prefetch-control" content="off">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   
-  <!-- ═══ SECURITY FIX #2: Added Permissions Policy ═══ -->
+  <!-- Permissions Policy -->
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
   
   <title>MY_STUFF // CHAOS MODE</title>
@@ -349,7 +340,7 @@
       opacity:0.85;
     }
 
-    /* Brutal Search - SECURITY FIX #3: Proper maxlength attribute */
+    /* Brutal Search */
     .brutal-search{
       display:flex;
       gap:0;
@@ -367,7 +358,7 @@
       autocomplete="off";
       autocorrect="off";
       spellcheck="false";
-      /* SECURITY: Moved maxlength to HTML attribute where it belongs */
+      maxlength="200";
     }
     .brutal-search input:focus{
       background:var(--yellow);
@@ -1021,6 +1012,7 @@
         <h1 class="hero-title">Welcome to Your Personal Command Center</h1>
         <p class="hero-desc">No fancy animations. No slow loading. Just pure brutal functionality. Pick a module and go.</p>
         
+       
         
       </section>
 
@@ -1056,7 +1048,7 @@
           <span class="card-tag">Play</span>
         </a>
 
-          <a href="RAILWAY DISPATCHER PRO.html" target="_blank" rel="noopener noreferrer" class="brutal-card">
+        <a href="RAILWAY DISPATCHER PRO.html" target="_blank" rel="noopener noreferrer" class="brutal-card">
           <div class="card-color-bar bar-lime"></div>
           <div class="card-icon">🚄</div>
           <h3 class="card-title">RAILWAY DISPATCHER</h3>
@@ -1085,7 +1077,7 @@
           </div>
           <div class="stats-row">
             <div class="stat-box">
-              <div class="stat-num yellow">4</div>
+              <div class="stat-num yellow">5</div>
               <div class="stat-label">Modules</div>
             </div>
             <div class="stat-box">
@@ -1119,8 +1111,6 @@
               </div>
               <span class="list-arrow">→</span>
             </a>
-
-            
 
             <a href="https://www.startpage.com" target="_blank" rel="noopener noreferrer" class="list-item">
               <div class="list-icon">S</div>
@@ -1264,14 +1254,14 @@
         <div class="about-section">
           <h3 class="about-heading">Privacy First</h3>
           <p class="about-text">
-            <strong>Your data stays yours.</strong> We don't track you. We don't sell your information. 
-            We don't load third-party analytics that slow down your experience. This dashboard runs entirely 
+            <strong>Your data stays yours.</strong> We use Google Analytics for basic traffic analysis only. 
+            We don't sell your information or load unnecessary third-party scripts. This dashboard runs primarily 
             client-side with minimal external dependencies.
           </p>
           <p class="about-text">
             Security features include: Content Security Policy headers, XSS protection, input sanitization, 
-            secure URL validation, and encrypted connections where applicable. Your privacy isn't an afterthought—it's 
-            the foundation.
+            secure URL validation, and encrypted connections where applicable. Your privacy matters—it's 
+            built into our foundation.
           </p>
         </div>
 
@@ -1295,25 +1285,6 @@
 
     /**
      * ═══════════════════════════════════════════════════════
-     * SECURITY AUDIT REPORT - All Issues Fixed
-     * ═══════════════════════════════════════════════════════
-     * 
-     * ✅ FIXED ISSUES:
-     * 1. Removed Google Analytics (violated own CSP policy)
-     * 2. Added Permissions-Policy header
-     * 3. Added upgrade-insecure-requests to CSP
-     * 4. Fixed maxlength attribute placement (was in CSS, now HTML)
-     * 5. Enhanced error handling (no sensitive data exposure)
-     * 6. Added input length validation at attribute level
-     * 7. Improved console logging security
-     * 8. Added form action prevention
-     * 
-     * SECURITY SCORE: A+ (Enterprise Grade)
-     * ═══════════════════════════════════════════════════════
-     */
-
-    /**
-     * ═══════════════════════════════════════════════════════
      * SECURITY UTILITY FUNCTIONS
      * ═══════════════════════════════════════════════════════
      */
@@ -1327,14 +1298,11 @@
     function sanitizeInput(str) {
       if (typeof str !== 'string') return '';
       
-      // SECURITY: Use textContent to escape HTML entities
       const div = document.createElement('div');
       div.textContent = str;
       
-      // Double-check for null byte injection
       const sanitized = div.innerHTML.replace(/\0/g, '');
       
-      // Length check (defense in depth)
       if (sanitized.length > 200) {
         return sanitized.substring(0, 200);
       }
@@ -1351,10 +1319,8 @@
     function isSafeUrl(url) {
       if (typeof url !== 'string') return false;
       
-      // Trim whitespace
       url = url.trim();
       
-      // Block empty URLs
       if (url.length === 0 || url.length > 2048) {
         return false;
       }
@@ -1362,14 +1328,12 @@
       try {
         const parsedUrl = new URL(url, window.location.origin);
         
-        // Only allow http: and https: protocols
         const allowedProtocols = ['http:', 'https:'];
         if (!allowedProtocols.includes(parsedUrl.protocol)) {
           console.warn('[Security] Blocked non-http(s) protocol:', parsedUrl.protocol);
           return false;
         }
         
-        // Block javascript:, data:, and vbscript: schemes (defense in depth)
         const normalizedUrl = url.trim().toLowerCase();
         if (normalizedUrl.startsWith('javascript:') ||
             normalizedUrl.startsWith('data:') ||
@@ -1379,7 +1343,6 @@
         
         return true;
       } catch (e) {
-        // Invalid URL format
         console.warn('[Security] Invalid URL format:', e.message);
         return false;
       }
@@ -1387,9 +1350,8 @@
 
     /**
      * Secure Event Handler Wrapper
-     * Prevents error information leakage
      * @param {Function} fn - Function to wrap
-     * @param {string} context - Error context (for logging only)
+     * @param {string} context - Error context
      * @returns {Function} - Wrapped secure function
      */
     function safeHandler(fn, context) {
@@ -1397,13 +1359,10 @@
         try {
           return fn.apply(this, args);
         } catch (error) {
-          // SECURITY: Don't expose full error details in production
-          // Log generic message only
           if (window.location.protocol !== 'file:' && 
               window.location.hostname !== 'localhost') {
             console.error('[Error]', context);
           } else {
-            // Development mode: show details
             console.error(`[Dev Error] ${context}:`, error.message);
           }
           return null;
@@ -1413,14 +1372,13 @@
 
     /**
      * ═══════════════════════════════════════════════════════
-     * CLOCK FUNCTIONALITY (Secure Implementation)
+     * CLOCK FUNCTIONALITY
      * ═══════════════════════════════════════════════════════
      */
     function updateClock() {
       safeHandler(function() {
         const now = new Date();
         
-        // SECURITY: Use Intl API for locale-safe formatting
         const timeString = now.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
@@ -1429,19 +1387,17 @@
         
         const el = document.getElementById('clock-display');
         if (el) {
-          // SECURITY: Use textContent (safe) not innerHTML
           el.textContent = timeString;
         }
       }, 'Clock Update')();
     }
 
-    // Initialize clock
     setInterval(updateClock, 1000);
     updateClock();
 
     /**
      * ═══════════════════════════════════════════════════════
-     * SEARCH HANDLING (Enhanced Security)
+     * SEARCH HANDLING
      * ═══════════════════════════════════════════════════════
      */
     function handleSearch(event) {
@@ -1451,31 +1407,27 @@
         const input = document.getElementById('search-input');
         if (!input) return false;
 
-        // SECURITY: Get value and sanitize immediately
         const rawValue = input.value || '';
         const query = sanitizeInput(rawValue.trim());
         
-        // Validate input
         if (!query || query.length === 0) {
           console.warn('[Security] Empty search query blocked');
           return false;
         }
 
-        // Length validation (already enforced by HTML maxlength, but defense in depth)
         if (query.length > 200) {
           console.warn('[Security] Search query exceeds maximum length');
           return false;
         }
 
-        // SECURITY: Comprehensive pattern detection
         const suspiciousPatterns = [
-          /<script\b[^<]*(?:(?!<\/script\b)[^<])*<\/script\b[^>]*>/gi,  // Script tags (handles </script > and malformed close tags)
-          /javascript:/gi,                                                // JS protocol
-          /data:\s*text\/html/gi,                                        // Data URIs
-          /on\w+\s*=/gi,                                                 // Event handlers
-          /expression\s*\(/gi,                                           // CSS expressions
-          /url\s*\(/gi,                                                  // CSS URLs
-          /@import/gi                                                    // CSS imports
+          /<script\b[^<]*(?:(?!<\/script\b)[^<])*<\/script\b[^>]*>/gi,
+          /javascript:/gi,
+          /data:\s*text\/html/gi,
+          /on\w+\s*=/gi,
+          /expression\s*\(/gi,
+          /url\s*\(/gi,
+          /@import/gi
         ];
 
         for (const pattern of suspiciousPatterns) {
@@ -1485,16 +1437,12 @@
           }
         }
 
-        // Execute safe search
         console.log('[Search] Executing query:', query.substring(0, 50) + (query.length > 50 ? '...' : ''));
         
-        // Build safe search URL
         const encodedQuery = encodeURIComponent(query);
         const searchUrl = `https://www.google.com/search?q=${encodedQuery}`;
         
-        // Validate final URL before opening
         if (isSafeUrl(searchUrl)) {
-          // SECURITY: Use noopener,noreferrer to prevent tabnabbing
           window.open(searchUrl, '_blank', 'noopener,noreferrer');
         } else {
           console.error('[Security] Failed to validate search URL');
@@ -1506,36 +1454,31 @@
 
     /**
      * ═══════════════════════════════════════════════════════
-     * SPLASH SCREEN EXIT (Secure)
+     * SPLASH SCREEN EXIT
      * ═══════════════════════════════════════════════════════
      */
     const stickerWall = document.getElementById('sticker-wall');
     const splashTrigger = document.getElementById('splash-trigger');
     const mainApp = document.getElementById('main-app');
 
-    // State management
     let hasEntered = false;
 
     function enterChaos() {
       return safeHandler(function() {
-        // Prevent race conditions
         if (hasEntered || !stickerWall) return;
         
         if (!stickerWall.classList.contains('hidden')) {
           hasEntered = true;
           
-          // Add hidden class with animation
           stickerWall.classList.add('hidden');
           
-          // Show main app with delay for smooth transition
           setTimeout(function() {
             if (mainApp) {
               mainApp.classList.add('visible');
               
-              // Cleanup: Remove splash from DOM after transition
               setTimeout(function() {
                 if (stickerWall && stickerWall.parentNode) {
-                  // Optional: Uncomment to remove from DOM completely
+                  // Optional: Remove from DOM
                   // stickerWall.parentNode.removeChild(stickerWall);
                 }
               }, 1000);
@@ -1545,11 +1488,9 @@
       }, 'Splash Exit')();
     }
 
-    // Bind events with security checks
     if (splashTrigger) {
       splashTrigger.addEventListener('click', enterChaos);
       splashTrigger.addEventListener('keydown', function(e) {
-        // SECURITY: Only allow Enter and Space (accessibility)
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           enterChaos();
@@ -1557,28 +1498,23 @@
       });
     }
 
-    // Sticker interactions (also trigger entry)
     const stickers = document.querySelectorAll('.sticker');
     stickers.forEach(function(stk) {
       stk.addEventListener('click', safeHandler(function() {
-        // Visual feedback
         this.style.transform = 'scale(1.3) rotate(0deg)';
-        
-        // Delay entry for visual effect
         setTimeout(enterChaos, 200);
       }, 'Sticker Click'));
     });
 
     /**
      * ═══════════════════════════════════════════════════════
-     * ABOUT MODAL (Secure Implementation)
+     * ABOUT MODAL
      * ═══════════════════════════════════════════════════════
      */
     const aboutModal = document.getElementById('about-modal');
     const aboutTrigger = document.getElementById('about-trigger');
     const aboutClose = document.getElementById('about-close');
 
-    // Track modal state
     let isModalOpen = false;
 
     function openAboutModal() {
@@ -1588,18 +1524,15 @@
         isModalOpen = true;
         aboutModal.classList.add('active');
         
-        // SECURITY: Prevent body scroll when modal open
         document.body.style.overflow = 'hidden';
-        document.body.style.paddingRight = getScrollbarWidth() + 'px'; // Prevent layout shift
+        document.body.style.paddingRight = getScrollbarWidth() + 'px';
         
-        // Focus management for accessibility
         if (aboutClose) {
           setTimeout(function() {
             aboutClose.focus();
           }, 100);
         }
         
-        // Add ESC listener
         document.addEventListener('keydown', handleModalEscape);
         
       }, 'Open About Modal')();
@@ -1612,32 +1545,27 @@
         isModalOpen = false;
         aboutModal.classList.remove('active');
         
-        // Restore body scroll
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
         
-        // Return focus to trigger
         if (aboutTrigger) {
           aboutTrigger.focus();
         }
         
-        // Remove ESC listener
         document.removeEventListener('keydown', handleModalEscape);
         
       }, 'Close About Modal')();
     }
 
-    // ESC key handler (separate function for clean removal)
     function handleModalEscape(e) {
       if (e.key === 'Escape' && isModalOpen) {
         closeAboutModal();
       }
     }
 
-    // Event bindings
     if (aboutTrigger) {
       aboutTrigger.addEventListener('click', function(e) {
-        e.preventDefault(); // Prevent anchor jump
+        e.preventDefault();
         openAboutModal();
       });
     }
@@ -1646,19 +1574,14 @@
       aboutClose.addEventListener('click', closeAboutModal);
     }
 
-    // Click outside to close
     if (aboutModal) {
       aboutModal.addEventListener('click', function(e) {
-        // Only close if clicking the backdrop, not content
         if (e.target === aboutModal) {
           closeAboutModal();
         }
       });
     }
 
-    /**
-     * Helper: Calculate scrollbar width to prevent layout shift
-     */
     function getScrollbarWidth() {
       return window.innerWidth - document.documentElement.clientWidth;
     }
@@ -1669,7 +1592,6 @@
      * ═══════════════════════════════════════════════════════
      */
 
-    // SECURITY: Prevent drag-and-drop attacks
     document.addEventListener('dragover', function(e) {
       e.preventDefault();
       e.stopPropagation();
@@ -1678,57 +1600,26 @@
     document.addEventListener('drop', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      console.log('[Security] Drop operation prevented (potential attack vector)');
+      console.log('[Security] Drop operation prevented');
     });
 
-    // SECURITY: Prevent paste attacks in sensitive contexts (future-proofing)
-    document.addEventListener('paste', function(e) {
-      // Could add specific restrictions here if needed
-      // Currently allowing paste for usability
-    });
-
-    // SECURITY: Context menu protection (optional, can be annoying for users)
-    // document.addEventListener('contextmenu', function(e) {
-    //   e.preventDefault();
-    // });
-
-    // SECURITY: Dev tools detection (informational only)
-    if (window.location.protocol === 'file:') {
-      console.warn(
-        '%c⚠️ Security Warning',
-        'color: red; font-size: 20px; font-weight: bold;',
-        '\nThis page is running from file:// protocol.\n' +
-        'Some security features may not work correctly.\n' +
-        'Please serve this page over HTTPS for full protection.'
-      );
-    }
-
-    // Performance monitoring (security-relevant for DoS detection)
     if ('PerformanceObserver' in window) {
       try {
         const perfObserver = new PerformanceObserver(function(list) {
           for (const entry of list.getEntries()) {
             if (entry.entryType === 'longtask') {
-              // Log long tasks (could indicate crypto-mining or other abuse)
-              if (entry.duration > 5000) { // 5 second threshold
-                console.debug('[Performance] Abnormally long task detected:', Math.round(entry.duration) + 'ms');
+              if (entry.duration > 5000) {
+                console.debug('[Performance] Long task detected:', Math.round(entry.duration) + 'ms');
               }
             }
           }
         });
         perfObserver.observe({ entryTypes: ['longtask'] });
       } catch (e) {
-        // PerformanceObserver not supported (non-critical)
+        // PerformanceObserver not supported
       }
     }
 
-    /**
-     * ═══════════════════════════════════════════════════════
-     * CONTENT SECURITY POLICY VIOLATION HANDLER
-     * ═══════════════════════════════════════════════════════
-     */
-    
-    // Listen for CSP violations (for debugging)
     if ('SecurityPolicyViolationEvent' in window) {
       document.addEventListener('securitypolicyviolation', function(e) {
         console.warn('[CSP Violation]', {
@@ -1739,12 +1630,7 @@
       });
     }
 
-    /**
-     * ═══════════════════════════════════════════════════════
-     * INITIALIZATION COMPLETE
-     * ═══════════════════════════════════════════════════════
-     */
-    console.log('%c✓ MY_STUFF Security Initialized', 'color: lime; font-weight: bold;');
+    console.log('%c✓ MY_STUFF Initialized with Google Analytics', 'color: lime; font-weight: bold;');
 
   </script>
 </body>
