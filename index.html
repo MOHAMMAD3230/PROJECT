@@ -1369,10 +1369,11 @@
           return false;
         }
         
-        // Block javascript: and data: schemes (double check)
-        if (url.toLowerCase().startsWith('javascript:') ||
-            url.toLowerCase().startsWith('data:') ||
-            url.toLowerCase().startswith('vbscript:')) {
+        // Block javascript:, data:, and vbscript: schemes (defense in depth)
+        const normalizedUrl = url.trim().toLowerCase();
+        if (normalizedUrl.startsWith('javascript:') ||
+            normalizedUrl.startsWith('data:') ||
+            normalizedUrl.startsWith('vbscript:')) {
           return false;
         }
         
