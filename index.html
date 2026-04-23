@@ -1469,13 +1469,13 @@
 
         // SECURITY: Comprehensive pattern detection
         const suspiciousPatterns = [
-          /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,  // Script tags
-          /javascript:/gi,                                         // JS protocol
-          /data:\s*text\/html/gi,                                 // Data URIs
-          /on\w+\s*=/gi,                                          // Event handlers
-          /expression\s*\(/gi,                                    // CSS expressions
-          /url\s*\(/gi,                                           // CSS URLs
-          /@import/gi                                             // CSS imports
+          /<script\b[^<]*(?:(?!<\/script\b)[^<])*<\/script\b[^>]*>/gi,  // Script tags (handles </script > and malformed close tags)
+          /javascript:/gi,                                                // JS protocol
+          /data:\s*text\/html/gi,                                        // Data URIs
+          /on\w+\s*=/gi,                                                 // Event handlers
+          /expression\s*\(/gi,                                           // CSS expressions
+          /url\s*\(/gi,                                                  // CSS URLs
+          /@import/gi                                                    // CSS imports
         ];
 
         for (const pattern of suspiciousPatterns) {
