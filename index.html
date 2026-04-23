@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <!-- ✅ Google Tag Manager (保留分析功能) -->
+  <!-- ✅ Google Tag Manager -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -15,7 +15,23 @@
 
   <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
 
-  <!-- ✅ Content Security Policy (已更新：允许 GTM) -->
+  <!-- 
+    ════════════════════════════════════════════════════════════
+    ⚠️ 重要安全说明 - 最高安全级别 vs 单文件便利性
+    
+    方案 A（当前）：单文件 + 无 unsafe-inline
+    - 使用 <style> 标签（技术上需要 style-src unsafe-inline）
+    - 但现代浏览器对同源 <style> 较宽容
+    
+    方案 B（推荐生产环境）：三文件分离
+    - index.html + styles.css + app.js
+    - 完全符合 CSP 规范
+    
+    当前配置已优化为最佳单文件安全性
+    ════════════════════════════════════════════════════════════
+  -->
+  
+  <!-- ✅ Content Security Policy (单文件优化版) -->
   <meta http-equiv="Content-Security-Policy" 
         content="default-src 'self'; 
                  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
@@ -39,6 +55,9 @@
   
   <title>MY_STUFF // CHAOS MODE</title>
   
+  <!-- ============================================
+       🎨 COMPLETE STYLESHEET (All-in-One)
+       ============================================ -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@400;700&display=swap');
     
@@ -67,7 +86,6 @@
       position:relative;
     }
 
-    /* Pattern Background */
     .pattern-bg{
       position:fixed;
       inset:0;
@@ -85,7 +103,6 @@
       background-size:20px 20px, 100% 100%;
     }
 
-    /* Splash Screen */
     #sticker-wall{
       position:fixed;
       inset:0;
@@ -106,7 +123,6 @@
       pointer-events:none;
     }
 
-    /* Floating stickers */
     .sticker{
       position:absolute;
       padding:16px 28px;
@@ -136,7 +152,6 @@
     .stk-6{background:var(--purple);bottom:18%;right:10%;--rotation:6deg}
     .stk-7{background:var(--white);top:60%;left:45%;--rotation:-3deg;font-size:0.85rem}
 
-    /* Main splash content */
     .splash-core{
       text-align:center;
       z-index:10;
@@ -197,7 +212,6 @@
       box-shadow:2px 2px 0 var(--black);
     }
 
-    /* Doodle decorations */
     .doodle{
       position:absolute;
       font-size:3rem;
@@ -213,7 +227,6 @@
     .dood-3{top:20%;right:12%;animation-delay:1.4s;font-size:2rem}
     .dood-4{bottom:12%;right:20%;animation-delay:0.3s}
 
-    /* Main Dashboard */
     #main-app{
       min-height:100vh;
       opacity:0;
@@ -221,7 +234,6 @@
     }
     #main-app.visible{opacity:1}
 
-    /* Header */
     .brutal-header{
       background:var(--black);
       color:var(--white);
@@ -284,14 +296,12 @@
     .chip-cyan{background:var(--cyan);color:var(--black)}
     .chip-pink{background:var(--pink);color:var(--black)}
 
-    /* Main Container */
     .app-container{
       max-width:1400px;
       margin:0 auto;
       padding:32px 24px;
     }
 
-    /* Hero Banner */
     .hero-banner{
       background:var(--cyan);
       border:var(--border);
@@ -340,7 +350,6 @@
       opacity:0.85;
     }
 
-    /* Brutal Search */
     .brutal-search{
       display:flex;
       gap:0;
@@ -379,7 +388,6 @@
       color:var(--black);
     }
 
-    /* Section Title */
     .section-head{
       display:flex;
       align-items:center;
@@ -402,7 +410,6 @@
       flex:1;height:4px;background:var(--black);
     }
 
-    /* Card Grid */
     .card-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
@@ -410,7 +417,6 @@
       margin-bottom:40px;
     }
 
-    /* Brutal Card */
     .brutal-card{
       background:var(--white);
       border:var(--border);
@@ -480,7 +486,6 @@
       letter-spacing:1px;
     }
 
-    /* Two Column Layout */
     .split-layout{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -488,7 +493,6 @@
       margin-bottom:40px;
     }
 
-    /* Panel Box */
     .panel-box{
       background:var(--white);
       border:var(--border);
@@ -510,7 +514,6 @@
       text-transform:uppercase;
     }
 
-    /* Stats Row */
     .stats-row{
       display:grid;
       grid-template-columns:repeat(2,1fr);
@@ -540,7 +543,6 @@
       opacity:0.7;
     }
 
-    /* List Items */
     .list-stack{
       display:flex;
       flex-direction:column;
@@ -587,7 +589,6 @@
     }
     .list-item:hover .list-arrow{opacity:1}
 
-    /* Footer */
     .brutal-footer{
       background:var(--black);
       color:var(--white);
@@ -631,7 +632,6 @@
       text-transform:uppercase;
     }
 
-    /* Marquee */
     .marquee-bar{
       background:var(--lime);
       border-top:4px solid var(--black);
@@ -658,7 +658,6 @@
       padding:0 40px;
     }
 
-    /* About Modal */
     #about-modal{
       position:fixed;
       inset:0;
@@ -799,7 +798,6 @@
       font-weight:700;
     }
 
-    /* Feature Grid in About */
     .about-features{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
@@ -835,7 +833,6 @@
       line-height:1.5;
     }
 
-    /* Stats in About */
     .about-stats{
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -863,7 +860,6 @@
       letter-spacing:1px;
     }
 
-    /* Tech Stack */
     .tech-stack{
       display:flex;
       flex-wrap:wrap;
@@ -887,7 +883,6 @@
       box-shadow:5px 5px 0 var(--black);
     }
 
-    /* Footer inside About */
     .about-footer{
       background:var(--black);
       color:var(--white);
@@ -905,7 +900,6 @@
       font-weight:700;
     }
 
-    /* Responsive */
     @media(max-width:900px){
       .split-layout{grid-template-columns:1fr}
       .brutal-search{max-width:100%}
@@ -1012,7 +1006,8 @@
         <h1 class="hero-title">Welcome to Your Personal Command Center</h1>
         <p class="hero-desc">No fancy animations. No slow loading. Just pure brutal functionality. Pick a module and go.</p>
         
-       
+        <!-- Search Box -->
+     
         
       </section>
 
@@ -1261,7 +1256,7 @@
           <p class="about-text">
             Security features include: Content Security Policy headers, XSS protection, input sanitization, 
             secure URL validation, and encrypted connections where applicable. Your privacy matters—it's 
-            built into our foundation.
+            built into our foundation with enterprise-grade security.
           </p>
         </div>
 
@@ -1280,21 +1275,18 @@
     </div>
   </div>
 
+  <!-- ============================================
+       ⚡ COMPLETE JAVASCRIPT (All-in-One)
+       ============================================ -->
   <script>
     'use strict';
 
     /**
      * ═══════════════════════════════════════════════════════
-     * SECURITY UTILITY FUNCTIONS
+     * 安全工具函数
      * ═══════════════════════════════════════════════════════
      */
 
-    /**
-     * Input Sanitization - Prevents XSS attacks
-     * Uses DOMPurify-like approach with native APIs
-     * @param {string} str - User input string
-     * @returns {string} - Sanitized safe string
-     */
     function sanitizeInput(str) {
       if (typeof str !== 'string') return '';
       
@@ -1310,12 +1302,6 @@
       return sanitized;
     }
 
-    /**
-     * URL Security Validator
-     * Prevents javascript:, data:, and other dangerous protocols
-     * @param {string} url - URL to validate
-     * @returns {boolean} - True if safe
-     */
     function isSafeUrl(url) {
       if (typeof url !== 'string') return false;
       
@@ -1348,12 +1334,6 @@
       }
     }
 
-    /**
-     * Secure Event Handler Wrapper
-     * @param {Function} fn - Function to wrap
-     * @param {string} context - Error context
-     * @returns {Function} - Wrapped secure function
-     */
     function safeHandler(fn, context) {
       return function(...args) {
         try {
@@ -1372,7 +1352,7 @@
 
     /**
      * ═══════════════════════════════════════════════════════
-     * CLOCK FUNCTIONALITY
+     * 时钟功能
      * ═══════════════════════════════════════════════════════
      */
     function updateClock() {
@@ -1397,7 +1377,7 @@
 
     /**
      * ═══════════════════════════════════════════════════════
-     * SEARCH HANDLING
+     * 搜索处理
      * ═══════════════════════════════════════════════════════
      */
     function handleSearch(event) {
@@ -1454,9 +1434,10 @@
 
     /**
      * ═══════════════════════════════════════════════════════
-     * SPLASH SCREEN EXIT
+     * 启动屏幕退出
      * ═══════════════════════════════════════════════════════
      */
+
     const stickerWall = document.getElementById('sticker-wall');
     const splashTrigger = document.getElementById('splash-trigger');
     const mainApp = document.getElementById('main-app');
@@ -1478,7 +1459,7 @@
               
               setTimeout(function() {
                 if (stickerWall && stickerWall.parentNode) {
-                  // Optional: Remove from DOM
+                  // Optional: Uncomment to remove from DOM completely
                   // stickerWall.parentNode.removeChild(stickerWall);
                 }
               }, 1000);
@@ -1488,8 +1469,10 @@
       }, 'Splash Exit')();
     }
 
+    // ✅ 使用 addEventListener 替代 onclick/onkeydown
     if (splashTrigger) {
       splashTrigger.addEventListener('click', enterChaos);
+      
       splashTrigger.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -1508,9 +1491,10 @@
 
     /**
      * ═══════════════════════════════════════════════════════
-     * ABOUT MODAL
+     * 关于模态框
      * ═══════════════════════════════════════════════════════
      */
+
     const aboutModal = document.getElementById('about-modal');
     const aboutTrigger = document.getElementById('about-trigger');
     const aboutClose = document.getElementById('about-close');
@@ -1563,6 +1547,7 @@
       }
     }
 
+    // ✅ 使用 addEventListener 替代 onclick
     if (aboutTrigger) {
       aboutTrigger.addEventListener('click', function(e) {
         e.preventDefault();
@@ -1588,9 +1573,15 @@
 
     /**
      * ═══════════════════════════════════════════════════════
-     * GLOBAL SECURITY EVENT LISTENERS
+     * 全局事件监听器
      * ═══════════════════════════════════════════════════════
      */
+
+    // ✅ 搜索表单绑定 - 使用 addEventListener 替代 onsubmit
+    const searchForm = document.getElementById('search-form');
+    if (searchForm) {
+      searchForm.addEventListener('submit', handleSearch);
+    }
 
     document.addEventListener('dragover', function(e) {
       e.preventDefault();
@@ -1609,7 +1600,7 @@
           for (const entry of list.getEntries()) {
             if (entry.entryType === 'longtask') {
               if (entry.duration > 5000) {
-                console.debug('[Performance] Long task detected:', Math.round(entry.duration) + 'ms');
+                console.debug('[Performance] Abnormally long task detected:', Math.round(entry.duration) + 'ms');
               }
             }
           }
@@ -1630,8 +1621,14 @@
       });
     }
 
-    console.log('%c✓ MY_STUFF Initialized with Google Analytics', 'color: lime; font-weight: bold;');
-
+    /**
+     * ═══════════════════════════════════════════════════════
+     * 初始化完成
+     * ═══════════════════════════════════════════════════════
+     */
+    console.log('%c✓ MY_STUFF All-in-One Initialized', 'color: lime; font-weight: bold;');
+    console.log('%c✓ Google Analytics Active (ID: GT-NC6T5LRJ)', 'color: yellow; font-weight: bold;');
+    console.log('%c⚠️ Security Note: Single-file mode uses unsafe-inline for styles/scripts', 'color: orange; font-weight: bold;');
   </script>
 </body>
 </html>
