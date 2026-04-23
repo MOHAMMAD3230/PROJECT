@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
   <script>
@@ -10,1097 +12,1109 @@
     gtag('config', 'GT-NC6T5LRJ');
   </script>
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-  <meta name="robots" content="nofollow" />
-  <meta name="algolia-site-verification" content="4D0E88B9A4BE8C12" />
-  <meta name="theme-color" content="#000010" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self';
-             script-src 'self' 'unsafe-inline'
-               https://pagead2.googlesyndication.com
-               https://www.googletagmanager.com
-               https://cdn.metered.ca;
-             frame-src
-               https://googleads.g.doubleclick.net
-               https://tpc.googlesyndication.com
-               https://cdn.metered.ca;
-             connect-src 'self'
-               https://www.google-analytics.com
-               https://www.googletagmanager.com
-               https://googleads.g.doubleclick.net
-               https://tpc.googlesyndication.com
-               https://pagead2.googlesyndication.com
-               https://stats.g.doubleclick.net
-               https://*.metered.ca
-               https://*.algolia.net
-               https://*.algolianet.com;
-             style-src 'self' 'unsafe-inline'
-               https://cdn.metered.ca;
-             img-src 'self' https:;
-             font-src 'self';
-             object-src 'none';
-             base-uri 'self';
-             form-action 'self';
-             upgrade-insecure-requests;" />
-
-  <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-  <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
-  <link rel="dns-prefetch" href="//www.google-analytics.com" />
-  <link rel="dns-prefetch" href="//googleads.g.doubleclick.net" />
-  <link rel="dns-prefetch" href="//tpc.googlesyndication.com" />
-  <link rel="dns-prefetch" href="//cdn.metered.ca" />
-  <link rel="dns-prefetch" href="//www.algolia.com" />
-
-  <link rel="stylesheet" href="https://cdn.metered.ca/docuscout/1.0/docuscout.css">
-  <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
-  <link rel="apple-touch-icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" />
-  <title>MY_STUFF</title>
-
+   <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
+  
+  <!-- ═══ 安全增强：Content Security Policy ═══ -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self'; 
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                 font-src https://fonts.gstatic.com; 
+                 script-src 'self' 'unsafe-inline';
+                 img-src 'self' data: https:;
+                 connect-src 'self';
+                 frame-ancestors 'none';
+                 base-uri 'self';
+                 form-action 'self';">
+  
+  <!-- ═══ 安全增强：防止点击劫持 ═══ -->
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  
+  <!-- ═══ 安全增强：MIME类型嗅探防护 ═══ -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  
+  <!-- ═══ 安全增强：DNS预取控制 ═══ -->
+  <meta http-equiv="x-dns-prefetch-control" content="off">
+  
+  <!-- ═══ 安全增强：Referrer策略 ═══ -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  
+  <title>MY_STUFF // CHAOS MODE</title>
+  
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@400;700&display=swap');
+    
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
+    
+    :root{
+      --yellow:#FFE600;
+      --pink:#FF6B9D;
+      --cyan:#00F5FF;
+      --lime:#CCFF00;
+      --orange:#FF9500;
+      --purple:#B983FF;
+      --black:#000000;
+      --white:#FFFFFF;
+      --border:4px solid var(--black);
+      --shadow:6px 6px 0px var(--black);
+      --shadow-hover:8px 8px 0px var(--black);
+    }
+    
     body{
-      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-      overflow-x:hidden;min-height:100vh;min-height:100dvh;
-      background:#000010;color:#fff;
-      display:flex;flex-direction:column;
-      -webkit-tap-highlight-color:transparent;
+      font-family:'Space Mono',monospace;
+      background:var(--white);
+      color:var(--black);
+      min-height:100vh;
+      overflow-x:hidden;
+      position:relative;
     }
 
-    .skip-link{position:absolute;top:-200%;left:50%;transform:translateX(-50%);background:#00bfff;color:#000;padding:12px 28px;border-radius:0 0 12px 12px;z-index:999999;font-weight:700;text-decoration:none;transition:top .2s ease}
-    .skip-link:focus{top:0;outline:3px solid #fff}
-
-    #matrix{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;background:#000010;display:block}
-
-    @media(prefers-reduced-motion:reduce){
-      #matrix{display:none}
-      *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+    /* ═══════════════════════════════════════
+       PATTERN BACKGROUND
+       ═══════════════════════════════════════ */
+    .pattern-bg{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background-color:#f5f5f5;
+      background-image:
+        radial-gradient(var(--black) 1px, transparent 1px),
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 10px,
+          rgba(255,230,0,0.05) 10px,
+          rgba(255,230,0,0.05) 20px
+        );
+      background-size:20px 20px, 100% 100%;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       SHUTDOWN OVERLAY — FULL CYBER NEON EXPERIENCE
-       ═══════════════════════════════════════════════════════════ */
-    #shutdown-screen{
-      position:fixed;inset:0;z-index:1500;background:#000;
-      display:flex;align-items:center;justify-content:center;
-      flex-direction:column;gap:0;
-      transition:opacity .8s ease;
+    /* ═══════════════════════════════════════
+       SPLASH SCREEN - STICKER WALL
+       ═══════════════════════════════════════ */
+    #sticker-wall{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--yellow);
+      transition:transform 0.8s cubic-bezier(0.68,-0.55,0.265,1.55), 
+                  opacity 0.5s ease 0.3s,
+                  visibility 0.5s ease 0.3s;
       overflow:hidden;
     }
-    #shutdown-screen.hidden{opacity:0;pointer-events:none}
-
-    /* CRT vignette overlay */
-    #shutdown-screen::after{
-      content:"";position:absolute;inset:0;
-      background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.7) 100%);
-      pointer-events:none;z-index:1;
+    #sticker-wall.hidden{
+      transform:scale(3) rotate(15deg);
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
     }
 
-    /* Dim shield above neon */
-    .off-shield-wrap{
+    /* Floating stickers */
+    .sticker{
+      position:absolute;
+      padding:16px 28px;
+      font-family:'Space Grotesk',sans-serif;
+      font-weight:700;
+      font-size:1.2rem;
+      border:var(--border);
+      box-shadow:4px 4px 0 var(--black);
+      cursor:pointer;
+      transition:all 0.2s ease;
+      user-select:none;
+      transform:rotate(var(--rotation));
+    }
+    .sticker:hover{
+      transform:rotate(0deg) scale(1.1) !important;
+      z-index:100;
+    }
+    .sticker:active{
+      transform:scale(0.95) rotate(calc(var(--rotation) + 5deg)) !important;
+    }
+
+    .stk-1{background:var(--yellow);top:10%;left:5%;--rotation:-12deg}
+    .stk-2{background:var(--pink);top:15%;right:8%;--rotation:8deg;font-size:1rem}
+    .stk-3{background:var(--cyan);top:45%;left:8%;--rotation:-5deg}
+    .stk-4{background:var(--lime);top:40%;right:5%;--rotation:12deg;font-size:0.95rem}
+    .stk-5{background:var(--orange);bottom:25%;left:12%;--rotation:-8deg}
+    .stk-6{background:var(--purple);bottom:18%;right:10%;--rotation:6deg}
+    .stk-7{background:var(--white);top:60%;left:45%;--rotation:-3deg;font-size:0.85rem}
+
+    /* Main splash content */
+    .splash-core{
+      text-align:center;
+      z-index:10;
+      padding:50px;
+      background:var(--white);
+      border:var(--border);
+      box-shadow:10px 10px 0 var(--black);
+      cursor:pointer;
+      transition:all 0.3s ease;
+      max-width:500px;
+    }
+    .splash-core:hover{
+      transform:translate(-4px,-4px);
+      box-shadow:14px 14px 0 var(--black);
+    }
+
+    .splash-title{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(3rem,10vw,5rem);
+      font-weight:900;
+      letter-spacing:-2px;
+      line-height:0.9;
       margin-bottom:16px;
-      display:flex;flex-direction:column;align-items:center;gap:8px;
-      position:relative;z-index:2;
-    }
-    .off-shield{
-      width:44px;height:44px;opacity:.08;
-      animation:offShieldPulse 4s ease-in-out infinite;
-    }
-    @keyframes offShieldPulse{
-      0%,100%{opacity:.05;transform:scale(1)}
-      50%{opacity:.12;transform:scale(1.05)}
-    }
-
-    /* ═══ HUD STATUS LINES ═══ */
-    .hud-status{
-      font-family:'Courier New',Courier,monospace;
-      font-size:clamp(.45rem,1.2vw,.62rem);
-      font-weight:900;letter-spacing:2px;
-      color:#331111;
       text-transform:uppercase;
-      position:relative;z-index:2;
-      padding:0 20px;
-      white-space:nowrap;overflow:hidden;
     }
-    .hud-status-top{margin-bottom:18px;animation:hudPulse1 3s ease-in-out infinite}
-    .hud-status-bot{margin-top:14px;animation:hudPulse2 3.5s ease-in-out infinite}
-    @keyframes hudPulse1{
-      0%,100%{color:#220808;text-shadow:none}
-      50%{color:#441111;text-shadow:0 0 4px rgba(255,0,0,.15)}
-    }
-    @keyframes hudPulse2{
-      0%,100%{color:#220808;text-shadow:none}
-      50%{color:#441111;text-shadow:0 0 4px rgba(255,0,0,.1)}
+    .splash-title span:nth-child(1){color:var(--black)}
+    .splash-title span:nth-child(2){color:var(--pink)}
+    .splash-title span:nth-child(odd){display:inline-block;transform:rotate(-2deg)}
+    .splash-title span:nth-child(even){display:inline-block;transform:rotate(2deg)}
+
+    .splash-sub{
+      font-size:1.1rem;
+      margin-bottom:24px;
+      color:rgba(0,0,0,0.7);
     }
 
-    /* ═══ NEON STAGE (contains everything around the text) ═══ */
-    .neon-stage{
+    .splash-btn{
+      display:inline-block;
+      padding:16px 40px;
+      background:var(--lime);
+      border:var(--border);
+      box-shadow:4px 4px 0 var(--black);
+      font-family:'Space Grotesk',sans-serif;
+      font-size:1.1rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      cursor:pointer;
+      transition:all 0.15s ease;
+    }
+    .splash-btn:hover{
+      transform:translate(-2px,-2px);
+      box-shadow:6px 6px 0 var(--black);
+      background:#b8e600;
+    }
+    .splash-btn:active{
+      transform:translate(2px,2px);
+      box-shadow:2px 2px 0 var(--black);
+    }
+
+    /* Doodle decorations */
+    .doodle{
+      position:absolute;
+      font-size:3rem;
+      opacity:0.6;
+      animation:doodleWiggle 2s ease-in-out infinite;
+    }
+    @keyframes doodleWiggle{
+      0%,100%{transform:rotate(-10deg)}
+      50%{transform:rotate(10deg)}
+    }
+    .dood-1{top:8%;left:15%;animation-delay:0s}
+    .dood-2{top:70%;left:5%;animation-delay:0.7s;font-size:2.5rem}
+    .dood-3{top:20%;right:12%;animation-delay:1.4s;font-size:2rem}
+    .dood-4{bottom:12%;right:20%;animation-delay:0.3s}
+
+    /* ═══════════════════════════════════════
+       MAIN DASHBOARD
+       ═══════════════════════════════════════ */
+    #main-app{
+      min-height:100vh;
+      opacity:0;
+      transition:opacity 0.5s ease 0.5s;
+    }
+    #main-app.visible{opacity:1}
+
+    /* Header */
+    .brutal-header{
+      background:var(--black);
+      color:var(--white);
+      padding:24px;
+      border-bottom:6px solid var(--yellow);
       position:relative;
-      display:flex;flex-direction:column;align-items:center;
-      padding:30px clamp(20px,6vw,60px);
-      z-index:2;
+      overflow:hidden;
     }
-
-    /* ═══ DATA CONDUITS — vertical red lines on sides ═══ */
-    .conduit{
+    .brutal-header::before{
+      content:"";
       position:absolute;
-      width:1px;
-      top:0;bottom:0;
-      background:linear-gradient(180deg,transparent 5%,rgba(255,26,26,.15) 30%,rgba(255,26,26,.3) 50%,rgba(255,26,26,.15) 70%,transparent 95%);
-      animation:conduitPulse 2.5s ease-in-out infinite;
-    }
-    .conduit-l1{left:8%}
-    .conduit-l2{left:14%;animation-delay:.8s}
-    .conduit-r1{right:8%;animation-delay:.4s}
-    .conduit-r2{right:14%;animation-delay:1.2s}
-    @keyframes conduitPulse{
-      0%,100%{opacity:.3}
-      50%{opacity:1}
-    }
-
-    /* ═══ DATA PACKETS — dots traveling along conduits ═══ */
-    .packet{
-      position:absolute;
-      width:3px;height:10px;
-      background:#ff1a1a;
-      border-radius:1px;
-      box-shadow:0 0 6px #ff0000,0 0 12px rgba(255,0,0,.3);
-    }
-    .packet-l1{left:calc(8% - 1px);animation:packetDown 3.2s linear infinite}
-    .packet-l2{left:calc(14% - 1px);animation:packetUp 2.8s linear infinite;animation-delay:.6s}
-    .packet-r1{right:calc(8% - 1px);animation:packetUp 3.5s linear infinite;animation-delay:1s}
-    .packet-r2{right:calc(14% - 1px);animation:packetDown 2.6s linear infinite;animation-delay:.3s}
-    @keyframes packetDown{
-      0%{top:-10px;opacity:0}
-      5%{opacity:1}
-      95%{opacity:1}
-      100%{top:calc(100% + 10px);opacity:0}
-    }
-    @keyframes packetUp{
-      0%{bottom:-10px;opacity:0}
-      5%{opacity:1}
-      95%{opacity:1}
-      100%{bottom:calc(100% + 10px);opacity:0}
-    }
-
-    /* ═══ SPARKS — floating particles ═══ */
-    .spark{
-      position:absolute;
-      width:2px;height:2px;
-      background:#ff1a1a;
+      top:-50%;right:-10%;
+      width:300px;height:300px;
+      background:var(--yellow);
       border-radius:50%;
-      box-shadow:0 0 4px #ff0000;
-      pointer-events:none;
-    }
-    .s1{top:10%;left:20%;animation:sparkFloat1 5s ease-in-out infinite}
-    .s2{top:25%;right:18%;animation:sparkFloat2 6s ease-in-out infinite;animation-delay:1s}
-    .s3{top:60%;left:12%;animation:sparkFloat3 4.5s ease-in-out infinite;animation-delay:2s;width:3px;height:3px;box-shadow:0 0 6px #ff0000}
-    .s4{top:75%;right:22%;animation:sparkFloat1 5.5s ease-in-out infinite;animation-delay:.5s}
-    .s5{top:15%;left:35%;animation:sparkFloat2 7s ease-in-out infinite;animation-delay:3s;width:1px;height:1px}
-    .s6{top:80%;left:30%;animation:sparkFloat3 4s ease-in-out infinite;animation-delay:1.5s}
-    .s7{top:40%;right:10%;animation:sparkFloat1 6.5s ease-in-out infinite;animation-delay:2.5s;width:1px;height:1px}
-    .s8{top:50%;left:5%;animation:sparkFloat2 5s ease-in-out infinite;animation-delay:4s}
-    @keyframes sparkFloat1{
-      0%,100%{transform:translate(0,0);opacity:.2}
-      25%{transform:translate(8px,-12px);opacity:.8}
-      50%{transform:translate(-4px,-20px);opacity:.3}
-      75%{transform:translate(6px,-8px);opacity:.7}
-    }
-    @keyframes sparkFloat2{
-      0%,100%{transform:translate(0,0);opacity:.3}
-      33%{transform:translate(-10px,-15px);opacity:.9}
-      66%{transform:translate(5px,-25px);opacity:.2}
-    }
-    @keyframes sparkFloat3{
-      0%,100%{transform:translate(0,0);opacity:.1}
-      50%{transform:translate(12px,-18px);opacity:.8}
+      opacity:0.1;
     }
 
-    /* ═══ HUD FRAME — corner brackets ═══ */
-    .hud-frame{
-      position:absolute;
-      inset:6px 0;
-      pointer-events:none;
-    }
-    .hud-c{
-      position:absolute;
-      width:clamp(14px,3vw,24px);
-      height:clamp(14px,3vw,24px);
-    }
-    .hud-c.tl{top:0;left:0;border-top:2px solid rgba(255,26,26,.35);border-left:2px solid rgba(255,26,26,.35);animation:hudCPulse 3s ease-in-out infinite}
-    .hud-c.tr{top:0;right:0;border-top:2px solid rgba(255,26,26,.35);border-right:2px solid rgba(255,26,26,.35);animation:hudCPulse 3s ease-in-out infinite;animation-delay:.5s}
-    .hud-c.bl{bottom:0;left:0;border-bottom:2px solid rgba(255,26,26,.35);border-left:2px solid rgba(255,26,26,.35);animation:hudCPulse 3s ease-in-out infinite;animation-delay:1s}
-    .hud-c.br{bottom:0;right:0;border-bottom:2px solid rgba(255,26,26,.35);border-right:2px solid rgba(255,26,26,.35);animation:hudCPulse 3s ease-in-out infinite;animation-delay:1.5s}
-    @keyframes hudCPulse{
-      0%,100%{opacity:.3;border-color:rgba(255,26,26,.25)}
-      50%{opacity:.8;border-color:rgba(255,26,26,.5)}
+    .header-grid{
+      max-width:1400px;
+      margin:0 auto;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:16px;
     }
 
-    /* ═══ NEON INNER — wraps text + overlays ═══ */
-    .neon-inner{
-      position:relative;
-      padding:8px 0;
+    .logo-box{
+      display:flex;align-items:center;gap:14px;
+    }
+    .logo-mark{
+      width:56px;height:56px;
+      background:var(--yellow);
+      border:3px solid var(--white);
+      display:flex;align-items:center;justify-content:center;
+      font-size:28px;
+      transform:rotate(-5deg);
     }
 
-    /* Scanlines */
-    .neon-scanlines{
-      position:absolute;inset:-20px -40px;
-      background:repeating-linear-gradient(
-        0deg,transparent,transparent 2px,
-        rgba(0,0,0,0.12) 2px,rgba(0,0,0,0.12) 4px
-      );
-      pointer-events:none;z-index:5;
-    }
-
-    /* Holographic shimmer sweep */
-    .neon-shimmer{
-      position:absolute;inset:-20px -40px;
-      background:linear-gradient(
-        105deg,
-        transparent 38%,
-        rgba(255,80,80,0.04) 43%,
-        rgba(255,180,180,0.08) 50%,
-        rgba(255,80,80,0.04) 57%,
-        transparent 62%
-      );
-      background-size:250% 100%;
-      animation:shimmerSweep 5s ease-in-out infinite;
-      pointer-events:none;z-index:4;
-    }
-    @keyframes shimmerSweep{
-      0%{background-position:250% 0}
-      100%{background-position:-250% 0}
-    }
-
-    /* ═══ THE NEON TEXT ITSELF ═══ */
-    .neon-adtext{
-      font-family:'Courier New',Courier,monospace;
-      font-size:clamp(2.2rem,8vw,4.8rem);
+    .logo-text{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:2rem;
       font-weight:900;
-      color:#ff1a1a;
+      letter-spacing:-1px;
       text-transform:uppercase;
-      letter-spacing:clamp(4px,1.8vw,16px);
-      line-height:1;
+    }
+
+    .header-actions{
+      display:flex;gap:12px;
+    }
+    .header-chip{
+      padding:8px 16px;
+      background:var(--white);
+      color:var(--black);
+      font-size:0.8rem;
+      font-weight:700;
+      border:2px solid var(--white);
+    }
+    .chip-cyan{background:var(--cyan);color:var(--black)}
+    .chip-pink{background:var(--pink);color:var(--black)}
+
+    /* Main Container */
+    .app-container{
+      max-width:1400px;
+      margin:0 auto;
+      padding:32px 24px;
+    }
+
+    /* Hero Banner */
+    .hero-banner{
+      background:var(--cyan);
+      border:var(--border);
+      box-shadow:var(--shadow);
+      padding:48px 32px;
+      margin-bottom:36px;
       position:relative;
-      text-shadow:
-        0 0 4px #ff1a1a,
-        0 0 8px #ff1a1a,
-        0 0 15px #ff1a1a,
-        0 0 30px #ff0000,
-        0 0 55px #ff0000,
-        0 0 80px #cc0000,
-        0 0 110px rgba(255,0,0,0.35);
-      animation:neonBreath 4s ease-in-out infinite;
-      z-index:3;
+      overflow:hidden;
     }
-
-    /* Breathing glow (not the flicker — smoother) */
-    @keyframes neonBreath{
-      0%,100%{
-        text-shadow:
-          0 0 4px #ff1a1a,
-          0 0 8px #ff1a1a,
-          0 0 15px #ff1a1a,
-          0 0 30px #ff0000,
-          0 0 55px #ff0000,
-          0 0 80px #cc0000,
-          0 0 110px rgba(255,0,0,0.35);
-        filter:brightness(1);
-      }
-      50%{
-        text-shadow:
-          0 0 6px #ff1a1a,
-          0 0 12px #ff1a1a,
-          0 0 22px #ff0000,
-          0 0 40px #ff0000,
-          0 0 70px #ff0000,
-          0 0 100px #cc0000,
-          0 0 140px rgba(255,0,0,0.4);
-        filter:brightness(1.15);
-      }
-    }
-
-    /* Glitch layer 1 — red offset */
-    .neon-adtext::before{
-      content:attr(data-text);
+    .hero-banner::after{
+      content:"";
       position:absolute;
-      top:0;left:0;
-      width:100%;height:100%;
-      color:#ff3333;
-      text-shadow:0 0 6px #ff0000;
-      clip-path:inset(50% 0 50% 0);
-      transform:translate(0);
-      animation:glitchClip1 6s steps(1) infinite;
-      pointer-events:none;
-      z-index:6;
-    }
-
-    /* Glitch layer 2 — cyan offset (RGB split) */
-    .neon-adtext::after{
-      content:attr(data-text);
-      position:absolute;
-      top:0;left:0;
-      width:100%;height:100%;
-      color:#00ccff;
-      text-shadow:0 0 6px #00eaff;
-      clip-path:inset(50% 0 50% 0);
-      transform:translate(0);
-      animation:glitchClip2 6s steps(1) infinite;
-      pointer-events:none;
-      z-index:6;
-    }
-
-    /* Glitch fires ~12% of the cycle */
-    @keyframes glitchClip1{
-      0%,86%,100%{clip-path:inset(50% 0 50% 0);transform:translate(0);opacity:0}
-      87%{clip-path:inset(8% 0 68% 0);transform:translate(-5px,-2px);opacity:1}
-      89%{clip-path:inset(58% 0 6% 0);transform:translate(4px,1px);opacity:1}
-      91%{clip-path:inset(22% 0 52% 0);transform:translate(-3px,3px);opacity:.8}
-      93%{clip-path:inset(72% 0 4% 0);transform:translate(6px,-1px);opacity:.5}
-      95%{clip-path:inset(38% 0 38% 0);transform:translate(-2px,0);opacity:.2}
-    }
-    @keyframes glitchClip2{
-      0%,88%,100%{clip-path:inset(50% 0 50% 0);transform:translate(0);opacity:0}
-      89%{clip-path:inset(62% 0 5% 0);transform:translate(5px,2px);opacity:1}
-      90%{clip-path:inset(12% 0 72% 0);transform:translate(-4px,-1px);opacity:1}
-      92%{clip-path:inset(38% 0 42% 0);transform:translate(6px,0);opacity:.7}
-      94%{clip-path:inset(78% 0 2% 0);transform:translate(-5px,2px);opacity:.4}
-      96%{clip-path:inset(5% 0 80% 0);transform:translate(3px,-2px);opacity:.1}
-    }
-
-    /* ═══ REFLECTION ═══ */
-    .neon-reflection{
-      font-family:'Courier New',Courier,monospace;
-      font-size:clamp(2.2rem,8vw,4.8rem);
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:clamp(4px,1.8vw,16px);
-      line-height:1;
-      color:transparent;
-      position:relative;
-      z-index:2;
-      transform:scaleY(-0.3);
-      transform-origin:top center;
-      -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.12) 0%,transparent 80%);
-      mask-image:linear-gradient(180deg,rgba(0,0,0,0.12) 0%,transparent 80%);
-      filter:blur(3px);
-      margin-top:-4px;
-      pointer-events:none;
-    }
-    /* Reflection uses background-clip for the glow effect */
-    .neon-reflection{
-      background:linear-gradient(180deg,#ff1a1a,#ff0000);
-      -webkit-background-clip:text;
-      background-clip:text;
-    }
-
-    /* ═══ AMBIENT GLOW ═══ */
-    .neon-ambient{
-      position:absolute;
-      width:clamp(250px,55vw,480px);
-      height:100px;
+      bottom:-30px;right:-30px;
+      width:150px;height:150px;
+      border:4px solid rgba(0,0,0,0.1);
       border-radius:50%;
-      background:radial-gradient(ellipse,rgba(255,0,0,0.1) 0%,transparent 70%);
-      pointer-events:none;
-      animation:ambientPulse 3s ease-in-out infinite;
-      z-index:0;
-    }
-    @keyframes ambientPulse{
-      0%,100%{opacity:.5;transform:scale(1)}
-      50%{opacity:1;transform:scale(1.1)}
     }
 
-    /* ═══ BELOW NEON — off indicators ═══ */
-    .off-dot{
-      width:10px;height:10px;border-radius:50%;
-      background:#0f0f0f;border:2px solid #080808;
-      animation:offPulse 3s ease-in-out infinite;
-      margin-top:28px;margin-bottom:16px;
-      position:relative;z-index:2;
+    .hero-label{
+      display:inline-block;
+      background:var(--black);
+      color:var(--white);
+      padding:6px 14px;
+      font-size:0.75rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      margin-bottom:16px;
+      transform:rotate(-2deg);
     }
-    @keyframes offPulse{
-      0%,100%{background:#080808;border-color:#040404;box-shadow:none}
-      50%{background:#1a1a1a;border-color:#111;box-shadow:0 0 5px rgba(255,26,26,.05)}
+
+    .hero-title{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(2rem,5vw,3.5rem);
+      font-weight:900;
+      line-height:1.1;
+      margin-bottom:16px;
+      max-width:700px;
     }
-    .off-text{
-      color:#0d0d0d;font-size:.8rem;font-weight:900;
-      letter-spacing:8px;text-transform:uppercase;
-      font-family:'Courier New',Courier,monospace;
-      position:relative;z-index:2;
+
+    .hero-desc{
+      font-size:1.05rem;
+      max-width:550px;
+      line-height:1.6;
+      margin-bottom:28px;
+      opacity:0.85;
     }
-    .off-hint{
-      color:#080808;font-size:.5rem;font-weight:900;
-      letter-spacing:2px;text-transform:uppercase;
-      font-family:'Courier New',Courier,monospace;
-      animation:hintPulse 4s ease-in-out infinite;
-      text-align:center;padding:0 20px;margin-top:6px;
-      position:relative;z-index:2;
+
+    /* Brutal Search */
+    .brutal-search{
+      display:flex;
+      gap:0;
+      max-width:480px;
     }
-    @keyframes hintPulse{0%,100%{color:#050505}50%{color:#111}}
-
-    /* ═══════════════════════════════════════
-       LOGO HEADER (dashboard)
-       ═══════════════════════════════════════ */
-    .logo-header{text-align:center;padding:28px 16px 12px;position:relative;z-index:1;user-select:none}
-    .logo-row{display:inline-flex;align-items:center;gap:14px}
-    .logo-shield{width:48px;height:48px;flex-shrink:0;filter:drop-shadow(0 0 12px rgba(0,191,255,.4))}
-    .logo-text-block{text-align:left}
-    .logo-title{
-      color:#00eaff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-      font-size:2rem;text-transform:uppercase;letter-spacing:5px;line-height:1.1;
-      text-shadow:0 0 1px #f1f3f3,0 0 2px #fafafa,0 0 3px #f8fafa,0 0 5px #f9fbfb,0 0 8px #f2f4f5,0 0 10px #f9fbfb,0 0 15px #f4f5f6;
+    .brutal-search input{
+      flex:1;
+      padding:16px 20px;
+      border:4px solid var(--black);
+      border-right:none;
+      font-family:'Space Mono',monospace;
+      font-size:1rem;
+      outline:none;
+      background:var(--white);
+      /* 安全增强：限制输入长度 */
+      maxlength="200";
+      autocomplete="off";
+      autocorrect="off";
+      spellcheck="false";
     }
-    .logo-sub{font-family:'Courier New',Courier,monospace;font-size:.6rem;color:#336;letter-spacing:4px;text-transform:uppercase;margin-top:4px}
+    .brutal-search input:focus{
+      background:var(--yellow);
+    }
+    .brutal-search button{
+      padding:16px 28px;
+      background:var(--black);
+      color:var(--white);
+      border:4px solid var(--black);
+      font-family:'Space Grotesk',sans-serif;
+      font-weight:700;
+      font-size:1rem;
+      cursor:pointer;
+      transition:all 0.15s ease;
+    }
+    .brutal-search button:hover{
+      background:var(--pink);
+      color:var(--black);
+    }
 
-    #page-content{position:relative;z-index:1;transition:opacity .5s ease;flex:1}
-    #page-content.powered-off{opacity:0;pointer-events:none}
+    /* Section Title */
+    .section-head{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:24px;
+    }
+    .section-tag{
+      background:var(--lime);
+      border:3px solid var(--black);
+      padding:8px 18px;
+      font-family:'Space Grotesk',sans-serif;
+      font-weight:700;
+      font-size:0.9rem;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      box-shadow:4px 4px 0 var(--black);
+      transform:rotate(-1deg);
+    }
+    .section-line{
+      flex:1;height:4px;background:var(--black);
+    }
 
-    .glow-box{background:rgba(0,0,20,.1);border:2px solid #00bfff;border-radius:12px;padding:20px;color:#fff;font-family:monospace;box-shadow:0 0 18px rgba(0,191,255,.7);overflow-wrap:break-word;position:relative;z-index:1}
-    .glow-box h3{margin-bottom:12px;color:#00eaff;font-size:.95rem}
+    /* Card Grid */
+    .card-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      gap:24px;
+      margin-bottom:40px;
+    }
 
-    .categories-section{max-width:520px;margin:12px auto;padding:0 16px}
-    .section-label{font-family:'Courier New',Courier,monospace;font-size:.6rem;color:#335;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;padding-left:4px}
-    .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .cat-card{display:flex;align-items:center;gap:12px;background:rgba(0,0,20,.12);border:1.5px solid rgba(0,191,255,.25);border-radius:10px;padding:16px 14px;text-decoration:none;color:#fff;transition:all .2s ease;min-height:72px}
-    .cat-card:hover,.cat-card:focus-visible{background:rgba(0,191,255,.08);border-color:#00bfff;box-shadow:0 0 20px rgba(0,191,255,.3);text-decoration:none}
-    .cat-card:active{transform:scale(.97)}
-    .cat-card:focus-visible{outline:2px solid #00eaff;outline-offset:2px}
-    .cat-icon{width:40px;height:40px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center}
-    .cat-icon svg{width:22px;height:22px}
-    .cat-icon.music-icon{background:rgba(0,191,255,.1);border:1px solid rgba(0,191,255,.2)}
-    .cat-icon.radio-icon{background:rgba(255,157,0,.1);border:1px solid rgba(255,157,0,.2)}
-    .cat-icon.aio-icon{background:rgba(0,255,65,.08);border:1px solid rgba(0,255,65,.15)}
-    .cat-info{display:flex;flex-direction:column;gap:2px;min-width:0}
-    .cat-name{font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .cat-desc{font-size:.65rem;color:#779;font-style:normal;font-weight:400}
-
-    .docuscout-section{max-width:520px;margin:12px auto;padding:0 16px}
-    .docuscout-box{padding:18px}
-    .docuscout-box p{margin-bottom:12px;color:#889;font-size:.82rem;line-height:1.5}
-    .docuscout-status{margin-top:14px;font-size:.7rem;color:#445;text-align:right}
-    .docuscout-status .active{color:#00ff41}
-
-    .quick-links-section{max-width:520px;margin:12px auto;padding:0 16px}
-    .quick-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-    .quick-row::-webkit-scrollbar{display:none}
-    .quick-chip{flex-shrink:0;display:flex;align-items:center;gap:8px;background:rgba(0,0,20,.15);border:1.5px solid rgba(0,191,255,.15);border-radius:24px;padding:10px 18px;text-decoration:none;color:#aac;font-size:.72rem;font-family:'Courier New',Courier,monospace;font-weight:600;transition:all .2s ease;white-space:nowrap;min-height:44px}
-    .quick-chip:hover,.quick-chip:focus-visible{color:#00eaff;border-color:rgba(0,191,255,.4);background:rgba(0,191,255,.06);text-decoration:none}
-    .quick-chip:active{transform:scale(.96)}
-    .quick-chip:focus-visible{outline:2px solid #00eaff;outline-offset:2px}
-    .quick-chip svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
-
-    .engines-section{max-width:520px;margin:12px auto;padding:0 16px 24px}
-    .engine-list{display:flex;flex-direction:column;gap:8px}
-    .engine-card{display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.3);border-radius:10px;padding:14px 16px;text-decoration:none;color:#fff;transition:all .2s ease;min-height:60px;border:1px solid transparent}
-    .engine-card:hover,.engine-card:focus-visible{background:rgba(255,255,255,.05);border-color:rgba(0,191,255,.15);box-shadow:0 0 20px rgba(0,191,255,.08);text-decoration:none}
-    .engine-card:active{transform:scale(.98)}
-    .engine-card:focus-visible{outline:2px solid #00eaff;outline-offset:2px}
-    .engine-logo{width:36px;height:36px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
-    .engine-logo svg{width:20px;height:20px}
-    .engine-info{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
-    .engine-name{font-weight:700;font-size:.88rem}
-    .engine-desc{font-size:.68rem;color:#778;font-style:italic}
-    .engine-arrow{flex-shrink:0;width:20px;height:20px;opacity:.15;transition:opacity .2s}
-    .engine-card:hover .engine-arrow{opacity:.45}
-
-    .site-footer{background:rgba(0,0,0,.5);color:#556;font-size:.75rem;text-align:center;padding:12px 16px;user-select:none;position:relative;z-index:1}
-    .site-footer small{display:inline-block;letter-spacing:1px}
-    .policy-links{text-align:center;padding:8px 16px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));font-size:.75rem;position:relative;z-index:1}
-    .policy-links a{color:#00bfff;text-decoration:none;padding:8px 10px;display:inline-flex;align-items:center;min-height:44px}
-    .policy-links a:hover{text-decoration:underline}
-    .policy-links a:focus-visible{outline:2px solid #00eaff;outline-offset:2px;border-radius:3px}
-    .policy-sep{color:#223}
-
-    /* ═══════════════════════════════════════
-       POWER FOOTER
-       ═══════════════════════════════════════ */
-    #power-footer{position:relative;z-index:2500;flex-shrink:0;margin-top:auto;padding-bottom:env(safe-area-inset-bottom,0px)}
-    #sys-light-bar{height:5px;width:100%;background:#ff1a1a;box-shadow:0 0 12px #ff1a1a;transition:background .5s ease,box-shadow .5s ease}
-    #sys-light-bar.on{background:#00ff41;box-shadow:0 0 24px #00ff41}
-
-    .power-controls{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(145deg,#151515,#080808);border-top:3px solid #000;gap:10px}
-    .power-unit{display:flex;align-items:center;gap:12px}
-    .power-toggle-col{display:flex;flex-direction:column;align-items:center}
-
-    .armor-toggle{width:60px;height:30px;background:linear-gradient(180deg,#1a1a1a,#0a0a0a);border:3px solid #000;border-radius:6px;cursor:pointer;position:relative;box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(0,0,0,.8);transition:all .3s ease;flex-shrink:0}
-    .armor-toggle:active{border-color:#00ff41}
-    .armor-toggle::before{content:"";position:absolute;top:50%;right:6px;transform:translateY(-50%);width:7px;height:7px;border-radius:50%;background:#ff1a1a;border:1.5px solid #330000;box-shadow:0 0 6px #ff1a1a;transition:all .4s ease;z-index:3}
-    .armor-toggle.on::before{background:#00ff41;border-color:#005500;box-shadow:0 0 8px #00ff41,0 0 18px rgba(0,255,65,.12)}
-    .toggle-lever{position:absolute;top:2px;left:2px;width:20px;height:16px;background:linear-gradient(180deg,#444,#222);border:1.5px solid #000;border-radius:3px;box-shadow:inset 1px 1px 0 #666,1px 1px 3px rgba(0,0,0,.6);transition:left .3s cubic-bezier(.4,0,.2,1);z-index:2}
-    .toggle-lever::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:1.5px;background:#111;box-shadow:0 -2.5px 0 #111,0 2.5px 0 #111;border-radius:1px}
-    .armor-toggle.on .toggle-lever{left:27px;background:linear-gradient(180deg,#555,#2a2a2a);box-shadow:inset 1px 1px 0 #777,1px 1px 3px rgba(0,0,0,.6),0 0 5px rgba(0,255,65,.1)}
-    .toggle-labels{display:flex;justify-content:space-between;width:60px;margin-top:2px;padding:0 2px}
-    .toggle-labels span{font-size:.38rem;font-weight:900;letter-spacing:1px;color:#1a1a1a;transition:color .3s;font-family:'Courier New',Courier,monospace}
-    .toggle-labels .lbl-on.active-lbl{color:#00ff41}
-    .toggle-labels .lbl-off.active-lbl{color:#ff1a1a}
-
-    .power-info{display:flex;flex-direction:column;gap:2px}
-    .power-label-top{font-size:.42rem;color:#333;text-transform:uppercase;letter-spacing:2px;font-weight:900;font-family:'Courier New',Courier,monospace}
-    #status-text{font-weight:900;letter-spacing:1.5px;color:#ff1a1a;font-size:.62rem;transition:color .4s;font-family:'Courier New',Courier,monospace}
-    #status-text.on{color:#00ff41}
-
-    /* ═══ Footer brand — glow + glitch ═══ */
-    .footer-brand{
-      display:flex;align-items:center;gap:8px;
-      font-family:'Courier New',Courier,monospace;
-      font-weight:900;font-size:.7rem;
-      letter-spacing:2px;text-transform:uppercase;
-      white-space:nowrap;transition:all .5s ease;
+    /* Brutal Card */
+    .brutal-card{
+      background:var(--white);
+      border:var(--border);
+      box-shadow:var(--shadow);
+      padding:28px;
       position:relative;
+      transition:all 0.2s ease;
+      text-decoration:none;
+      color:var(--black);
+      display:block;
     }
-    .footer-brand svg{width:20px;height:20px;flex-shrink:0;transition:all .5s ease}
-    .footer-brand.off{
-      color:#ff1a1a;
-      text-shadow:0 0 4px #ff1a1a,0 0 8px #ff1a1a,0 0 16px rgba(255,0,0,.35);
+    .brutal-card:hover{
+      transform:translate(-3px,-3px);
+      box-shadow:var(--shadow-hover);
     }
-    .footer-brand.off svg{filter:drop-shadow(0 0 4px #ff1a1a) drop-shadow(0 0 8px rgba(255,0,0,.25))}
-    /* Footer brand micro-glitch when off */
-    .footer-brand.off .fb-text{position:relative}
-    .footer-brand.off .fb-text::before{
-      content:attr(data-text);
-      position:absolute;top:0;left:0;
-      color:#ff3333;
-      clip-path:inset(50% 0 50% 0);
-      animation:fbGlitch 4s steps(1) infinite;
+    .brutal-card:active{
+      transform:translate(2px,2px);
+      box-shadow:3px 3px 0 var(--black);
     }
-    @keyframes fbGlitch{
-      0%,90%,100%{clip-path:inset(50% 0 50% 0);transform:translate(0);opacity:0}
-      91%{clip-path:inset(20% 0 60% 0);transform:translate(-2px,0);opacity:1}
-      93%{clip-path:inset(50% 0 20% 0);transform:translate(2px,0);opacity:.6}
-      95%{clip-path:inset(70% 0 10% 0);transform:translate(-1px,0);opacity:.2}
-    }
-    .footer-brand.on{
-      color:#00ff41;
-      text-shadow:0 0 4px #00ff41,0 0 8px #00ff41,0 0 16px rgba(0,255,65,.25);
-    }
-    .footer-brand.on svg{filter:drop-shadow(0 0 4px #00ff41) drop-shadow(0 0 8px rgba(0,255,65,.25))}
-    /* Status badge next to brand */
-    .fb-badge{
-      font-size:.42rem;letter-spacing:1px;
-      padding:2px 5px;border-radius:2px;
-      margin-left:4px;font-weight:900;
-      transition:all .5s ease;
-    }
-    .fb-badge.off{background:rgba(255,26,26,.1);color:#ff1a1a;border:1px solid rgba(255,26,26,.2)}
-    .fb-badge.on{background:rgba(0,255,65,.08);color:#00ff41;border:1px solid rgba(0,255,65,.15)}
 
-    .power-led{width:8px;height:8px;border-radius:50%;background:#ff1a1a;border:1.5px solid #330000;box-shadow:0 0 5px #ff1a1a;transition:all .4s ease;flex-shrink:0}
-    .power-led.on{background:#00ff41;border-color:#005500;box-shadow:0 0 8px #00ff41,0 0 16px rgba(0,255,65,.15)}
+    .card-color-bar{
+      height:8px;
+      background:var(--black);
+      margin:-28px -28px 24px -28px;
+    }
+    .bar-yellow{background:var(--yellow)}
+    .bar-pink{background:var(--pink)}
+    .bar-cyan{background:var(--cyan)}
+    .bar-lime{background:var(--lime)}
+    .bar-orange{background:var(--orange)}
+    .bar-purple{background:var(--purple)}
 
-    .noscript-msg{position:relative;z-index:1;text-align:center;color:#00bfff;padding:40px 20px;font-size:1.1rem;font-family:monospace}
+    .card-icon{
+      width:72px;height:72px;
+      border:3px solid var(--black);
+      display:flex;align-items:center;justify-content:center;
+      font-size:36px;
+      margin-bottom:20px;
+      background:var(--white);
+      box-shadow:4px 4px 0 var(--black);
+    }
 
-    /* ═══════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════ */
-    @media(min-width:769px){
-      .cat-grid{grid-template-columns:1fr 1fr 1fr}
-      .engine-list{flex-direction:row;flex-wrap:wrap;gap:10px}
-      .engine-card{flex:1 1 calc(50% - 5px);min-width:220px}
-      .logo-shield{width:56px;height:56px}
-      .logo-title{font-size:2.4rem;letter-spacing:6px}
-      .categories-section,.docuscout-section,.quick-links-section,.engines-section{max-width:640px}
+    .card-title{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:1.4rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:-0.5px;
+      margin-bottom:10px;
     }
-    @media(min-width:1024px){
-      .engine-list{flex-wrap:nowrap;flex-direction:column}
-      .engine-card{flex:none}
-      .categories-section,.docuscout-section,.quick-links-section,.engines-section{max-width:600px}
+
+    .card-text{
+      font-size:0.92rem;
+      line-height:1.6;
+      margin-bottom:20px;
+      opacity:0.75;
     }
-    @media(max-width:400px){
-      .logo-header{padding:20px 12px 8px}
-      .logo-row{gap:10px}
-      .logo-shield{width:38px;height:38px}
-      .logo-title{font-size:1.5rem;letter-spacing:3px}
-      .logo-sub{font-size:.5rem;letter-spacing:2px}
-      .cat-grid{grid-template-columns:1fr;gap:8px}
-      .cat-card{padding:14px 12px;min-height:64px}
-      .cat-icon{width:36px;height:36px;border-radius:6px}
-      .cat-icon svg{width:18px;height:18px}
-      .cat-name{font-size:.82rem}
-      .glow-box{padding:14px}
-      .quick-chip{padding:8px 14px;font-size:.66rem}
-      .engine-card{padding:12px 14px;min-height:56px}
-      .engine-logo{width:32px;height:32px}
-      .engine-logo svg{width:16px;height:16px}
-      .armor-toggle{width:52px;height:26px}
-      .toggle-lever{width:17px;height:14px}
-      .armor-toggle.on .toggle-lever{left:23px}
-      .toggle-labels{width:52px}
-      .armor-toggle::before{right:4px;width:6px;height:6px}
-      #status-text{font-size:.56rem;letter-spacing:1px}
-      .power-label-top{font-size:.38rem}
-      .power-controls{padding:8px 12px;gap:8px}
-      .footer-brand{font-size:.58rem;letter-spacing:1px}
-      .fb-badge{font-size:.36rem;padding:1px 4px}
-      .off-shield{width:32px;height:32px}
-      .conduit-l2,.conduit-r2{display:none}
-      .packet-l2,.packet-r2{display:none}
-      .hud-status{font-size:.4rem;letter-spacing:1px}
+
+    .card-tag{
+      display:inline-block;
+      padding:6px 14px;
+      background:var(--black);
+      color:var(--white);
+      font-size:0.78rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1px;
     }
-    @media(max-width:340px){
-      .logo-title{font-size:1.3rem;letter-spacing:2px}
-      .logo-shield{width:32px;height:32px}
-      .footer-brand svg{width:16px;height:16px}
-      .footer-brand{font-size:.5rem;gap:4px}
-      .fb-badge{display:none}
-      .hud-status{font-size:.35rem;padding:0 12px}
-      .conduit-l1,.conduit-r1{display:none}
-      .packet-l1,.packet-r1{display:none}
+
+    /* Two Column Layout */
+    .split-layout{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+      margin-bottom:40px;
     }
-    @media(max-height:500px) and (orientation:landscape){
-      .logo-header{padding:10px 16px 4px}
-      .logo-shield{width:30px;height:30px}
-      .logo-title{font-size:1.2rem;letter-spacing:2px}
-      .logo-sub{display:none}
-      .cat-grid{grid-template-columns:1fr 1fr 1fr;gap:6px}
-      .cat-card{padding:10px;min-height:46px;gap:8px}
-      .cat-icon{width:26px;height:26px;border-radius:4px}
-      .cat-icon svg{width:14px;height:14px}
-      .cat-name{font-size:.72rem}
-      .cat-desc{display:none}
-      .quick-chip{padding:6px 12px;min-height:36px;font-size:.58rem}
-      .engine-card{padding:10px 12px;min-height:40px;gap:10px}
-      .engine-logo{width:26px;height:26px}
-      .engine-logo svg{width:14px;height:14px}
-      .engine-desc{display:none}
-      .power-controls{padding:6px 12px}
-      .off-shield-wrap{margin-bottom:10px}
-      .neon-adtext{font-size:clamp(1.6rem,5vw,2.5rem)!important}
-      .neon-reflection{font-size:clamp(1.6rem,5vw,2.5rem)!important}
-      .neon-stage{padding:16px 30px}
-      .hud-status{display:none}
-      .off-dot{margin-top:16px;margin-bottom:10px}
+
+    /* Panel Box */
+    .panel-box{
+      background:var(--white);
+      border:var(--border);
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+    .panel-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+      padding-bottom:16px;
+      border-bottom:3px solid var(--black);
+    }
+    .panel-title{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:1.2rem;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    /* Stats Row */
+    .stats-row{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+    }
+    .stat-box{
+      background:var(--black);
+      color:var(--white);
+      padding:20px;
+      text-align:center;
+    }
+    .stat-num{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:2.5rem;
+      font-weight:900;
+      line-height:1;
+      margin-bottom:6px;
+    }
+    .stat-num.yellow{color:var(--yellow)}
+    .stat-num.cyan{color:var(--cyan)}
+    .stat-num.pink{color:var(--pink)}
+    .stat-num.lime{color:var(--lime)}
+    .stat-label{
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      opacity:0.7;
+    }
+
+    /* List Items */
+    .list-stack{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .list-item{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:16px;
+      background:var(--white);
+      border:3px solid var(--black);
+      text-decoration:none;
+      color:var(--black);
+      transition:all 0.15s ease;
+    }
+    .list-item:hover{
+      background:var(--yellow);
+      transform:translateX(6px);
+    }
+    .list-icon{
+      width:44px;height:44px;
+      background:var(--black);
+      color:var(--white);
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;
+      flex-shrink:0;
+    }
+    .list-info{flex:1}
+    .list-name{
+      font-weight:700;
+      font-size:0.95rem;
+      margin-bottom:2px;
+    }
+    .list-meta{
+      font-size:0.78rem;
+      opacity:0.6;
+    }
+    .list-arrow{
+      font-size:1.4rem;
+      font-weight:900;
+      opacity:0.3;
+      transition:opacity 0.15s ease;
+    }
+    .list-item:hover .list-arrow{opacity:1}
+
+    /* Footer */
+    .brutal-footer{
+      background:var(--black);
+      color:var(--white);
+      padding:40px 24px;
+      margin-top:60px;
+      border-top:6px solid var(--pink);
+    }
+    .footer-inner{
+      max-width:1400px;
+      margin:0 auto;
+      text-align:center;
+    }
+    .footer-links{
+      display:flex;
+      justify-content:center;
+      gap:20px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+    .footer-link{
+      color:var(--white);
+      text-decoration:none;
+      padding:8px 18px;
+      border:2px solid var(--white);
+      font-weight:700;
+      font-size:0.82rem;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      transition:all 0.15s ease;
+    }
+    .footer-link:hover{
+      background:var(--yellow);
+      color:var(--black);
+      border-color:var(--yellow);
+    }
+    .footer-copy{
+      font-size:0.8rem;
+      opacity:0.5;
+      letter-spacing:2px;
+      text-transform:uppercase;
+    }
+
+    /* Marquee */
+    .marquee-bar{
+      background:var(--lime);
+      border-top:4px solid var(--black);
+      border-bottom:4px solid var(--black);
+      padding:12px 0;
+      overflow:hidden;
+      margin-bottom:0;
+    }
+    .marquee-text{
+      display:flex;
+      white-space:nowrap;
+      font-family:'Space Grotesk',sans-serif;
+      font-weight:900;
+      font-size:1.1rem;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      animation:marqueeScroll 20s linear infinite;
+    }
+    @keyframes marqueeScroll{
+      from{transform:translateX(0)}
+      to{transform:translateX(-50%)}
+    }
+    .marquee-spacer{
+      padding:0 40px;
+    }
+
+    /* Responsive */
+    @media(max-width:900px){
+      .split-layout{grid-template-columns:1fr}
+      .brutal-search{max-width:100%}
+    }
+    @media(max-width:600px){
+      .app-container{padding:20px 16px}
+      .card-grid{grid-template-columns:1fr}
+      .header-grid{justify-content:center;text-align:center}
+      .hero-banner{padding:32px 20px}
+      .sticker{padding:10px 18px;font-size:0.9rem}
+      .splash-core{padding:30px 20px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{
+        animation-duration:0.01ms!important;
+        transition-duration:0.01ms!important;
+      }
     }
   </style>
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17083520520"></script>
-  <script>
-    window.dataLayer=window.dataLayer||[];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js',new Date());
-    gtag('config','AW-17083520520');
-    gtag('config','GT-NC6T5LRJ');
-    gtag('config','G-DR9S4GJ2C4');
-  </script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4592970036066688" crossorigin="anonymous"></script>
 </head>
 <body>
 
-  <canvas id="matrix" aria-hidden="true"></canvas>
+  <!-- Pattern Background -->
+  <div class="pattern-bg"></div>
 
-  <noscript><div class="noscript-msg">JavaScript is required to use this page. Please enable it in your browser settings.</div></noscript>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <!-- ═══════════ STICKER WALL ENTRANCE ═══════════ -->
+  <div id="sticker-wall">
+    
+    <!-- Floating Stickers -->
+    <div class="sticker stk-1">MUSIC ♪</div>
+    <div class="sticker stk-2">RADIO 📻</div>
+    <div class="sticker stk-3">GAMES 🎮</div>
+    <div class="sticker stk-4">SECURE 🔒</div>
+    <div class="sticker stk-5">FAST ⚡</div>
+    <div class="sticker stk-6">COOL 😎</div>
+    <div class="sticker stk-7">v2.0</div>
 
-  <!-- ═══════════ SHUTDOWN OVERLAY — CYBER NEON ═══════════ -->
-  <div id="shutdown-screen" aria-live="polite">
+    <!-- Doodles -->
+    <div class="doodle dood-1">✦</div>
+    <div class="doodle dood-2">★</div>
+    <div class="doodle dood-3">◆</div>
+    <div class="doodle dood-4">●</div>
 
-    <!-- Dim red shield -->
-    <div class="off-shield-wrap">
-      <svg class="off-shield" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M50 5L10 25V50C10 72 27 92 50 98C73 92 90 72 90 50V25L50 5Z" stroke="#ff1a1a" stroke-width="2.5" fill="none" opacity=".12"/>
-        <path d="M38 50L47 59L65 41" stroke="#ff1a1a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".12"/>
-      </svg>
+    <!-- Main Splash -->
+    <div class="splash-core" id="splash-trigger" tabindex="0" role="button" aria-label="Enter dashboard">
+      <h1 class="splash-title">
+        <span>My</span><span>_</span><span>Stuff</span>
+      </h1>
+      <p class="splash-sub">Your personal chaos dashboard awaits...</p>
+      <div class="splash-btn">SMASH TO ENTER →</div>
     </div>
 
-    <!-- HUD top status -->
-    <div class="hud-status hud-status-top">&gt; SIGNAL: ACTIVE | ENCRYPTION: AES-256 | NODE: OFFLINE</div>
-
-    <!-- ═══ NEON STAGE ═══ -->
-    <div class="neon-stage">
-
-      <!-- Data conduits (vertical red lines) -->
-      <div class="conduit conduit-l1"></div>
-      <div class="conduit conduit-l2"></div>
-      <div class="conduit conduit-r1"></div>
-      <div class="conduit conduit-r2"></div>
-
-      <!-- Data packets traveling along conduits -->
-      <div class="packet packet-l1"></div>
-      <div class="packet packet-l2"></div>
-      <div class="packet packet-r1"></div>
-      <div class="packet packet-r2"></div>
-
-      <!-- Floating sparks -->
-      <div class="spark s1"></div>
-      <div class="spark s2"></div>
-      <div class="spark s3"></div>
-      <div class="spark s4"></div>
-      <div class="spark s5"></div>
-      <div class="spark s6"></div>
-      <div class="spark s7"></div>
-      <div class="spark s8"></div>
-
-      <!-- HUD corner frame -->
-      <div class="hud-frame">
-        <div class="hud-c tl"></div>
-        <div class="hud-c tr"></div>
-        <div class="hud-c bl"></div>
-        <div class="hud-c br"></div>
-      </div>
-
-      <!-- The neon text + overlays -->
-      <div class="neon-inner">
-        <div class="neon-scanlines"></div>
-        <div class="neon-shimmer"></div>
-        <div class="neon-adtext" id="neon-text" data-text="MY_STUFF">MY_STUFF</div>
-      </div>
-
-      <!-- Ambient red glow -->
-      <div class="neon-ambient"></div>
-    </div>
-
-    <!-- Reflection -->
-    <div class="neon-reflection" aria-hidden="true">MY_STUFF</div>
-
-    <!-- HUD bottom status -->
-    <div class="hud-status hud-status-bot">&gt; SYSTEM HALTED | AWAITING AUTHORIZATION</div>
-
-    <!-- Power-off indicators -->
-    <div class="off-dot"></div>
-    <div class="off-text">Power Off</div>
-    <div class="off-hint">use toggle below to power on</div>
   </div>
 
-  <!-- ═══════════ PAGE CONTENT ═══════════ -->
-  <div id="page-content" class="powered-off">
+  <!-- ═══════════ MAIN APP ═══════════ -->
+  <div id="main-app">
 
-    <header class="logo-header">
-      <div class="logo-row">
-        <svg class="logo-shield" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="shieldGrad" x1="10" y1="5" x2="90" y2="98" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#00bfff" stop-opacity="0.8"/>
-              <stop offset="100%" stop-color="#0055aa" stop-opacity="0.6"/>
-            </linearGradient>
-          </defs>
-          <path d="M50 5L10 25V50C10 72 27 92 50 98C73 92 90 72 90 50V25L50 5Z" stroke="url(#shieldGrad)" stroke-width="2.5" fill="rgba(0,191,255,0.04)"/>
-          <path d="M50 12L17 29V50C17 69 31 86 50 91C69 86 83 69 83 50V29L50 12Z" stroke="#00bfff" stroke-width="0.8" fill="none" opacity="0.2"/>
-          <path d="M38 50L47 59L65 41" stroke="#00eaff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <line x1="20" y1="20" x2="30" y2="20" stroke="#00bfff" stroke-width="1.5" opacity="0.3"/>
-          <line x1="20" y1="20" x2="20" y2="30" stroke="#00bfff" stroke-width="1.5" opacity="0.3"/>
-          <line x1="80" y1="20" x2="70" y2="20" stroke="#00bfff" stroke-width="1.5" opacity="0.3"/>
-          <line x1="80" y1="20" x2="80" y2="30" stroke="#00bfff" stroke-width="1.5" opacity="0.3"/>
-          <line x1="20" y1="80" x2="30" y2="80" stroke="#00bfff" stroke-width="1.5" opacity="0.3"/>
-          <line x1="20" y1="80" x2="20" y2="70" stroke="#00bfff" stroke-width="1.5" opacity="0.3"/>
-          <line x1="80" y1="80" x2="70" y2="80" stroke="#00bfff" stroke-width="1.5" opacity="0.3"/>
-          <line x1="80" y1="80" x2="80" y2="70" stroke="#00bfff" stroke-width="1.5" opacity="0.3"/>
-        </svg>
-        <div class="logo-text-block">
-          <div class="logo-title">MY_STUFF</div>
-          <div class="logo-sub">Secure Portal v1.0</div>
+    <!-- Header -->
+    <header class="brutal-header">
+      <div class="header-grid">
+        <div class="logo-box">
+          <div class="logo-mark">⚡</div>
+          <div class="logo-text">MY_STUFF</div>
+        </div>
+        <div class="header-actions">
+          <span class="header-chip chip-cyan">ONLINE</span>
+          <span class="header-chip chip-pink">v2.0</span>
+          <span class="header-chip" id="clock-display">00:00</span>
         </div>
       </div>
     </header>
 
-    <main id="main-content">
+    <!-- Marquee Bar -->
+    <div class="marquee-bar">
+      <div class="marquee-text">
+        <span>★ WELCOME TO THE CHAOS ★</span>
+        <span class="marquee-spacer">●</span>
+        <span>ALL SYSTEMS OPERATIONAL ★</span>
+        <span class="marquee-spacer">●</span>
+        <span>ENJOY YOUR STAY ★</span>
+        <span class="marquee-spacer">●</span>
+        <span>★ WELCOME TO THE CHAOS ★</span>
+        <span class="marquee-spacer">●</span>
+        <span>ALL SYSTEMS OPERATIONAL ★</span>
+        <span class="marquee-spacer">●</span>
+        <span>ENJOY YOUR STAY ★</span>
+        <span class="marquee-spacer">●</span>
+      </div>
+    </div>
 
-      <section class="categories-section" aria-label="Categories">
-        <div class="section-label">// Categories</div>
-        <div class="cat-grid">
-          <a href="music.html" class="cat-card">
-            <div class="cat-icon music-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#00bfff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    <!-- Main Content -->
+    <main class="app-container">
+
+      <!-- Hero -->
+      <section class="hero-banner">
+        <span class="hero-label">// DASHBOARD ACTIVE</span>
+        <h1 class="hero-title">Welcome to Your Personal Command Center</h1>
+        <p class="hero-desc">No fancy animations. No slow loading. Just pure brutal functionality. Pick a module and go.</p>
+        
+       
+      </section>
+
+      <!-- Main Modules -->
+      <div class="section-head">
+        <span class="section-tag">Modules</span>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="card-grid">
+
+        <a href="music.html" class="brutal-card">
+          <div class="card-color-bar bar-yellow"></div>
+          <div class="card-icon">🎵</div>
+          <h3 class="card-title">Music Library</h3>
+          <p class="card-text">Your entire audio collection in one place. Playlists, favorites, and more.</p>
+          <span class="card-tag">Audio</span>
+        </a>
+
+        <a href="radio.html" class="brutal-card">
+          <div class="card-color-bar bar-pink"></div>
+          <div class="card-icon">📻</div>
+          <h3 class="card-title">Live Radio</h3>
+          <p class="card-text">Tune into live broadcasts from around the world. Never miss a beat.</p>
+          <span class="card-tag">Stream</span>
+        </a>
+
+        <a href="https://mohammad3230.github.io/Games-More-.../" target="_blank" rel="noopener noreferrer" class="brutal-card">
+          <div class="card-color-bar bar-lime"></div>
+          <div class="card-icon">🎮</div>
+          <h3 class="card-title">MY_STUFF_AIO V2.0</h3>
+          <p class="card-text">All-in-one gaming portal. Entertainment overload incoming.</p>
+          <span class="card-tag">Play</span>
+        </a>
+
+        <a href="https://www.iubenda.com/privacy-policy/12072372" target="_blank" rel="noopener noreferrer" class="brutal-card">
+          <div class="card-color-bar bar-purple"></div>
+          <div class="card-icon">🔒</div>
+          <h3 class="card-title">Privacy Center</h3>
+          <p class="card-text">Your data, your rules. Check out our privacy policies here.</p>
+          <span class="card-tag">Secure</span>
+        </a>
+
+      </div>
+
+      <!-- Split Panels -->
+      <div class="split-layout">
+
+        <!-- Stats Panel -->
+        <div class="panel-box">
+          <div class="panel-header">
+            <h3 class="panel-title">System Stats</h3>
+            <span style="font-size:1.5rem">📊</span>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-num yellow">4</div>
+              <div class="stat-label">Modules</div>
             </div>
-            <div class="cat-info"><span class="cat-name">My_Music</span><span class="cat-desc">Audio collection</span></div>
-          </a>
-          <a href="radio.html" class="cat-card">
-            <div class="cat-icon radio-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#ff9d00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+            <div class="stat-box">
+              <div class="stat-num cyan">99%</div>
+              <div class="stat-label">Uptime</div>
             </div>
-            <div class="cat-info"><span class="cat-name">Live Radio</span><span class="cat-desc">Stream live</span></div>
-          </a>
-          <a href="https://mohammad3230.github.io/Games-More-.../" id="uplink-link" rel="noopener noreferrer" target="_blank" class="cat-card">
-            <div class="cat-icon aio-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#00ff41" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <div class="stat-box">
+              <div class="stat-num pink">256</div>
+              <div class="stat-label">Encryption</div>
             </div>
-            <div class="cat-info"><span class="cat-name">AIO v2.0</span><span class="cat-desc">All-in-one hub</span></div>
-          </a>
+            <div class="stat-box">
+              <div class="stat-num lime">ON</div>
+              <div class="stat-label">Status</div>
+            </div>
+          </div>
         </div>
-      </section>
 
-      <section class="quick-links-section" aria-label="Quick links">
-        <div class="section-label">// Quick Access</div>
-        <div class="quick-row">
-          <a href="music.html" class="quick-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor" opacity="0.3"/></svg>Playlist
-          </a>
-          <a href="radio.html" class="quick-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Radio Live
-          </a>
-          <a href="https://mohammad3230.github.io/Games-More-.../" rel="noopener noreferrer" target="_blank" class="quick-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Games Hub
-          </a>
-          <a href="https://www.iubenda.com/privacy-policy/12072372" rel="noopener noreferrer" target="_blank" class="quick-chip">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Privacy
-          </a>
-        </div>
-      </section>
+        <!-- Search Engines Panel -->
+        <div class="panel-box">
+          <div class="panel-header">
+            <h3 class="panel-title">Quick Search</h3>
+            <span style="font-size:1.5rem">🔍</span>
+          </div>
+          <div class="list-stack">
+            
+            <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" class="list-item">
+              <div class="list-icon">G</div>
+              <div class="list-info">
+                <div class="list-name">Google</div>
+                <div class="list-meta">General search engine</div>
+              </div>
+              <span class="list-arrow">→</span>
+            </a>
 
-      <section class="docuscout-section" aria-label="System documentation search">
-        <div class="glow-box docuscout-box">
-          <h3>&gt; SYSTEM_DOCUMENTATION_SEARCH</h3>
-          <p>Enter a query to search local repositories or chat with the AI assistant.</p>
-          <div id="docuscout-search-bar" role="search"></div>
-          <div class="docuscout-status">CONNECTION_STATUS: <span class="active">ENCRYPTED</span> | KEY_ACTIVE: TRUE</div>
-        </div>
-      </section>
+            
 
-      <section class="engines-section" aria-label="Search engines">
-        <div class="section-label">// Search Engines</div>
-        <div class="engine-list">
-          <a href="https://www.google.com" target="_blank" rel="noopener noreferrer" class="engine-card">
-            <div class="engine-logo"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#4285F4" stroke-width="1.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c4.84 0 8.87-3.44 9.8-8h-9.8v-3h13c.07.66.1 1.32.1 2 0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2c2.7 0 5.15.99 7.05 2.63L16.5 7.18C15.07 5.92 13.63 5 12 5z" fill="#4285F4" opacity="0.8"/></svg></div>
-            <div class="engine-info"><span class="engine-name">Google</span><span class="engine-desc">Google will Track You</span></div>
-            <svg class="engine-arrow" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M7 4L13 10L7 16"/></svg>
-          </a>
-          <a href="https://www.algolia.com" target="_blank" rel="noopener noreferrer" class="engine-card">
-            <div class="engine-logo"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#5468FF" stroke-width="1.5"/><path d="M16.5 16.5L22 22" stroke="#5468FF" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="3" fill="#5468FF" opacity="0.4"/></svg></div>
-            <div class="engine-info"><span class="engine-name">Algolia</span><span class="engine-desc">Fast Search-as-a-Service</span></div>
-            <svg class="engine-arrow" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M7 4L13 10L7 16"/></svg>
-          </a>
-          <a href="https://www.startpage.com" target="_blank" rel="noopener noreferrer" class="engine-card">
-            <div class="engine-logo"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#678" stroke-width="1.5"/><path d="M8 12L11 15L17 9" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="engine-info"><span class="engine-name">Startpage</span><span class="engine-desc">Most Private Search Engine</span></div>
-            <svg class="engine-arrow" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M7 4L13 10L7 16"/></svg>
-          </a>
-          <a href="https://www.ecosia.org" target="_blank" rel="noopener noreferrer" class="engine-card">
-            <div class="engine-logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10z" stroke="#36A93C" stroke-width="1.5"/><path d="M12 6C9 6 7 8 7 10c0 2 1 3 2 4s2 3 2 5" stroke="#36A93C" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M12 6c3 0 5 2 5 4s-1 3-2 4-2 3-2 5" stroke="#8BC34A" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M7 10h10" stroke="#36A93C" stroke-width="1" stroke-linecap="round" opacity="0.4"/></svg></div>
-            <div class="engine-info"><span class="engine-name">Ecosia</span><span class="engine-desc">Save Trees</span></div>
-            <svg class="engine-arrow" viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M7 4L13 10L7 16"/></svg>
-          </a>
+            <a href="https://www.startpage.com" target="_blank" rel="noopener noreferrer" class="list-item">
+              <div class="list-icon">S</div>
+              <div class="list-info">
+                <div class="list-name">Startpage</div>
+                <div class="list-meta">Privacy-first search</div>
+              </div>
+              <span class="list-arrow">→</span>
+            </a>
+
+            <a href="https://www.ecosia.org" target="_blank" rel="noopener noreferrer" class="list-item">
+              <div class="list-icon">E</div>
+              <div class="list-info">
+                <div class="list-name">Ecosia</div>
+                <div class="list-meta">Eco-friendly search</div>
+              </div>
+              <span class="list-arrow">→</span>
+            </a>
+
+          </div>
         </div>
-      </section>
+
+      </div>
 
     </main>
 
-    <footer>
-      <div class="site-footer"><small>Copyright &copy; 2023-2026 All rights reserved</small></div>
-      <div class="policy-links">
-        <a href="https://www.iubenda.com/privacy-policy/12072372" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-        <span class="policy-sep">|</span>
-        <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" target="_blank" rel="noopener noreferrer">Cookie Policy</a>
+    <!-- Footer -->
+    <footer class="brutal-footer">
+      <div class="footer-inner">
+        <div class="footer-links">
+          <a href="https://www.iubenda.com/privacy-policy/12072372" target="_blank" rel="noopener noreferrer" class="footer-link">Privacy Policy</a>
+          <a href="https://www.iubenda.com/privacy-policy/12072372/cookie-policy" target="_blank" rel="noopener noreferrer" class="footer-link">Cookie Policy</a>
+          <a href="#" class="footer-link">About</a>
+        </div>
+        <p class="footer-copy">Copyright © 2023-2026 All rights reserved MY_STUFF // Built with Chaos Energy // No feelings were hurt</p>
       </div>
     </footer>
 
   </div>
 
-  <!-- ═══════════ POWER FOOTER ═══════════ -->
-  <footer id="power-footer">
-    <div id="sys-light-bar"></div>
-    <div class="power-controls">
-
-      <div class="power-unit">
-        <div class="power-toggle-col">
-          <div class="armor-toggle" id="power-toggle" role="button" tabindex="0" aria-label="Toggle power on or off" aria-pressed="false">
-            <div class="toggle-lever"></div>
-          </div>
-          <div class="toggle-labels">
-            <span class="lbl-off active-lbl">OFF</span>
-            <span class="lbl-on">ON</span>
-          </div>
-        </div>
-        <div class="power-info">
-          <div class="power-label-top">Master Power</div>
-          <div id="status-text">SYSTEM: STANDBY</div>
-        </div>
-      </div>
-
-      <!-- Footer brand with glow + badge -->
-      <div class="footer-brand off" id="footer-brand">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M50 10L18 27V50C18 68 31 83 50 88C69 83 82 68 82 50V27L50 10Z" stroke="currentColor" stroke-width="3" fill="none"/>
-          <path d="M40 50L47 57L62 42" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-        <span class="fb-text" data-text="MY_STUFF">MY_STUFF</span>
-        <span class="fb-badge off" id="fb-badge">OFFLINE</span>
-      </div>
-
-      <div class="power-led" id="power-led" aria-hidden="true"></div>
-
-    </div>
-  </footer>
-
-  <script src="https://cdn.metered.ca/docuscout/1.0/docuscout.js"></script>
-
   <script>
     'use strict';
 
-    var isPowerOn = false;
-    var docuscoutInitialized = false;
-    var corruptionTimer = null;
+    /**
+     * ═══════════════════════════════════════════════════════
+     * 安全工具函数
+     * ═══════════════════════════════════════════════════════
+     */
 
-    /* Clickjacking */
-    (function(){
-      try{if(window.top!==window.self)window.top.location=window.self.location;}catch(e){}
-    })();
-
-    /* URL safety */
-    function isSafeURL(u){
-      if(typeof u!=='string')return false;var t=u.trim();if(!t)return false;
-      try{var p=new URL(t,window.location.origin);return p.protocol==='http:'||p.protocol==='https:';}
-      catch(e){return false;}
+    /**
+     * 输入消毒函数 - 防止XSS攻击
+     * @param {string} str - 用户输入的字符串
+     * @returns {string} - 安全的字符串
+     */
+    function sanitizeInput(str) {
+      if (typeof str !== 'string') return '';
+      
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
     }
-    (function(){
-      var l=document.getElementById('uplink-link');
-      if(l)l.addEventListener('click',function(e){if(!isSafeURL(l.getAttribute('href')))e.preventDefault();});
-    })();
 
-    /* ═══════ MATRIX ═══════ */
-    var matrixCtrl=null;
-    function initializeMatrix(){
-      var c=document.getElementById('matrix');if(!c)return null;
-      var x=c.getContext('2d');if(!x)return null;
-      if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return null;
-      var ch='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()+~{}[]<>?',fs=18,cols,drops,lt=0,fi=50,aid=null,on=false;
-      function resize(){c.width=window.innerWidth;c.height=window.innerHeight;cols=Math.floor(c.width/fs);drops=[];for(var i=0;i<cols;i++)drops[i]=Math.random()*(c.height/fs)|0;}
-      resize();
-      function anim(ts){
-        if(!on)return;aid=requestAnimationFrame(anim);
-        if(ts-lt<fi)return;lt=ts;
-        x.fillStyle='rgba(0,0,16,0.1)';x.fillRect(0,0,c.width,c.height);
-        x.font=fs+'px monospace';
-        for(var i=0;i<drops.length;i++){
-          var t=ch.charAt(Math.floor(Math.random()*ch.length));
-          x.fillStyle=(i%2===0)?'#00bfff':'#e0f7ff';
-          x.fillText(t,i*fs,drops[i]*fs);
-          if(drops[i]*fs>c.height&&Math.random()>0.975)drops[i]=0;
-          drops[i]++;
-        }
+    /**
+     * 验证URL安全性
+     * @param {string} url - 要验证的URL
+     * @returns {boolean} - 是否为安全的URL
+     */
+    function isSafeUrl(url) {
+      if (typeof url !== 'string') return false;
+      
+      try {
+        const parsedUrl = new URL(url);
+        // 只允许http和https协议
+        return ['http:', 'https:'].includes(parsedUrl.protocol);
+      } catch (e) {
+        return false;
       }
-      var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(on)resize();},200);});
-      return{
-        start:function(){if(on)return;on=true;resize();x.fillStyle='#000010';x.fillRect(0,0,c.width,c.height);lt=0;aid=requestAnimationFrame(anim);},
-        stop:function(){on=false;if(aid){cancelAnimationFrame(aid);aid=null;}x.fillStyle='#000010';x.fillRect(0,0,c.width,c.height);}
+    }
+
+    /**
+     * 安全的事件处理包装器
+     * @param {Function} fn - 要执行的函数
+     * @param {string} context - 错误上下文描述
+     * @returns {Function} - 包装后的函数
+     */
+    function safeHandler(fn, context) {
+      return function(...args) {
+        try {
+          return fn.apply(this, args);
+        } catch (error) {
+          console.error(`[Security Error] ${context}:`, error.message);
+          return null;
+        }
       };
     }
 
-    /* ═══════ CHARACTER CORRUPTION (JS-driven glitch on neon text) ═══════ */
-    var CORRUPTION_CHARS = '_#/\\|[]{}<>@$%^&*!?~`0123456789';
-    var ORIGINAL_TEXT = 'MY_STUFF';
-    var corruptionActive = false;
-    var corruptionLock = false;
-
-    function startCorruption() {
-      if (corruptionActive) return;
-      corruptionActive = true;
-      var el = document.getElementById('neon-text');
-      if (!el) { corruptionActive = false; return; }
-
-      corruptionTimer = setInterval(function() {
-        if (corruptionLock || !corruptionActive) return;
-
-        /* Only corrupt ~35% of the time for subtlety */
-        if (Math.random() > 0.35) return;
-
-        corruptionLock = true;
-        var arr = ORIGINAL_TEXT.split('');
-        var count = 1 + Math.floor(Math.random() * 3);
-
-        for (var i = 0; i < count; i++) {
-          var idx = Math.floor(Math.random() * arr.length);
-          /* Never corrupt the underscore — it's the "brand identity" anchor */
-          if (arr[idx] !== '_') {
-            arr[idx] = CORRUPTION_CHARS[Math.floor(Math.random() * CORRUPTION_CHARS.length)];
-          }
+    /**
+     * ═══════════════════════════════════════════════════════
+     * 时钟功能（带错误处理）
+     * ═══════════════════════════════════════════════════════
+     */
+    function updateClock() {
+      safeHandler(function() {
+        var now = new Date();
+        var h = String(now.getHours()).padStart(2, '0');
+        var m = String(now.getMinutes()).padStart(2, '0');
+        var el = document.getElementById('clock-display');
+        if (el) {
+          el.textContent = h + ':' + m;
         }
-        el.textContent = arr.join('');
-
-        /* Restore after a brief flash */
-        var delay = 60 + Math.floor(Math.random() * 180);
-        setTimeout(function() {
-          el.textContent = ORIGINAL_TEXT;
-          corruptionLock = false;
-        }, delay);
-
-      }, 700);
+      }, 'Clock Update')();
     }
 
-    function stopCorruption() {
-      corruptionActive = false;
-      if (corruptionTimer) { clearInterval(corruptionTimer); corruptionTimer = null; }
-      corruptionLock = false;
-      var el = document.getElementById('neon-text');
-      if (el) el.textContent = ORIGINAL_TEXT;
+    // 启动时钟
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /**
+     * ═══════════════════════════════════════════════════════
+     * 搜索处理（带输入验证）
+     * ═══════════════════════════════════════════════════════
+     */
+    function handleSearch(event) {
+      event.preventDefault();
+      
+      return safeHandler(function() {
+        var input = document.getElementById('search-input');
+        if (!input) return false;
+
+        var query = sanitizeInput(input.value.trim());
+        
+        // 验证输入不为空且长度合理
+        if (!query || query.length === 0) {
+          console.warn('[Security] Empty search query blocked');
+          return false;
+        }
+
+        if (query.length > 200) {
+          console.warn('[Security] Search query too long');
+          return false;
+        }
+
+        // 检查是否包含可疑模式（基本XSS检测）
+        var suspiciousPatterns = /<script|javascript:|data:text|on\w+\s*=/i;
+        if (suspiciousPatterns.test(query)) {
+          console.warn('[Security] Suspicious pattern detected in search query');
+          return false;
+        }
+
+        // 这里可以添加实际的搜索逻辑
+        console.log('[Search] Safe query:', query);
+        
+        // 示例：跳转到Google搜索
+        var safeQuery = encodeURIComponent(query);
+        var searchUrl = 'https://www.google.com/search?q=' + safeQuery;
+        
+        if (isSafeUrl(searchUrl)) {
+          window.open(searchUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        return false;
+      }, 'Search Handler')();
     }
 
-    /* ═══════ POWER TOGGLE ═══════ */
-    function togglePower() {
-      isPowerOn = !isPowerOn;
+    /**
+     * ═══════════════════════════════════════════════════════
+     * Splash屏幕退出功能
+     * ═══════════════════════════════════════════════════════
+     */
+    var stickerWall = document.getElementById('sticker-wall');
+    var splashTrigger = document.getElementById('splash-trigger');
+    var mainApp = document.getElementById('main-app');
 
-      var lb = document.getElementById('sys-light-bar');
-      var st = document.getElementById('status-text');
-      var sd = document.getElementById('shutdown-screen');
-      var tg = document.getElementById('power-toggle');
-      var lo = document.querySelector('.lbl-on');
-      var lf = document.querySelector('.lbl-off');
-      var pc = document.getElementById('page-content');
-      var pl = document.getElementById('power-led');
-      var fb = document.getElementById('footer-brand');
-      var badge = document.getElementById('fb-badge');
+    // 防止重复触发的标志
+    var hasEntered = false;
 
-      if (isPowerOn) {
-        lb.classList.add('on');
-        st.textContent = 'SYSTEM: ACTIVE'; st.classList.add('on');
-        sd.classList.add('hidden');
-        tg.classList.add('on'); tg.setAttribute('aria-pressed', 'true');
-        lo.classList.add('active-lbl'); lf.classList.remove('active-lbl');
-        pc.classList.remove('powered-off');
-        pl.classList.add('on');
-        fb.classList.remove('off'); fb.classList.add('on');
-        badge.classList.remove('off'); badge.classList.add('on');
-        badge.textContent = 'ONLINE';
+    function enterChaos() {
+      return safeHandler(function() {
+        // 防止重复触发
+        if (hasEntered || !stickerWall) return;
+        
+        if (!stickerWall.classList.contains('hidden')) {
+          hasEntered = true;
+          stickerWall.classList.add('hidden');
+          
+          setTimeout(function() {
+            if (mainApp) {
+              mainApp.classList.add('visible');
+            }
+          }, 200);
+        }
+      }, 'Splash Exit')();
+    }
 
-        stopCorruption();
-        if (matrixCtrl) matrixCtrl.start();
-        if (!docuscoutInitialized) { initializeDocuScout(); docuscoutInitialized = true; }
+    // 绑定事件监听器
+    if (splashTrigger) {
+      splashTrigger.addEventListener('click', enterChaos);
+      splashTrigger.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          enterChaos();
+        }
+      });
+    }
 
-      } else {
-        lb.classList.remove('on');
-        st.textContent = 'SYSTEM: STANDBY'; st.classList.remove('on');
-        sd.classList.remove('hidden');
-        tg.classList.remove('on'); tg.setAttribute('aria-pressed', 'false');
-        lo.classList.remove('active-lbl'); lf.classList.add('active-lbl');
-        pc.classList.add('powered-off');
-        pl.classList.remove('on');
-        fb.classList.remove('on'); fb.classList.add('off');
-        badge.classList.remove('on'); badge.classList.add('off');
-        badge.textContent = 'OFFLINE';
+    // 贴纸点击事件（也允许进入主界面）
+    var stickers = document.querySelectorAll('.sticker');
+    stickers.forEach(function(stk) {
+      stk.addEventListener('click', safeHandler(function() {
+        this.style.transform = 'scale(1.3) rotate(0deg)';
+        setTimeout(enterChaos, 200);
+      }, 'Sticker Click'));
+    });
 
-        startCorruption();
-        if (matrixCtrl) matrixCtrl.stop();
+    /**
+     * ═══════════════════════════════════════════════════════
+     * 全局安全事件监听器
+     * ═══════════════════════════════════════════════════════
+     */
+
+    // 阻止拖放操作（防止恶意内容被拖入）
+    document.addEventListener('dragover', function(e) {
+      e.preventDefault();
+    });
+
+    document.addEventListener('drop', function(e) {
+      e.preventDefault();
+      console.log('[Security] Drop operation prevented');
+    });
+
+    // 控制台安全提示（开发环境可见）
+    if (window.location.protocol === 'file:') {
+      console.warn(
+        '%c⚠️ Security Warning',
+        'color: red; font-size: 20px; font-weight: bold;',
+        '\nThis page is running from file:// protocol.\n' +
+        'Some security features may not work correctly.\n' +
+        'Please serve this page over HTTPS for full protection.'
+      );
+    }
+
+    // 性能监控（可选，用于检测异常行为）
+    if ('PerformanceObserver' in window) {
+      try {
+        var perfObserver = new PerformanceObserver(function(list) {
+          for (var entry of list.getEntries()) {
+            if (entry.entryType === 'longtask') {
+              console.debug('[Performance] Long task detected:', entry.duration + 'ms');
+            }
+          }
+        });
+        perfObserver.observe({ entryTypes: ['longtask'] });
+      } catch (e) {
+        // PerformanceObserver not fully supported
       }
     }
 
-    /* ═══════ DOCUSCOUT ═══════ */
-    function initializeDocuScout() {
-      try {
-        var ds = new DocuScout();
-        ds.init({ key: "20cb457b0c285be48c99ae98728892bb1ba1d78a", container: "docuscout-search-bar" });
-      } catch (e) {}
-    }
-
-    /* ═══════ EVENTS ═══════ */
-    (function() {
-      var t = document.getElementById('power-toggle');
-      if (!t) return;
-      t.addEventListener('click', togglePower);
-      t.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePower(); }
-      });
-    })();
-
-    /* ═══════ BOOT ═══════ */
-    document.addEventListener('DOMContentLoaded', function() {
-      matrixCtrl = initializeMatrix();
-      /* Page starts OFF — corruption begins immediately */
-      startCorruption();
-    });
   </script>
 </body>
 </html>
