@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced Logistics: Curvilinear Alignment</title>
+    <style>
+        :root { --panel: #1e1e2e; --accent: #89b4fa; --danger: #f38ba8; --success: #a6e3a1; }
+        body { background: #11111b; color: #cdd6f4; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; overflow: hidden; }
+        #sidebar { width: 320px; background: var(--panel); padding: 20px; border-right: 2px solid #313244; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
+        #viewport { flex-grow: 1; position: relative; background: #181825; }
+        canvas { display: block; width: 100%; height: 100%; }
+        .card { background: #313244; padding: 12px; border-radius: 8px; border: 1px solid #45475a; }
+        .btn-route { width: 100%; padding: 8px; margin: 4px 0; border: none; border-radius: 4px; cursor: pointer; background: #45475a; color: white; }
+        .btn-route.active { background: var(--accent); color: #11111b; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<aside id="sidebar">
+    <h2 style="color: var(--accent); margin: 0;">LOGIC PRO v7</h2>
+    <div class="card">
+        <div style="font-size: 0.8em; margin-bottom: 8px;">SWITCHING MATRIX</div>
+        <button class="btn-route active" onclick="setRoute(0, this)">LINE 01: MAIN</button>
+        <button class="btn-route" onclick="setRoute(1, this)">LINE 02: NORTH</button>
+        <button class="btn-route" onclick="setRoute(2, this)">LINE 03: SOUTH</button>
+    </div>
+    <div class="card">
+        <input type="range" id="throttle" min="0" max="20" step="0.1" value="8" style="width:100%">
+        <div style="text-align: center; font-size: 0.9em; margin-top: 5px;" id="speedTxt">0 km/h</div>
+    </div>
+</aside>
+
+<main id="viewport">
+    <canvas id="mainCanvas"></canvas>
+</main>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+        width = canvas.width = window.innerWidth - 320;
+        height = canvas.height = window.innerHeight;
+    }
+    window.onresize = resize;
+    resize();
+
+    let selectedRouteIndex = 0;
+    let train = { progress: 0, speed: 0, lockedRoute: 0 };
+    const junctionX = 350;
+
+    const routes = [
+        { endY: 300, color: "#89b4fa" }, // Main
+        { endY: 100, color: "#a6e3a1" }, // North
+        { endY: 500, color: "#f9e2af" }  // South
+    ];
+
+    function setRoute(idx, btn) {
+        selectedRouteIndex = idx;
+        document.querySelectorAll('.btn-route').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // --- Advanced Parametric Engine ---
+    
+    // Get position at t (0 to 1)
+    function getPos(t, routeIdx) {
+        const jT = junctionX / width;
+        if (t < jT) {
+            return { x: t * width, y: 300 };
+        } else {
+            const localT = (t - jT) / (1 - jT);
+            const p0 = { x: junctionX, y: 300 };
+            const p1 = { x: junctionX + 200, y: 300 }; // Control point
+            const p2 = { x: width, y: routes[routeIdx].endY };
+            
+            const invT = 1 - localT;
+            return {
+                x: invT * invT * p0.x + 2 * invT * localT * p1.x + localT * localT * p2.x,
+                y: invT * invT * p0.y + 2 * invT * localT * p1.y + localT * localT * p2.y
+            };
+        }
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // 1. Update Physics
+        train.speed += (parseFloat(document.getElementById('throttle').value)/1500 - train.speed) * 0.05;
+        train.progress += train.speed;
+        if (train.progress > 1) {
+            train.progress = 0;
+            train.lockedRoute = selectedRouteIndex;
+        }
+
+        // 2. Draw Tracks
+        routes.forEach((r, i) => {
+            ctx.beginPath();
+            ctx.lineWidth = (i === train.lockedRoute) ? 6 : 2;
+            ctx.strokeStyle = (i === train.lockedRoute) ? r.color : "#313244";
+            ctx.moveTo(0, 300);
+            ctx.lineTo(junctionX, 300);
+            ctx.quadraticCurveTo(junctionX + 200, 300, width, r.endY);
+            ctx.stroke();
+        });
+
+        // 3. Calculate Train Orientation (Heading)
+        // We look slightly ahead and slightly behind to find the angle
+        const lookAhead = 0.005;
+        const p1 = getPos(Math.max(0, train.progress - lookAhead), train.lockedRoute);
+        const p2 = getPos(Math.min(1, train.progress + lookAhead), train.lockedRoute);
+        const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        const currentPos = getPos(train.progress, train.lockedRoute);
+
+        // 4. Render Train with Rotation
+        ctx.save();
+        ctx.translate(currentPos.x, currentPos.y);
+        ctx.rotate(angle); // This aligns the train to the curve
+
+        // Shadows and Glow
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = routes[train.lockedRoute].color;
+
+        // Train Body
+        ctx.fillStyle = "#cdd6f4";
+        ctx.fillRect(-40, -15, 80, 30);
+        
+        // Engine Headlight
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(35, -10, 5, 20);
+
+        // Windows
+        ctx.globalAlpha = 0.4;
+        ctx.fillStyle = routes[train.lockedRoute].color;
+        ctx.fillRect(10, -12, 20, 24);
+        
+        ctx.restore();
+
+        document.getElementById('speedTxt').textContent = Math.round(train.speed * 6000) + " km/h";
+        requestAnimationFrame(loop);
+    }
+
+    loop();
+</script>
+</body>
+</html>
