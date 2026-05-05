@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Territory Dispatch | Unified Block Control</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --track-dim: #1a1a1a;
+            --track-clear: #00ff41;
+            --track-occ: #ff0000;
+            --signal-go: #2ecc71;
+            --signal-stop: #ff0000;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: #eee; 
+            font-family: 'Courier New', monospace; 
+            margin: 0; 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: #111;
+            padding: 8px 20px;
+            border-bottom: 2px solid #333;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #888;
+        }
+
+        #view-port { flex-grow: 1; background: #080808; position: relative; }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .control-panel {
+            background: #111;
+            height: 200px;
+            border-top: 2px solid #222;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            padding: 10px;
+            gap: 15px;
+        }
+
+        .module { border: 1px solid #333; padding: 10px; overflow-y: auto; background: #0a0a0a; }
+        .module-title { font-size: 9px; color: #555; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #222; }
+
+        button {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #bbb;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        button:hover { border-color: var(--track-clear); color: var(--track-clear); }
+        button.active { background: #002200; border-color: var(--track-clear); color: var(--track-clear); }
+        .btn-emergency { background: #422; border-color: #633; color: #f99; }
+        .btn-occ { border-color: #553333; }
+
+        #comm-log { font-size: 10px; color: var(--signal-go); line-height: 1.2; }
+        .occ-tag { color: var(--track-occ); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>TERRITORY DISPATCH: NY-ZONE-1 [INTEGRATED VIEW]</div>
+        <div id="clock">00:00:00</div>
+    </header>
+
+    <div id="view-port">
+        <canvas id="mainCanvas"></canvas>
+    </div>
+
+    <div class="control-panel">
+        <div class="module">
+            <div class="module-title">Interlocking & Routing</div>
+            <button onclick="setTrack(0)" class="tk-btn">TK 10</button>
+            <button onclick="setTrack(1)" class="tk-btn">TK 11</button>
+            <button onclick="setTrack(2)" class="tk-btn">TK 12</button>
+            <button onclick="setTrack(3)" class="tk-btn">TK 13</button>
+            <div style="margin-top: 5px;">
+                <button onclick="setBranch(1)" class="br-btn">Harbor Br.</button>
+                <button onclick="setBranch(2)" class="br-btn">North Br.</button>
+                <button onclick="setBranch(3)" class="br-btn">Empire Br.</button>
+            </div>
+        </div>
+        
+        <div class="module">
+            <div class="module-title">Block & Station Telemetry</div>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                <button class="btn-occ" onclick="toggleOccupancy('MAIN_ENTRY')">Entry Block</button>
+                <button class="btn-occ" onclick="toggleOccupancy('STN_THROAT')">Throat Block</button>
+                <button class="btn-occ" onclick="toggleOccupancy('UNION_STN')">Union Stn Plat</button>
+                <button class="btn-occ" onclick="toggleOccupancy('HARBOR_TERM')">Harbor Term</button>
+                <button onclick="resetSignals()" class="btn-emergency">EMERGENCY ALL RED</button>
+            </div>
+        </div>
+
+        <div class="module">
+            <div class="module-title">Signal Log</div>
+            <div id="comm-log">> SYSTEM READY...</div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const log = document.getElementById('comm-log');
+    
+    let activeTk = 0;
+    let activeBranch = 0;
+    let occupancy = {
+        'MAIN_ENTRY': false,
+        'STN_THROAT': false,
+        'UNION_STN': false,
+        'HARBOR_TERM': false
+    };
+
+    const stations = [
+        { id: 'UNION_STN', name: 'UNION STATION', x: 0.85, y: null, isMain: true },
+        { id: 'HARBOR_TERM', name: 'HARBOR TERMINAL', x: 0.85, y: 0.2, isMain: false },
+        { id: 'NORTH_PNT', name: 'NORTH POINT', x: 0.85, y: 0.1, isMain: false }
+    ];
+
+    function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        draw();
+    }
+
+    function addLog(msg, type='') {
+        const time = new Date().toLocaleTimeString([], {hour12: false});
+        log.innerHTML += `<br><span class="${type}">[${time}] ${msg}</span>`;
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function drawSignal(x, y, isClear, type = 'mast', label = "") {
+        const color = isClear ? "#2ecc71" : "#ff0000";
+        ctx.save();
+        ctx.fillStyle = "#666";
+        ctx.font = "8px monospace";
+        ctx.fillText(label, x - 12, y - 18);
+        if (type === 'mast') {
+            ctx.fillStyle = "#444";
+            ctx.fillRect(x - 1, y - 20, 2, 20); 
+            ctx.fillStyle = "#000";
+            ctx.fillRect(x - 5, y - 25, 10, 15);
+            ctx.beginPath(); ctx.arc(x, y - 18, 3, 0, Math.PI * 2);
+        } else {
+            ctx.fillStyle = "#000";
+            ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI, true); ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y - 3, 2.5, 0, Math.PI * 2);
+        }
+        ctx.fillStyle = color;
+        if(isClear) { ctx.shadowBlur = 10; ctx.shadowColor = color; }
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawStations() {
+        const w = canvas.width;
+        const h = canvas.height;
+        const midY = h / 2;
+
+        stations.forEach(stn => {
+            let drawY = stn.y ? stn.y * h : midY;
+            if (stn.isMain) {
+                if (activeTk === -1) return;
+                const tkOffsets = [-60, -20, 20, 60];
+                drawY = midY + tkOffsets[activeTk];
+            }
+
+            const isOcc = occupancy[stn.id];
+            const rectW = 120;
+            const rectH = 20;
+            const posX = w * stn.x - rectW/2;
+            const posY = drawY - rectH/2;
+
+            // 1. Clear the track line behind the station
+            ctx.fillStyle = "#080808";
+            ctx.fillRect(posX, posY, rectW, rectH);
+
+            // 2. Draw Platform Box
+            ctx.strokeStyle = isOcc ? "#ff0000" : "#444";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(posX, posY, rectW, rectH);
+            if(isOcc) {
+                ctx.fillStyle = "rgba(255, 0, 0, 0.15)";
+                ctx.fillRect(posX, posY, rectW, rectH);
+            }
+
+            // 3. Station Text
+            ctx.fillStyle = isOcc ? "#ff0000" : "#aaa";
+            ctx.font = "bold 10px 'Courier New'";
+            ctx.textAlign = "center";
+            ctx.fillText(stn.name, w * stn.x, drawY + 4);
+
+            // 4. STATION SIGNALS (START AND END)
+            // Entry Signal (West): Clear if platform is empty
+            drawSignal(posX - 20, drawY, !isOcc, 'dwarf', 'ENT');
+
+            // Exit Signal (East): Clear if platform is occupied (train waiting) AND throat is clear
+            // Note: Adjust logic as needed for your interlocking rules
+            const exitClear = isOcc && !occupancy['STN_THROAT'];
+            drawSignal(posX + rectW + 20, drawY, exitClear, 'dwarf', 'EXT');
+        });
+    }
+
+    function draw() {
+        const w = canvas.width;
+        const h = canvas.height;
+        const midY = h / 2;
+        ctx.clearRect(0, 0, w, h);
+
+        // Grid
+        ctx.strokeStyle = "#111";
+        for(let i=0; i<w; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,h); ctx.stroke(); }
+
+        // Main Entry
+        const mainOcc = occupancy['MAIN_ENTRY'];
+        ctx.strokeStyle = mainOcc ? "#ff0000" : "#333";
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(w * 0.35, midY); ctx.stroke();
+        drawSignal(w * 0.05, midY, !mainOcc, 'mast', "2W");
+
+        // Branches
+        const branches = [{ id: 1, yEnd: h * 0.2, ctrl: w * 0.3, lbl: "H-BR" }, { id: 2, yEnd: h * 0.1, ctrl: w * 0.15, lbl: "N-BR" }, { id: 3, yEnd: h * 0.8, ctrl: w * 0.25, lbl: "E-BR" }];
+        branches.forEach(b => {
+            const isAligned = activeBranch === b.id;
+            const branchOcc = (b.id === 1) ? occupancy['HARBOR_TERM'] : false;
+            ctx.strokeStyle = isAligned ? ((mainOcc || branchOcc) ? "#ff0000" : "#00ff41") : "#1a1a1a";
+            ctx.beginPath(); ctx.moveTo(w * 0.05, midY); ctx.bezierCurveTo(b.ctrl, midY, b.ctrl, b.yEnd, w, b.yEnd); ctx.stroke();
+            if(isAligned) drawSignal(w * 0.2, midY - 20, isAligned && !mainOcc && !branchOcc, 'mast', b.lbl);
+        });
+
+        // Tracks
+        const tkOffsets = [-60, -20, 20, 60];
+        tkOffsets.forEach((yOff, i) => {
+            const isAligned = activeTk === i;
+            const targetY = midY + yOff;
+            ctx.strokeStyle = isAligned ? (occupancy['STN_THROAT'] || mainOcc || occupancy['UNION_STN'] ? "#ff0000" : "#00ff41") : "#1a1a1a";
+            ctx.beginPath(); ctx.moveTo(w * 0.35, midY); ctx.bezierCurveTo(w * 0.55, midY, w * 0.65, targetY, w, targetY); ctx.stroke();
+            drawSignal(w * 0.5, targetY + 12, isAligned && !occupancy['STN_THROAT'] && !mainOcc && !occupancy['UNION_STN'], 'dwarf', `S${10+i}`);
+        });
+
+        // Draw Stations LAST so they sit on top of tracks
+        drawStations();
+    }
+
+    function setTrack(id) { activeTk = id; activeBranch = 0; addLog(`TK ${10+id} ALIGNED`); updateButtonStyles(); draw(); }
+    function setBranch(id) { activeBranch = id; activeTk = -1; addLog(`BRANCH ${id} ALIGNED`); updateButtonStyles(); draw(); }
+    function toggleOccupancy(id) { occupancy[id] = !occupancy[id]; addLog(`${id} ${occupancy[id] ? 'OCCUPIED' : 'CLEAR'}`, occupancy[id] ? 'occ-tag' : ''); draw(); }
+    function resetSignals() { Object.keys(occupancy).forEach(k => occupancy[k] = true); addLog("EMERGENCY STOP - ALL BLOCKS OCCUPIED", "occ-tag"); draw(); }
+    
+    function updateButtonStyles() {
+        document.querySelectorAll('.tk-btn').forEach((btn, i) => btn.className = (i === activeTk) ? 'tk-btn active' : 'tk-btn');
+        document.querySelectorAll('.br-btn').forEach((btn, i) => btn.className = (i + 1 === activeBranch) ? 'br-btn active' : 'br-btn');
+    }
+
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour12: false}); }, 1000);
+    window.addEventListener('resize', resize);
+    updateButtonStyles();
+    resize();
+</script>
+</body>
+</html>
