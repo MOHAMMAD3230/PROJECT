@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fixed Station Controller | Port & Penn Terminal</title>
+    <style>
+        :root {
+            --track-dim: #222;
+            --track-active: #00ff41;
+            --platform: #333;
+            --water: #1a3a5a;
+        }
+
+        body { 
+            background: #050505; 
+            color: #fff; 
+            font-family: 'Courier New', monospace; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background: #111;
+            padding: 10px 20px;
+            border-bottom: 2px solid #444;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #111 0%, #050505 100%);
+        }
+
+        canvas { display: block; }
+
+        .control-panel {
+            background: #151515;
+            height: 180px;
+            border-top: 1px solid #333;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 15px;
+            gap: 20px;
+        }
+
+        .module { border: 1px solid #222; padding: 10px; position: relative; }
+        .module::before { content: 'MODULE'; position: absolute; top: -8px; left: 10px; background: #151515; padding: 0 5px; font-size: 10px; color: #555; }
+
+        button {
+            background: #222;
+            border: 1px solid #444;
+            color: #00ff41;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        button:hover { background: #00ff41; color: #000; }
+        button.active { background: #004400; border-color: #00ff41; }
+
+        #event-log { font-size: 10px; color: #00ff41; height: 100px; overflow-y: auto; opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>NY-DISTRICT CTC: TERMINAL DISPATCH</div>
+        <div>REF: image_2bb65c.jpg | image_2b60e5.jpg</div>
+        <div id="clock">00:00:00</div>
+    </header>
+
+    <div id="canvas-container">
+        <canvas id="mainCanvas"></canvas>
+    </div>
+
+    <div class="control-panel">
+        <div class="module">
+            <div style="color: #888; font-size: 10px; margin-bottom: 5px;">STATION THROAT - WEST</div>
+            <button onclick="setRoute(0)" id="btn0">TK 10</button>
+            <button onclick="setRoute(1)" id="btn1">TK 11</button>
+            <button onclick="setRoute(2)" id="btn2">TK 12</button>
+            <button onclick="setRoute(3)" id="btn3">TK 13</button>
+            <button onclick="setRoute(4)" id="btn4">TK 14</button>
+        </div>
+        
+        <div class="module">
+            <div style="color: #888; font-size: 10px; margin-bottom: 5px;">HARBOR/DOCK INTERFACE</div>
+            <button onclick="toggleWater()">FLOOD/DRAIN CANAL</button>
+            <button onclick="toggleCranes()">ACTIVE CRANES</button>
+        </div>
+
+        <div class="module">
+            <div id="event-log">
+                > INITIALIZING TOPOLOGY...<br>
+                > ALIGNING TRACKS TO STATION...
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const log = document.getElementById('event-log');
+    
+    let activeTK = 0;
+    let waterActive = false;
+
+    const trackY = [-120, -60, 0, 60, 120];
+
+    function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        draw();
+    }
+
+    function addLog(msg) {
+        log.innerHTML += `<br>> ${msg}`;
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function draw() {
+        const w = canvas.width;
+        const h = canvas.height;
+        const midY = h / 2;
+        ctx.clearRect(0, 0, w, h);
+
+        // 1. Draw Waterway (from image_2b60e5.jpg)
+        ctx.fillStyle = waterActive ? "#1a3a5a" : "#0a1a2a";
+        ctx.fillRect(w * 0.75, 0, w * 0.15, h);
+
+        // 2. Draw Platforms (from image_2bb65c.jpg)
+        ctx.fillStyle = "#1a1a1a";
+        trackY.forEach((offset, i) => {
+            if(i < trackY.length - 1) {
+                const platY = midY + ((trackY[i] + trackY[i+1]) / 2);
+                ctx.fillRect(w * 0.6, platY - 10, w * 0.3, 20);
+                ctx.strokeStyle = "#333";
+                ctx.strokeRect(w * 0.6, platY - 10, w * 0.3, 20);
+            }
+        });
+
+        // 3. Draw Fixed Tracks
+        ctx.lineWidth = 2;
+        trackY.forEach((yOff, i) => {
+            const isActive = activeTK === i;
+            
+            // Background track
+            ctx.strokeStyle = "#222";
+            ctx.beginPath();
+            ctx.moveTo(0, midY);
+            ctx.bezierCurveTo(w * 0.3, midY, w * 0.4, midY + yOff, w * 0.6, midY + yOff);
+            ctx.lineTo(w, midY + yOff);
+            ctx.stroke();
+
+            // Active glow track
+            if(isActive) {
+                ctx.strokeStyle = "#00ff41";
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = "#00ff41";
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Signal Light
+                ctx.fillStyle = "#00ff41";
+                ctx.beginPath();
+                ctx.arc(w * 0.55, midY + yOff - 15, 4, 0, Math.PI*2);
+                ctx.fill();
+            }
+        });
+    }
+
+    function setRoute(id) {
+        activeTK = id;
+        document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn'+id).classList.add('active');
+        addLog(`INTERLOCKING: TK ${10+id} ROUTE SECURED`);
+        draw();
+    }
+
+    function toggleWater() {
+        waterActive = !waterActive;
+        addLog(waterActive ? "CANAL: HIGH TIDE LEVEL" : "CANAL: LOW TIDE LEVEL");
+        draw();
+    }
+
+    function toggleCranes() {
+        addLog("CRANES: MOVING TO LOADING POSITION");
+    }
+
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+
+    window.addEventListener('resize', resize);
+    resize();
+    document.getElementById('btn0').classList.add('active');
+</script>
+</body>
+</html>
