@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+<title>Cyberpunk Deck Terminal - E2EE ECDH Modular Edition</title>
+<style>
+  :root {
+    --chassis-dark: #1b1e22;
+    --pcb-bg: #c2beaa;
+    --pcb-trace: #8b8878;
+    --screen-crt: #00ff66;
+    --screen-off: #030a04;
+    --amber-led: #ffb000;
+    
+    /* Gboard Dark Theme Palette */
+    --gb-bg: #1e1f22;
+    --gb-key-bg: #2d2f34;
+    --gb-key-press: #3c4048;
+    --gb-action-bg: #202124;
+    --gb-blue: #8ab4f8;
+    --gb-text: #e8eaed;
+    --gb-subtext: #9aa0a6;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  body {
+    background: radial-gradient(circle at 50% 50%, #2b3036, #0e1012);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 10px;
+  }
+
+  .device-shell {
+    position: relative;
+    width: 100%;
+    max-width: 530px;
+    background: #14171a;
+    border-radius: 30px;
+    box-shadow: 
+      0 20px 40px rgba(0,0,0,0.8),
+      inset 2px 2px 4px rgba(255,255,255,0.1),
+      inset -4px -4px 10px rgba(0,0,0,0.9);
+    padding: 15px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Upper Bay */
+  .upper-bay {
+    display: flex;
+    gap: 8px;
+    position: relative;
+    width: 100%;
+  }
+
+  .power-switch-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 4px;
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  .switch-label {
+    color: #888;
+    font-size: 7px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+    font-family: 'Courier New', monospace;
+  }
+
+  .rocker-switch {
+    width: 24px;
+    height: 44px;
+    background: #08090a;
+    border-radius: 4px;
+    border: 2px solid #333;
+    cursor: pointer;
+    position: relative;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+  }
+
+  .rocker-handle {
+    position: absolute;
+    left: 1px;
+    width: 18px;
+    height: 20px;
+    background: linear-gradient(180deg, #d32f2f, #7a1515);
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    transition: top 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    top: 2px;
+  }
+
+  .rocker-switch.off .rocker-handle {
+    top: 18px;
+    background: linear-gradient(180deg, #444, #222);
+  }
+
+  .pcb-section {
+    flex: 1;
+    min-width: 105px;
+    height: 220px;
+    background: var(--pcb-bg);
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 2px 2px 8px rgba(0,0,0,0.6);
+    border: 2px solid #85806c;
+    overflow: hidden;
+    padding: 6px;
+    position: relative;
+    font-family: 'Courier New', monospace;
+  }
+
+  .pcb-trace-lines {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 30% 40%, rgba(139,136,120,0.4) 10%, transparent 11%),
+      linear-gradient(90deg, transparent 48%, var(--pcb-trace) 49%, var(--pcb-trace) 51%, transparent 52%);
+    background-size: 20px 20px, 15px 15px;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .warning-label {
+    background: #e8e4d3;
+    border: 1px solid #7c2d2d;
+    color: #a81c1c;
+    font-size: 5.5px;
+    line-height: 1.1;
+    font-weight: bold;
+    padding: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .pcb-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .mode-toggle-box {
+    background: #25282d;
+    border: 1px solid #111;
+    border-radius: 4px;
+    padding: 3px;
+    text-align: center;
+  }
+  .mode-label {
+    font-size: 6px;
+    color: #9da5b4;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+  .toggle-slider-btn {
+    width: 100%;
+    height: 18px;
+    background: #111315;
+    border-radius: 3px;
+    display: flex;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid #000;
+  }
+  .slider-indicator {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 2px;
+    top: 0;
+    left: 0;
+    transition: left 0.15s ease, background 0.15s ease;
+  }
+  .mode-toggle-box.receiver .slider-indicator {
+    left: 50%;
+    background: #f59e0b;
+  }
+  .slider-text {
+    width: 50%;
+    line-height: 18px;
+    font-size: 6.5px;
+    font-weight: bold;
+    color: #fff;
+    z-index: 2;
+    text-align: center;
+  }
+
+  .mini-btn {
+    background: #2b3036;
+    border: 1px solid #000;
+    color: #fff;
+    font-size: 6.5px;
+    padding: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 0 2px 0 #0d0e10;
+    text-align: center;
+  }
+  .mini-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 #000;
+  }
+
+  .rotary-pot {
+    width: 22px;
+    height: 22px;
+    background: radial-gradient(circle, #222 40%, #555 70%, #111 100%);
+    border-radius: 50%;
+    border: 2px solid #000;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .rotary-pot::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    width: 2px;
+    height: 5px;
+    background: #00ff66;
+    transform: translateX(-50%);
+  }
+
+  /* Screen Module */
+  .screen-module {
+    flex: 2;
+    height: 220px;
+    background: #1e2227;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), -3px 4px 10px rgba(0,0,0,0.6);
+    border: 2px solid #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px;
+    position: relative;
+  }
+
+  .brand-logo {
+    font-family: 'Arial Black', Impact, sans-serif;
+    color: #c8ced6;
+    letter-spacing: 2px;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .screen-frame {
+    width: 100%;
+    flex: 1;
+    background: var(--screen-off);
+    border-radius: 6px;
+    border: 3px solid #14171a;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .screen-frame.power-on {
+    background: #031408;
+    box-shadow: inset 0 0 12px rgba(0,255,100,0.25);
+  }
+
+  .status-header {
+    height: 16px;
+    background: #06230f;
+    border-bottom: 1px solid rgba(0,255,100,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+    color: var(--screen-crt);
+    font-size: 7.5px;
+    font-weight: bold;
+    display: none;
+    font-family: 'Courier New', monospace;
+  }
+  .screen-frame.power-on .status-header {
+    display: flex;
+  }
+
+  .status-cluster-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .header-icon {
+    font-size: 7.5px;
+  }
+
+  .wifi-meter {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5px;
+    height: 8px;
+  }
+  .bar {
+    width: 2px;
+    background: rgba(0, 255, 100, 0.2);
+  }
+  .bar:nth-child(1) { height: 2px; }
+  .bar:nth-child(2) { height: 4px; }
+  .bar:nth-child(3) { height: 6px; }
+  .bar:nth-child(4) { height: 8px; }
+  .bar.lit { 
+    background: var(--screen-crt); 
+    box-shadow: 0 0 3px var(--screen-crt); 
+  }
+
+  .bt-indicator {
+    font-size: 7.5px;
+    opacity: 0.3;
+  }
+  .bt-indicator.active {
+    opacity: 1;
+    text-shadow: 0 0 4px var(--screen-crt);
+  }
+
+  .crt-screen {
+    flex: 1;
+    padding: 5px;
+    color: var(--screen-crt);
+    font-size: 7.5px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    text-shadow: 0 0 4px rgba(0,255,100,0.8);
+    display: none;
+    font-family: 'Courier New', monospace;
+  }
+  .screen-frame.power-on .crt-screen {
+    display: block;
+  }
+  .crt-screen::-webkit-scrollbar { width: 0; }
+
+  /* Right Controls */
+  .right-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 44px;
+    flex-shrink: 0;
+    padding: 2px 0;
+  }
+
+  .status-cluster {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bezel-led {
+    width: 14px;
+    height: 14px;
+    background: #111;
+    border-radius: 50%;
+    border: 2px solid #2a2e33;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.9);
+    transition: all 0.15s ease;
+  }
+  .bezel-led.green.lit {
+    background: radial-gradient(circle at 35% 35%, #88ffaa, #00cc44);
+    box-shadow: 0 0 14px #00ff66, inset 0 0 4px #fff;
+    border-color: #00ff66;
+  }
+  .bezel-led.amber.lit {
+    background: radial-gradient(circle at 35% 35%, #ffe088, #d97706);
+    box-shadow: 0 0 14px #f59e0b, inset 0 0 4px #fff;
+    border-color: #f59e0b;
+  }
+  .bezel-led.red.lit {
+    background: radial-gradient(circle at 35% 35%, #ff8888, #cc0000);
+    box-shadow: 0 0 14px #ff2a2a, inset 0 0 4px #fff;
+    border-color: #ff2a2a;
+  }
+  .bezel-led.blue.lit {
+    background: radial-gradient(circle at 35% 35%, #88ccff, #0066cc);
+    box-shadow: 0 0 14px #0088ff, inset 0 0 4px #fff;
+    border-color: #0088ff;
+  }
+
+  @keyframes blinkRed {
+    0%, 100% {
+      background: radial-gradient(circle at 35% 35%, #ff8888, #cc0000);
+      box-shadow: 0 0 16px #ff2a2a, inset 0 0 4px #fff;
+      border-color: #ff2a2a;
+    }
+    50% {
+      background: #1a0505;
+      box-shadow: none;
+      border-color: #330000;
+    }
+  }
+
+  .bezel-led.blinking-red {
+    animation: blinkRed 0.6s infinite ease-in-out;
+  }
+
+  .heavy-dial {
+    width: 36px;
+    height: 36px;
+    background: repeating-conic-gradient(#1e2226 0deg 15deg, #111315 15deg 30deg);
+    border-radius: 50%;
+    border: 2px solid #000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.9);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.15s ease;
+  }
+  .heavy-dial::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: #444;
+    border-radius: 50%;
+  }
+
+  /* Industrial Switchboard */
+  .industrial-switchboard {
+    background: #202428;
+    border: 2px solid #101214;
+    border-radius: 12px;
+    padding: 10px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.05), 0 6px 12px rgba(0,0,0,0.6);
+  }
+
+  .toggle-switch-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    gap: 4px;
+  }
+
+  .switch-overhead-led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #111;
+    border: 1px solid #000;
+    transition: all 0.15s ease;
+  }
+  .switch-overhead-led.lit {
+    background: #00ff66;
+    box-shadow: 0 0 8px #00ff66, inset 0 0 2px #fff;
+  }
+
+  .missile-switch-body {
+    width: 32px;
+    height: 48px;
+    position: relative;
+    cursor: pointer;
+    background: #111315;
+    border-radius: 4px;
+    border: 1px solid #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.9);
+  }
+
+  .toggle-metal-stem {
+    width: 4px;
+    height: 22px;
+    background: linear-gradient(90deg, #e0e0e0, #888, #444);
+    border-radius: 2px;
+    position: absolute;
+    bottom: 8px;
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: bottom center;
+    transform: rotate(20deg);
+  }
+
+  .red-safety-guard {
+    position: absolute;
+    top: 2px;
+    width: 24px;
+    height: 28px;
+    background: linear-gradient(180deg, #d32f2f, #941515);
+    border-radius: 4px 4px 2px 2px;
+    border: 1px solid #5a0c0c;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.3);
+    transition: transform 0.2s ease, top 0.2s ease;
+    transform-origin: top center;
+  }
+
+  .missile-switch-body.switch-on .red-safety-guard {
+    transform: rotate(-35deg) scaleY(0.9);
+    top: -4px;
+  }
+  .missile-switch-body.switch-on .toggle-metal-stem {
+    transform: rotate(-20deg);
+  }
+
+  .switch-text-plate {
+    background: #181a1d;
+    border: 1px solid #2d333b;
+    color: #64748b;
+    font-size: 6px;
+    font-weight: bold;
+    padding: 3px 2px;
+    border-radius: 3px;
+    text-align: center;
+    width: 90%;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    font-family: 'Courier New', monospace;
+  }
+
+  .switch-text-plate.glow {
+    color: #00ff66;
+    border-color: #00ff66;
+    background: #04240f;
+    text-shadow: 0 0 6px #00ff66;
+    box-shadow: 0 0 6px rgba(0,255,100,0.4);
+  }
+
+  .estop-container {
+    width: 65px;
+    height: 65px;
+    background: repeating-linear-gradient(45deg, #eab308, #eab308 6px, #1c1917 6px, #1c1917 12px);
+    border: 2px solid #000;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.8);
+  }
+
+  .estop-inner-well {
+    width: 48px;
+    height: 48px;
+    background: #111315;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #000;
+    box-shadow: inset 0 0 8px rgba(255,0,0,0.5);
+  }
+
+  .estop-mushroom-btn {
+    width: 38px;
+    height: 38px;
+    background: radial-gradient(circle at 35% 35%, #ff3b3b, #a30e0e);
+    border-radius: 50%;
+    border: 2px solid #570505;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: all 0.08s ease;
+  }
+  .estop-mushroom-btn:active, .estop-mushroom-btn.engaged {
+    transform: scale(0.9);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.9), inset 0 2px 6px rgba(0,0,0,0.9);
+    background: radial-gradient(circle at 35% 35%, #a30e0e, #570505);
+  }
+
+  /* Gboard Container */
+  .gboard-container {
+    width: 100%;
+    background: var(--gb-bg);
+    border-radius: 12px;
+    border: 1px solid #33363d;
+    padding: 6px 4px 8px 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .gboard-top-ribbon {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px;
+    height: 26px;
+    background: transparent;
+  }
+
+  .gboard-suggestions {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    flex: 1;
+  }
+  .gboard-suggestions::-webkit-scrollbar { display: none; }
+
+  .suggestion-chip {
+    color: var(--gb-subtext);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.1s ease;
+  }
+  .suggestion-chip:active {
+    background: var(--gb-key-press);
+    color: var(--gb-text);
+  }
+
+  .gboard-tools {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .g-tool-btn {
+    color: var(--gb-subtext);
+    font-size: 13px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border-radius: 50%;
+    transition: all 0.1s ease;
+  }
+  .g-tool-btn:active {
+    background: var(--gb-key-press);
+    color: var(--gb-blue);
+  }
+
+  .gb-row {
+    display: flex;
+    width: 100%;
+    gap: 4px;
+    justify-content: center;
+  }
+
+  .gb-key {
+    flex: 1;
+    height: 38px;
+    background: var(--gb-key-bg);
+    color: var(--gb-text);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    position: relative;
+    border: none;
+    outline: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    transition: background 0.05s ease, transform 0.05s ease;
+  }
+
+  .gb-key:active, .gb-key.active-press {
+    background: var(--gb-key-press);
+    transform: scale(0.96);
+  }
+
+  .gb-key-action {
+    background: var(--gb-action-bg);
+    color: var(--gb-subtext);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .gb-key-action:active, .gb-key-action.active-press {
+    background: var(--gb-key-press);
+    color: var(--gb-text);
+  }
+
+  .gb-key-blue {
+    background: #1a73e8;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .gb-key-blue:active, .gb-key-blue.active-press {
+    background: #1557b0;
+  }
+
+  .gb-key.shift-active {
+    background: var(--gb-key-press);
+    color: var(--gb-blue);
+  }
+
+  .key-shift { flex: 1.4; }
+  .key-backspace { flex: 1.4; }
+  .key-sym { flex: 1.3; }
+  .key-space { flex: 4.8; font-size: 10px; letter-spacing: 0.5px; color: var(--gb-subtext); }
+  .key-enter { flex: 1.6; }
+
+  /* Settings Directional Navigation Pad */
+  .settings-dpad-container {
+    width: 100%;
+    background: #16171a;
+    border-radius: 12px;
+    border: 2px solid #2d333b;
+    padding: 12px 14px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), 0 4px 15px rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .dpad-header-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2d333b;
+    padding-bottom: 6px;
+  }
+
+  .dpad-title {
+    color: #8ab4f8;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+
+  .dpad-btn-close {
+    background: #d32f2f;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+  .dpad-btn-close:active {
+    background: #941515;
+    transform: scale(0.96);
+  }
+
+  .dpad-matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .dpad-key {
+    height: 44px;
+    background: #25282e;
+    color: #e8eaed;
+    border: 1px solid #3c4048;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #111315, 0 4px 6px rgba(0,0,0,0.5);
+    transition: all 0.05s ease;
+  }
+  .dpad-key:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #111315;
+    background: #34373e;
+  }
+
+  .dpad-key-enter {
+    background: linear-gradient(180deg, #1a73e8, #1557b0);
+    color: #fff;
+    border-color: #4285f4;
+    font-size: 12px;
+  }
+  .dpad-key-enter:active {
+    background: #0d47a1;
+  }
+
+  .dpad-key-sub {
+    font-size: 8px;
+    color: #9aa0a6;
+    margin-top: 1px;
+    font-weight: normal;
+  }
+
+  .screw {
+    width: 5px;
+    height: 5px;
+    background: #444a52;
+    border-radius: 50%;
+    position: absolute;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+  }
+  .screw::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    width: 80%;
+    height: 1px;
+    background: #111;
+    transform: rotate(35deg);
+  }
+
+  /* --- FLUID RESPONSIVE MEDIA QUERIES --- */
+  @media (max-width: 420px) {
+    body {
+      padding: 4px;
+    }
+    
+    .device-shell {
+      border-radius: 18px;
+      padding: 10px 8px;
+      gap: 8px;
+    }
+
+    .upper-bay {
+      gap: 4px;
+    }
+
+    .pcb-section,
+    .screen-module {
+      height: 180px;
+    }
+
+    .gb-key {
+      height: 34px;
+      font-size: 12px;
+    }
+
+    .missile-switch-body {
+      width: 26px;
+      height: 40px;
+    }
+
+    .toggle-metal-stem {
+      height: 18px;
+    }
+
+    .red-safety-guard {
+      width: 20px;
+      height: 24px;
+    }
+
+    .estop-container {
+      width: 52px;
+      height: 52px;
+    }
+
+    .estop-inner-well {
+      width: 40px;
+      height: 40px;
+    }
+
+    .estop-mushroom-btn {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    body {
+      padding: 24px;
+    }
+
+    .device-shell {
+      box-shadow: 
+        0 28px 60px rgba(0,0,0,0.9),
+        inset 2px 2px 4px rgba(255,255,255,0.1),
+        inset -4px -4px 10px rgba(0,0,0,0.9);
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="device-shell">
+  <div class="screw" style="top: 6px; left: 8px;"></div>
+  <div class="screw" style="top: 6px; right: 8px;"></div>
+  <div class="screw" style="bottom: 6px; left: 8px;"></div>
+  <div class="screw" style="bottom: 6px; right: 8px;"></div>
+
+  <div class="upper-bay">
+    <div class="power-switch-container">
+      <div class="switch-label">PWR</div>
+      <div class="rocker-switch" id="powerSwitch" title="Toggle System Power">
+        <div class="rocker-handle"></div>
+      </div>
+    </div>
+
+    <div class="pcb-section">
+      <div class="pcb-trace-lines"></div>
+      <div class="warning-label">SYNC TRANSCEIVER</div>
+      <div class="pcb-controls">
+        <div class="mode-toggle-box" id="modeSwitchContainer">
+          <div class="mode-label">TRANSCEIVER MODE</div>
+          <div class="toggle-slider-btn" id="modeToggleBtn" title="Toggle Host / Receiver Mode">
+            <div class="slider-indicator"></div>
+            <div class="slider-text">HOST</div>
+            <div class="slider-text">RCVR</div>
+          </div>
+        </div>
+
+        <div class="mini-btn" id="connectBtn">CONNECT PEER</div>
+        <div class="mini-btn" id="settingsBtn">SETTINGS ⚙️</div>
+        
+        <div style="display: flex; gap: 4px; justify-content: center; margin-top: 2px;">
+          <div class="rotary-pot" id="pot1" title="Tuning Trim"></div>
+          <div class="rotary-pot" id="pot2" title="Gain Control"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-module">
+      <div class="brand-logo">SONY</div>
+      <div class="screen-frame power-on" id="screenFrame">
+        <div class="status-header">
+          <span id="roleBadge">MODE: HOST</span>
+          <div class="status-cluster-icons">
+            <span class="header-icon" id="encIcon" title="Encryption">🔒 E2EE</span>
+            <span class="header-icon" id="batteryIcon" title="Battery">🔋100%</span>
+            <span class="header-icon" id="soundIcon" title="Sound">🔊</span>
+            <span class="bt-indicator" id="btIcon" title="Bluetooth">ᛒ</span>
+            <div class="wifi-meter" id="wifiMeter" title="Network Signal">
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+              <div class="bar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="crt-screen" id="crtDisplay">BOOT SEQUENCE INITIALIZED...
+NODE: HOST
+CRYPTO: ECDH (P-256) + AES-GCM (256-BIT)
+FORWARD SECRECY ACTIVE_</div>
+      </div>
+    </div>
+
+    <div class="right-controls">
+      <div class="status-cluster">
+        <div class="bezel-led green lit" id="ledPower" title="Power Indicator"></div>
+        <div class="bezel-led blinking-red" id="ledSync" title="Sync Status (Blink Red=Lost, Green=Connected, Orange=Low Signal)"></div>
+        <div class="bezel-led amber" id="ledBt" title="Bluetooth Link"></div>
+        <div class="bezel-led red" id="ledTxRx" title="Packet Activity"></div>
+      </div>
+      <div class="heavy-dial" id="sideDial" title="Rotate frequency dial"></div>
+    </div>
+  </div>
+
+  <!-- Industrial Missile Switchboard -->
+  <div class="industrial-switchboard">
+    <div class="toggle-switch-unit">
+      <div class="switch-overhead-led" id="ledTog1"></div>
+      <div class="missile-switch-body" id="togBtn1" title="Toggle RF Amplifier Power">
+        <div class="toggle-metal-stem"></div>
+        <div class="red-safety-guard"></div>
+      </div>
+      <div class="switch-text-plate" id="textTog1">RF AMP<br>PUMP</div>
+    </div>
+
+    <div class="toggle-switch-unit">
+      <div class="switch-overhead-led lit" id="ledTog2"></div>
+      <div class="missile-switch-body switch-on" id="togBtn2" title="Toggle Secure Crypto Encryption">
+        <div class="toggle-metal-stem"></div>
+        <div class="red-safety-guard"></div>
+      </div>
+      <div class="switch-text-plate glow" id="textTog2">CRYPTO<br>ENGAGE</div>
+    </div>
+
+    <div class="toggle-switch-unit">
+      <div class="switch-overhead-led" id="ledTog3"></div>
+      <div class="missile-switch-body" id="togBtn3" title="Toggle High-Gain Antenna Booster">
+        <div class="toggle-metal-stem"></div>
+        <div class="red-safety-guard"></div>
+      </div>
+      <div class="switch-text-plate" id="textTog3">ANTENNA<br>BOOST</div>
+    </div>
+
+    <div class="estop-container" title="Emergency Transceiver Disconnect / Kill Switch">
+      <div class="estop-inner-well">
+        <div class="estop-mushroom-btn" id="eStopBtn"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOOGLE KEYBOARD (GBOARD INTERFACE) -->
+  <div class="gboard-container" id="gboardPanel">
+    <div class="gboard-top-ribbon">
+      <div class="gboard-suggestions" id="gboardSuggestions">
+        <div class="suggestion-chip" data-suggest="ACK">ACK</div>
+        <div class="suggestion-chip" data-suggest="STATUS">STATUS</div>
+        <div class="suggestion-chip" data-suggest="PING">PING</div>
+        <div class="suggestion-chip" data-suggest="CLEAR">CLEAR</div>
+      </div>
+      <div class="gboard-tools">
+        <button class="g-tool-btn" id="gMicBtn" title="Voice Input">🎙️</button>
+        <button class="g-tool-btn" id="gPingBtn" title="Ping Peer">📡</button>
+        <button class="g-tool-btn" id="gSettingsBtn" title="Settings">⚙️</button>
+      </div>
+    </div>
+
+    <!-- Row 1: Number Row -->
+    <div class="gb-row" id="row1">
+      <button class="gb-key" data-key="1">1</button>
+      <button class="gb-key" data-key="2">2</button>
+      <button class="gb-key" data-key="3">3</button>
+      <button class="gb-key" data-key="4">4</button>
+      <button class="gb-key" data-key="5">5</button>
+      <button class="gb-key" data-key="6">6</button>
+      <button class="gb-key" data-key="7">7</button>
+      <button class="gb-key" data-key="8">8</button>
+      <button class="gb-key" data-key="9">9</button>
+      <button class="gb-key" data-key="0">0</button>
+    </div>
+
+    <!-- Row 2: Q - P -->
+    <div class="gb-row" id="row2">
+      <button class="gb-key" data-key="q">q</button>
+      <button class="gb-key" data-key="w">w</button>
+      <button class="gb-key" data-key="e">e</button>
+      <button class="gb-key" data-key="r">r</button>
+      <button class="gb-key" data-key="t">t</button>
+      <button class="gb-key" data-key="y">y</button>
+      <button class="gb-key" data-key="u">u</button>
+      <button class="gb-key" data-key="i">i</button>
+      <button class="gb-key" data-key="o">o</button>
+      <button class="gb-key" data-key="p">p</button>
+    </div>
+
+    <!-- Row 3: A - L -->
+    <div class="gb-row" id="row3" style="padding: 0 12px;">
+      <button class="gb-key" data-key="a">a</button>
+      <button class="gb-key" data-key="s">s</button>
+      <button class="gb-key" data-key="d">d</button>
+      <button class="gb-key" data-key="f">f</button>
+      <button class="gb-key" data-key="g">g</button>
+      <button class="gb-key" data-key="h">h</button>
+      <button class="gb-key" data-key="j">j</button>
+      <button class="gb-key" data-key="k">k</button>
+      <button class="gb-key" data-key="l">l</button>
+    </div>
+
+    <!-- Row 4: Shift, Z - M, Backspace -->
+    <div class="gb-row" id="row4">
+      <button class="gb-key gb-key-action key-shift" id="gShiftBtn" data-action="shift">⇧</button>
+      <button class="gb-key" data-key="z">z</button>
+      <button class="gb-key" data-key="x">x</button>
+      <button class="gb-key" data-key="c">c</button>
+      <button class="gb-key" data-key="v">v</button>
+      <button class="gb-key" data-key="b">b</button>
+      <button class="gb-key" data-key="n">n</button>
+      <button class="gb-key" data-key="m">m</button>
+      <button class="gb-key gb-key-action key-backspace" data-action="del">⌫</button>
+    </div>
+
+    <!-- Row 5: ?123, Emoji, Space, Period, TX -->
+    <div class="gb-row" id="row5">
+      <button class="gb-key gb-key-action key-sym" id="gSymToggle" data-action="sym">?123</button>
+      <button class="gb-key gb-key-action" data-action="emoji">😀</button>
+      <button class="gb-key key-space" data-action="space">English (US)</button>
+      <button class="gb-key" data-key=".">.</button>
+      <button class="gb-key gb-key-blue key-enter" data-action="tx">➤</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS DIRECTIONAL DPAD NAVIGATION PAD -->
+  <div class="settings-dpad-container" id="settingsDpadPanel">
+    <div class="dpad-header-bar">
+      <span class="dpad-title">⚙️ SYSTEM SETTINGS CONTROLLER</span>
+      <button class="dpad-btn-close" id="closeSettingsDpadBtn">CLOSE ✕</button>
+    </div>
+
+    <div class="dpad-matrix-grid">
+      <div></div>
+      <button class="dpad-key" data-dpad="up">▲<span class="dpad-key-sub">PREV</span></button>
+      <div></div>
+
+      <button class="dpad-key" data-dpad="left">◄<span class="dpad-key-sub">TOGGLE</span></button>
+      <button class="dpad-key dpad-key-enter" data-dpad="enter">ENTER<span class="dpad-key-sub">SELECT</span></button>
+      <button class="dpad-key" data-dpad="right">►<span class="dpad-key-sub">TOGGLE</span></button>
+
+      <div></div>
+      <button class="dpad-key" data-dpad="down">▼<span class="dpad-key-sub">NEXT</span></button>
+      <div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- END-TO-END ZERO-KNOWLEDGE CRYPTOGRAPHY (ECDH + AES-256-GCM) ---
+  let localECDHKeyPair = null;
+  let sharedSessionKey = null;
+
+  async function initECDHKeyPair() {
+    localECDHKeyPair = await crypto.subtle.generateKey(
+      { name: "ECDH", namedCurve: "P-256" },
+      false,
+      ["deriveKey", "deriveBits"]
+    );
+  }
+
+  async function exportPublicKeyJWK() {
+    if (!localECDHKeyPair) await initECDHKeyPair();
+    return await crypto.subtle.exportKey("jwk", localECDHKeyPair.publicKey);
+  }
+
+  async function deriveSessionKey(peerPublicJWK) {
+    try {
+      const importedPeerKey = await crypto.subtle.importKey(
+        "jwk",
+        peerPublicJWK,
+        { name: "ECDH", namedCurve: "P-256" },
+        false,
+        []
+      );
+
+      sharedSessionKey = await crypto.subtle.deriveKey(
+        { name: "ECDH", public: importedPeerKey },
+        localECDHKeyPair.privateKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+      return true;
+    } catch(e) {
+      console.error("ECDH Key Derivation Failed:", e);
+      return false;
+    }
+  }
+
+  async function encryptAES(text) {
+    if (!sharedSessionKey) return text;
+    try {
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encoded = new TextEncoder().encode(text);
+      const ciphertext = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv: iv },
+        sharedSessionKey,
+        encoded
+      );
+      const combined = new Uint8Array(iv.length + ciphertext.byteLength);
+      combined.set(iv, 0);
+      combined.set(new Uint8Array(ciphertext), iv.length);
+      return btoa(String.fromCharCode(...combined));
+    } catch (e) {
+      return text;
+    }
+  }
+
+  async function decryptAES(cipherBase64) {
+    if (!sharedSessionKey) return "[E2EE KEY NOT NEGOTIATED]";
+    try {
+      const binaryString = atob(cipherBase64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const iv = bytes.slice(0, 12);
+      const ciphertext = bytes.slice(12);
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: iv },
+        sharedSessionKey,
+        ciphertext
+      );
+      return new TextDecoder().decode(decrypted);
+    } catch (e) {
+      return "[DECRYPTION INTEGRITY FAILED]";
+    }
+  }
+
+  function generateSecureId(prefix = 'NODE') {
+    const arr = new Uint8Array(8);
+    crypto.getRandomValues(arr);
+    return `${prefix}_${Array.from(arr, b => b.toString(16).padStart(2, '0')).join('')}`;
+  }
+
+  const currentInstanceId = generateSecureId('NODE');
+  const processedMessageIds = new Set();
+
+  let lastTxTimestamp = 0;
+  const TX_RATE_LIMIT_MS = 250;
+  const MAX_PAYLOAD_CHARS = 256;
+  const PACKET_EXPIRY_MS = 30000;
+
+  // --- AUDIO SYNTHESIS ENGINE ---
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let audioCtx = null;
+
+  function initAudio() {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playSound(type) {
+    if (phoneSettings.soundMuted && type !== 'switch') return;
+    initAudio();
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    if (type === 'gboard_tap') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, t);
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.015);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.015);
+    } else if (type === 'click') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, t);
+      osc.frequency.exponentialRampToValueAtTime(100, t + 0.02);
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.02);
+    } else if (type === 'send_beep') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200, t);
+      osc.frequency.setValueAtTime(1600, t + 0.03);
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.08);
+    } else if (type === 'connect_beep') {
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc1.type = 'sine';
+      osc2.type = 'triangle';
+
+      osc1.frequency.setValueAtTime(880, t);
+      osc1.frequency.setValueAtTime(1760, t + 0.1);
+      osc2.frequency.setValueAtTime(1108.73, t);
+      osc2.frequency.setValueAtTime(2217.46, t + 0.1);
+
+      gainNode.gain.setValueAtTime(0.3, t);
+      gainNode.gain.setValueAtTime(0.35, t + 0.1);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+
+      osc1.connect(gainNode);
+      osc2.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      osc1.start(t);
+      osc2.start(t);
+      osc1.stop(t + 0.35);
+      osc2.stop(t + 0.35);
+    } else if (type === 'msg_rx_beep') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1046.5, t);
+      osc.frequency.setValueAtTime(1318.5, t + 0.06);
+      gain.gain.setValueAtTime(0.28, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.18);
+    } else if (type === 'heavy_clack') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(120, t);
+      osc.frequency.exponentialRampToValueAtTime(20, t + 0.12);
+      gain.gain.setValueAtTime(0.7, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.12);
+    } else if (type === 'ping_pong') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1500, t);
+      osc.frequency.setValueAtTime(2000, t + 0.05);
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.12);
+    } else if (type === 'switch') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(160, t);
+      osc.frequency.exponentialRampToValueAtTime(30, t + 0.08);
+      gain.gain.setValueAtTime(0.5, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.08);
+    } else if (type === 'nav') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(450, t);
+      gain.gain.setValueAtTime(0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.04);
+    }
+  }
+
+  function triggerVibration(pattern = [25]) {
+    if (phoneSettings.vibration && navigator.vibrate) {
+      navigator.vibrate(pattern);
+    }
+  }
+
+  // --- STATE REGISTRY ---
+  let isPowered = true;
+  let isHost = true;
+  let isConnected = false;
+  let btActive = false;
+  let btMenuMode = false;
+  let settingsMenuMode = false;
+  let settingsSelectedIndex = 0;
+  let dialAngle = 0;
+  let outgoingBuffer = "";
+  let isEncrypted = true;
+  let isRecordingVoice = false;
+  let recognition = null;
+  let pingSentTime = 0;
+  let networkQuality = 'strong';
+
+  let rfAmpBoost = false;
+  let antennaBoost = false;
+
+  let isShift = false;
+  let isSymMode = false;
+  let isEmojiMode = false;
+
+  const phoneSettings = {
+    soundMuted: false,
+    vibration: true,
+    airplaneMode: false,
+    darkCRTTheme: true,
+    autoScroll: true
+  };
+
+  let stagedSettings = { ...phoneSettings };
+
+  const gboardLayouts = {
+    alpha: {
+      r1: ['1','2','3','4','5','6','7','8','9','0'],
+      r2: ['q','w','e','r','t','y','u','i','o','p'],
+      r3: ['a','s','d','f','g','h','j','k','l'],
+      r4: ['z','x','c','v','b','n','m']
+    },
+    sym: {
+      r1: ['1','2','3','4','5','6','7','8','9','0'],
+      r2: ['@','#','$','%','&','-','+','(',')','/'],
+      r3: ['*','"','\'',':',';','!','?','\\','~'],
+      r4: ['_','<','>','=','[',']','{','}']
+    },
+    emoji: {
+      r1: ['😀','😂','😍','😎','😭','😡','👍','🔥','✨','💯'],
+      r2: ['💀','🤖','👾','📡','🛰️','🔋','💾','🕹️','🚀','🛸'],
+      r3: ['💻','🔒','🔑','⚠️','💣','🧪','🌐','🛑','✅'],
+      r4: ['🎯','👁️','⚡','⚙️','🛡️','💥','💬']
+    }
+  };
+
+  // --- VOICE SPEECH ENGINE ---
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRec) {
+    recognition = new SpeechRec();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+      const transcript = String(event.results[0][0].transcript || '').slice(0, MAX_PAYLOAD_CHARS);
+      outgoingBuffer += (outgoingBuffer ? ' ' : '') + transcript;
+      appendText(`\n[VOICE INPUT]: ${transcript}`);
+      isRecordingVoice = false;
+      document.getElementById('gMicBtn').style.color = 'var(--gb-subtext)';
+    };
+
+    recognition.onerror = () => {
+      isRecordingVoice = false;
+      document.getElementById('gMicBtn').style.color = 'var(--gb-subtext)';
+      appendText('\n[MIC ERROR] VOICE CAPTURE FAILED');
+    };
+
+    recognition.onend = () => {
+      isRecordingVoice = false;
+      document.getElementById('gMicBtn').style.color = 'var(--gb-subtext)';
+    };
+  }
+
+  // --- BATTERY TELEMETRY ---
+  if (navigator.getBattery) {
+    navigator.getBattery().then(batt => {
+      function updateBattery() {
+        const pct = Math.round(batt.level * 100);
+        document.getElementById('batteryIcon').textContent = (batt.charging ? '⚡' : '🔋') + pct + '%';
+      }
+      updateBattery();
+      batt.addEventListener('levelchange', updateBattery);
+      batt.addEventListener('chargingchange', updateBattery);
+    });
+  }
+
+  // --- TRANSPORT BUS ---
+  let nodeChannel = null;
+  try {
+    nodeChannel = new BroadcastChannel('cyberpunk_transceiver_bus');
+  } catch (e) {
+    console.warn("BroadcastChannel fallback active");
+  }
+
+  function broadcastData(msgObj) {
+    if (phoneSettings.airplaneMode) {
+      appendText('\n[SYS ERROR] AIRPLANE MODE ACTIVE - TX BLOCKED');
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastTxTimestamp < TX_RATE_LIMIT_MS && msgObj.type === 'DATA') {
+      appendText('\n[RATE LIMIT] TX THROTTLED');
+      return;
+    }
+    lastTxTimestamp = now;
+
+    const msgId = generateSecureId('MSG') + '_' + now;
+    const packet = {
+      ...msgObj,
+      msgId: msgId,
+      timestamp: now,
+      senderInstance: currentInstanceId,
+      senderRole: isHost ? 'HOST' : 'RCVR'
+    };
+
+    processedMessageIds.add(msgId);
+
+    if (nodeChannel) {
+      nodeChannel.postMessage(packet);
+    }
+    try {
+      localStorage.setItem('cyberpunk_transceiver_bus', JSON.stringify({ ...packet, _nonce: Math.random() }));
+    } catch(e) {}
+  }
+
+  function updateSyncIndicator() {
+    if (!isPowered) {
+      ledSync.className = 'bezel-led';
+      return;
+    }
+
+    if (!isConnected || networkQuality === 'lost') {
+      ledSync.className = 'bezel-led blinking-red lit';
+    } else if (networkQuality === 'low' && !antennaBoost) {
+      ledSync.className = 'bezel-led amber lit';
+    } else {
+      ledSync.className = 'bezel-led green lit';
+    }
+  }
+
+  // --- SECURE PACKET HANDSHAKE & RECEIVER ---
+  async function handleIncomingMessage(msg) {
+    if (!isPowered || !msg || typeof msg !== 'object' || !msg.type) return;
+    if (phoneSettings.airplaneMode) return;
+
+    if (typeof msg.timestamp === 'number' && (Date.now() - msg.timestamp > PACKET_EXPIRY_MS)) {
+      return;
+    }
+
+    if (msg.senderInstance === currentInstanceId) return;
+    if (msg.msgId && processedMessageIds.has(msg.msgId)) return;
+    if (msg.msgId) {
+      processedMessageIds.add(msg.msgId);
+      if (processedMessageIds.size > 500) {
+        const first = processedMessageIds.values().next().value;
+        processedMessageIds.delete(first);
+      }
+    }
+
+    if (msg.type === 'HOST_CONNECT_REQUEST') {
+      if (!isHost) {
+        const keyDerived = await deriveSessionKey(msg.ecdhPublicKey);
+        if (keyDerived) {
+          isConnected = true;
+          updateSyncIndicator();
+          flashActivityLED();
+          playSound('connect_beep');
+          triggerVibration([100, 50, 100]);
+          const myPublicJWK = await exportPublicKeyJWK();
+          appendText('\n================================\n[ECDH KEY AGREEMENT SUCCESS]\nSHARED E2EE SESSION DERIVED\n================================\n> ');
+          broadcastData({ type: 'RECEIVER_ACK', ecdhPublicKey: myPublicJWK });
+        }
+      }
+    } else if (msg.type === 'RECEIVER_ACK') {
+      if (isHost) {
+        const keyDerived = await deriveSessionKey(msg.ecdhPublicKey);
+        if (keyDerived) {
+          isConnected = true;
+          updateSyncIndicator();
+          flashActivityLED();
+          playSound('connect_beep');
+          triggerVibration([100, 50, 100]);
+          appendText('\n================================\n[E2EE CHANNEL ESTABLISHED]\nPEER VERIFIED: ZERO PASSWORDS STORED\n================================\n> ');
+        }
+      }
+    } else if (msg.type === 'ROLE_CHANGED') {
+      if (msg.senderRole === 'RCVR' && isHost) {
+        appendText('\n[PEER EVENT] RCVR READY - EMITTING ECDH BEACON...');
+        initiateHandshake();
+      } else if (msg.senderRole === 'HOST' && !isHost) {
+        appendText('\n[PEER EVENT] HOST DETECTED - AWAITING ECDH HANDSHAKE...');
+      } else if (msg.senderRole === (isHost ? 'HOST' : 'RCVR')) {
+        isConnected = false;
+        updateSyncIndicator();
+        appendText('\n[WARN] PEER CONFLICT: BOTH DEVICES SET TO SAME ROLE');
+      }
+    } else if (msg.type === 'DISCONNECT_SIGNAL') {
+      isConnected = false;
+      sharedSessionKey = null;
+      updateSyncIndicator();
+      playSound('heavy_clack');
+      appendText('\n[ALERT] PEER NODE TRANSMITTED DISCONNECT / E-STOP\n> ');
+    } else if (msg.type === 'DATA') {
+      isConnected = true;
+      updateSyncIndicator();
+      flashActivityLED();
+      playSound('msg_rx_beep');
+      triggerVibration([60, 40, 60]);
+
+      let safePayload = String(msg.payload || '').slice(0, 1024);
+      let displayPayload = safePayload;
+
+      if (msg.encrypted) {
+        const decrypted = await decryptAES(safePayload);
+        displayPayload = `[CIPHER]: ${safePayload}\n  [E2EE-DECRYPTED]: ${decrypted}`;
+      }
+
+      appendText(`\n[INCOMING <${msg.senderRole === 'HOST' ? 'HOST' : 'RCVR'}>]: ${displayPayload}\n> `);
+    } else if (msg.type === 'PING') {
+      flashActivityLED();
+      broadcastData({
+        type: 'PONG',
+        clientTime: typeof msg.clientTime === 'number' ? msg.clientTime : 0
+      });
+    } else if (msg.type === 'PONG') {
+      if (typeof msg.clientTime === 'number') {
+        const latency = Date.now() - msg.clientTime;
+        playSound('ping_pong');
+        appendText(`\n[RTT PING RESPONSE]: ${latency}ms\n> `);
+      }
+    }
+  }
+
+  if (nodeChannel) {
+    nodeChannel.onmessage = (event) => handleIncomingMessage(event.data);
+  }
+
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'cyberpunk_transceiver_bus' && event.newValue) {
+      try {
+        const parsed = JSON.parse(event.newValue);
+        handleIncomingMessage(parsed);
+      } catch(e) {}
+    }
+  });
+
+  const screenFrame = document.getElementById('screenFrame');
+  const screen = document.getElementById('crtDisplay');
+  const powerSwitch = document.getElementById('powerSwitch');
+  const modeContainer = document.getElementById('modeSwitchContainer');
+  const roleBadge = document.getElementById('roleBadge');
+  const soundIcon = document.getElementById('soundIcon');
+  const encIcon = document.getElementById('encIcon');
+  const ledPower = document.getElementById('ledPower');
+  const ledSync = document.getElementById('ledSync');
+  const ledBt = document.getElementById('ledBt');
+  const ledTxRx = document.getElementById('ledTxRx');
+  const wifiMeter = document.getElementById('wifiMeter');
+  const sideDial = document.getElementById('sideDial');
+
+  const gboardPanel = document.getElementById('gboardPanel');
+  const settingsDpadPanel = document.getElementById('settingsDpadPanel');
+
+  function appendText(txt) {
+    if (!isPowered) return;
+    if (settingsMenuMode || btMenuMode) return;
+    screen.textContent += txt;
+    if (phoneSettings.autoScroll) {
+      screen.scrollTop = screen.scrollHeight;
+    }
+  }
+
+  function flashActivityLED() {
+    ledTxRx.classList.add('lit');
+    setTimeout(() => ledTxRx.classList.remove('lit'), rfAmpBoost ? 280 : 180);
+  }
+
+  function updateGboardKeys() {
+    let currentSet = gboardLayouts.alpha;
+    if (isEmojiMode) currentSet = gboardLayouts.emoji;
+    else if (isSymMode) currentSet = gboardLayouts.sym;
+
+    const r1Keys = document.querySelectorAll('#row1 .gb-key');
+    r1Keys.forEach((k, i) => {
+      k.textContent = currentSet.r1[i] || '';
+      k.setAttribute('data-key', currentSet.r1[i] || '');
+    });
+
+    const r2Keys = document.querySelectorAll('#row2 .gb-key');
+    r2Keys.forEach((k, i) => {
+      let char = currentSet.r2[i] || '';
+      if (!isSymMode && !isEmojiMode && isShift) char = char.toUpperCase();
+      k.textContent = char;
+      k.setAttribute('data-key', char);
+    });
+
+    const r3Keys = document.querySelectorAll('#row3 .gb-key');
+    r3Keys.forEach((k, i) => {
+      let char = currentSet.r3[i] || '';
+      if (!isSymMode && !isEmojiMode && isShift) char = char.toUpperCase();
+      k.textContent = char;
+      k.setAttribute('data-key', char);
+    });
+
+    const r4Keys = document.querySelectorAll('#row4 .gb-key[data-key]');
+    r4Keys.forEach((k, i) => {
+      let char = currentSet.r4[i] || '';
+      if (!isSymMode && !isEmojiMode && isShift) char = char.toUpperCase();
+      k.textContent = char;
+      k.setAttribute('data-key', char);
+    });
+
+    const symBtn = document.getElementById('gSymToggle');
+    if (isEmojiMode || isSymMode) symBtn.textContent = 'ABC';
+    else symBtn.textContent = '?123';
+
+    const shiftBtn = document.getElementById('gShiftBtn');
+    shiftBtn.classList.toggle('shift-active', isShift);
+  }
+
+  function renderSettingsMenu() {
+    if (!isPowered) return;
+    const settingsItems = [
+      { label: "SOUND / MUTE", val: stagedSettings.soundMuted ? "[MUTED 🔇]" : "[UNMUTED 🔊]" },
+      { label: "AIRPLANE MODE", val: stagedSettings.airplaneMode ? "[ON ✈️]" : "[OFF]" },
+      { label: "VIBRATION HAPTICS", val: stagedSettings.vibration ? "[ENABLED]" : "[DISABLED]" },
+      { label: "CRT PALETTE THEME", val: stagedSettings.darkCRTTheme ? "[GREEN PHOSPHOR]" : "[AMBER CRT]" },
+      { label: "AUTO-SCROLL VIEW", val: stagedSettings.autoScroll ? "[ON]" : "[OFF]" }
+    ];
+
+    let view = "=== DEVICE SETTINGS CONTROLLER ===\n";
+    view += "NAVIGATE [▲/▼] | TOGGLE [ENTER/◄/►]\n\n";
+    settingsItems.forEach((item, idx) => {
+      const cursor = (idx === settingsSelectedIndex) ? "► " : "  ";
+      view += `${cursor}${item.label.padEnd(19, ' ')}: ${item.val}\n`;
+    });
+    view += "\nPRESS [CLOSE ✕] TO SAVE & EXIT";
+    screen.textContent = view;
+  }
+
+  function toggleStagedSetting(index) {
+    if (index === 0) stagedSettings.soundMuted = !stagedSettings.soundMuted;
+    else if (index === 1) stagedSettings.airplaneMode = !stagedSettings.airplaneMode;
+    else if (index === 2) stagedSettings.vibration = !stagedSettings.vibration;
+    else if (index === 3) stagedSettings.darkCRTTheme = !stagedSettings.darkCRTTheme;
+    else if (index === 4) stagedSettings.autoScroll = !stagedSettings.autoScroll;
+    renderSettingsMenu();
+  }
+
+  function openSettings() {
+    if (!isPowered) return;
+    playSound('switch');
+    settingsMenuMode = true;
+    btMenuMode = false;
+    stagedSettings = { ...phoneSettings };
+
+    gboardPanel.style.display = 'none';
+    settingsDpadPanel.style.display = 'flex';
+
+    renderSettingsMenu();
+  }
+
+  function closeSettingsWithPrompt() {
+    if (!isPowered || !settingsMenuMode) return;
+
+    const hasChanges = Object.keys(phoneSettings).some(k => phoneSettings[k] !== stagedSettings[k]);
+
+    if (hasChanges) {
+      const saveConfirmed = confirm("Settings have changed. Save changes?");
+      if (saveConfirmed) {
+        Object.assign(phoneSettings, stagedSettings);
+        soundIcon.textContent = phoneSettings.soundMuted ? "🔇" : "🔊";
+        document.documentElement.style.setProperty('--screen-crt', phoneSettings.darkCRTTheme ? '#00ff66' : '#ffb000');
+        updateNetworkMeter();
+        appendText('\n[SETTINGS]: CHANGES SAVED SUCCESSFULLY\n> ');
+      } else {
+        stagedSettings = { ...phoneSettings };
+        appendText('\n[SETTINGS]: CHANGES DISCARDED\n> ');
+      }
+    }
+
+    settingsMenuMode = false;
+    settingsDpadPanel.style.display = 'none';
+    gboardPanel.style.display = 'flex';
+
+    screen.textContent = 'SETTINGS CLOSED\nGBOARD TERMINAL READY_\n> ';
+  }
+
+  document.getElementById('settingsBtn').addEventListener('click', openSettings);
+  document.getElementById('gSettingsBtn').addEventListener('click', openSettings);
+  document.getElementById('closeSettingsDpadBtn').addEventListener('click', closeSettingsWithPrompt);
+
+  document.querySelectorAll('.dpad-key').forEach(btn => {
+    btn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      if (!isPowered || !settingsMenuMode) return;
+      const act = btn.getAttribute('data-dpad');
+      triggerVibration([20]);
+
+      if (act === 'up') {
+        playSound('nav');
+        settingsSelectedIndex = (settingsSelectedIndex - 1 + 5) % 5;
+        renderSettingsMenu();
+      } else if (act === 'down') {
+        playSound('nav');
+        settingsSelectedIndex = (settingsSelectedIndex + 1) % 5;
+        renderSettingsMenu();
+      } else if (act === 'enter' || act === 'left' || act === 'right') {
+        playSound('switch');
+        toggleStagedSetting(settingsSelectedIndex);
+      }
+    });
+  });
+
+  function updateNetworkMeter() {
+    const bars = wifiMeter.querySelectorAll('.bar');
+    if (!navigator.onLine || !isPowered || phoneSettings.airplaneMode) {
+      bars.forEach(b => b.classList.remove('lit'));
+      networkQuality = 'lost';
+      updateSyncIndicator();
+      return;
+    }
+
+    let level = 4;
+    networkQuality = 'strong';
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) {
+      if (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') {
+        level = 1;
+        networkQuality = 'low';
+      } else if (conn.effectiveType === '3g') {
+        level = 2;
+        networkQuality = 'low';
+      } else if (conn.effectiveType === '4g') {
+        level = (conn.rtt > 180) ? 3 : 4;
+        if (conn.rtt > 180) networkQuality = 'low';
+      }
+    }
+
+    bars.forEach((bar, idx) => {
+      if (idx < level) bar.classList.add('lit');
+      else bar.classList.remove('lit');
+    });
+
+    updateSyncIndicator();
+  }
+
+  window.addEventListener('online', () => {
+    updateNetworkMeter();
+    appendText('\n[NET] CONNECTION ESTABLISHED\n> ');
+  });
+  window.addEventListener('offline', () => {
+    updateNetworkMeter();
+    appendText('\n[NET] CARRIER LOST - OFFLINE\n> ');
+  });
+  if (navigator.connection) {
+    navigator.connection.addEventListener('change', updateNetworkMeter);
+  }
+
+  async function toggleMode(targetHost) {
+    isHost = (targetHost !== undefined) ? targetHost : !isHost;
+    playSound('switch');
+    btMenuMode = false;
+    isConnected = false;
+    sharedSessionKey = null;
+    await initECDHKeyPair();
+    updateSyncIndicator();
+
+    if (isHost) {
+      modeContainer.classList.remove('receiver');
+      roleBadge.textContent = 'MODE: HOST';
+      screen.textContent = 'NODE: HOST (MASTER)\n>> SEARCHING / EMITTING ECDH BEACON...\n> ';
+      broadcastData({ type: 'ROLE_CHANGED' });
+      initiateHandshake();
+    } else {
+      modeContainer.classList.add('receiver');
+      roleBadge.textContent = 'MODE: RCVR';
+      screen.textContent = 'NODE: RCVR (LISTENER)\n>> LISTENING FOR HOST ECDH PUBLIC KEY...\n> ';
+      broadcastData({ type: 'ROLE_CHANGED' });
+    }
+  }
+
+  document.getElementById('modeToggleBtn').addEventListener('click', () => toggleMode());
+
+  async function initiateHandshake() {
+    if (!isPowered) return;
+    playSound('click');
+    flashActivityLED();
+    
+    if (isHost) {
+      appendText('\n[HOST] EMITTING ECDH PUBLIC KEY...');
+      const publicJWK = await exportPublicKeyJWK();
+      broadcastData({
+        type: 'HOST_CONNECT_REQUEST',
+        ecdhPublicKey: publicJWK,
+        timestamp: Date.now()
+      });
+    } else {
+      appendText('\n[RCVR] SCANNING CARRIER FOR HOST...');
+      broadcastData({ type: 'ROLE_CHANGED' });
+    }
+  }
+
+  document.getElementById('connectBtn').addEventListener('click', initiateHandshake);
+
+  function bindMissileToggle(btnId, ledId, textId, onToggleCallback) {
+    const btn = document.getElementById(btnId);
+    const led = document.getElementById(ledId);
+    const txt = document.getElementById(textId);
+    let state = btn.classList.contains('switch-on');
+
+    btn.addEventListener('click', () => {
+      if (!isPowered) return;
+      state = !state;
+      playSound('heavy_clack');
+      triggerVibration([80]);
+
+      btn.classList.toggle('switch-on', state);
+      led.classList.toggle('lit', state);
+      txt.classList.toggle('glow', state);
+
+      if (onToggleCallback) onToggleCallback(state);
+    });
+  }
+
+  bindMissileToggle('togBtn1', 'ledTog1', 'textTog1', (isOn) => {
+    rfAmpBoost = isOn;
+    appendText(`\n[RF AMP PUMP]: ${isOn ? 'ONLINE (HIGH OUTPUT / BOOST PULSE)' : 'OFFLINE'}\n> `);
+  });
+
+  bindMissileToggle('togBtn2', 'ledTog2', 'textTog2', (isOn) => {
+    isEncrypted = isOn;
+    encIcon.textContent = isEncrypted ? '🔒 E2EE' : '🔓 RAW';
+    appendText(`\n[CRYPTO CIPHER]: ${isOn ? 'ACTIVE (ECDH P-256 + AES-256 GCM)' : 'DISABLED (PLAIN TEXT)'}\n> `);
+  });
+
+  bindMissileToggle('togBtn3', 'ledTog3', 'textTog3', (isOn) => {
+    antennaBoost = isOn;
+    updateSyncIndicator();
+    appendText(`\n[ANTENNA BOOSTER]: ${isOn ? 'ENGAGED (+12dB GAIN / CLEAR CARRIER)' : 'BYPASSED'}\n> `);
+  });
+
+  document.getElementById('eStopBtn').addEventListener('click', () => {
+    if (!isPowered) return;
+    playSound('heavy_clack');
+    triggerVibration([200, 100, 200]);
+    isConnected = false;
+    sharedSessionKey = null;
+    updateSyncIndicator();
+
+    broadcastData({ type: 'DISCONNECT_SIGNAL' });
+    appendText('\n================================\n[EMERGENCY E-STOP ENGAGED]\nKEYS DESTROYED & LINK TERMINATED\n================================\n> ');
+  });
+
+  powerSwitch.addEventListener('click', async () => {
+    isPowered = !isPowered;
+    playSound('switch');
+
+    if (isPowered) {
+      powerSwitch.classList.remove('off');
+      screenFrame.classList.add('power-on');
+      ledPower.classList.add('lit');
+      if (btActive) ledBt.classList.add('lit');
+      await initECDHKeyPair();
+      updateNetworkMeter();
+      screen.textContent = 'SYSTEM POWER ON\nNODE READY\n> ';
+      broadcastData({ type: 'ROLE_CHANGED' });
+    } else {
+      powerSwitch.classList.add('off');
+      screenFrame.classList.remove('power-on');
+      ledPower.classList.remove('lit');
+      ledSync.className = 'bezel-led';
+      ledBt.classList.remove('lit');
+      ledTxRx.classList.remove('lit');
+      sharedSessionKey = null;
+      updateNetworkMeter();
+    }
+  });
+
+  document.querySelectorAll('.suggestion-chip').forEach(chip => {
+    chip.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      if (!isPowered) return;
+      const val = chip.getAttribute('data-suggest');
+      playSound('gboard_tap');
+      triggerVibration([20]);
+
+      if (val === 'CLEAR') {
+        outgoingBuffer = "";
+        screen.textContent = '> ';
+      } else if (val === 'PING') {
+        pingSentTime = Date.now();
+        broadcastData({ type: 'PING', clientTime: pingSentTime });
+        appendText('\n[PING TRANSMITTED -> WAITING FOR PONG]');
+      } else {
+        outgoingBuffer += (outgoingBuffer ? ' ' : '') + val;
+        appendText(val + ' ');
+      }
+    });
+  });
+
+  document.getElementById('gMicBtn').addEventListener('click', () => {
+    if (!isPowered) return;
+    if (!recognition) {
+      appendText('\n[SPEECH REC NOT SUPPORTED ON THIS BROWSER]');
+      return;
+    }
+    playSound('switch');
+    if (!isRecordingVoice) {
+      try {
+        recognition.start();
+        isRecordingVoice = true;
+        document.getElementById('gMicBtn').style.color = 'var(--gb-blue)';
+        appendText('\n[LISTENING FOR VOICE COMMAND...]');
+      } catch(err) {}
+    } else {
+      recognition.stop();
+      isRecordingVoice = false;
+      document.getElementById('gMicBtn').style.color = 'var(--gb-subtext)';
+    }
+  });
+
+  document.getElementById('gPingBtn').addEventListener('click', () => {
+    if (!isPowered) return;
+    playSound('gboard_tap');
+    pingSentTime = Date.now();
+    broadcastData({ type: 'PING', clientTime: pingSentTime });
+    appendText('\n[PING TRANSMITTED -> WAITING FOR PONG]');
+  });
+
+  document.querySelectorAll('.gboard-container .gb-key').forEach(key => {
+    key.addEventListener('pointerdown', async (e) => {
+      e.preventDefault();
+      if (!isPowered) return;
+      const keyVal = key.getAttribute('data-key');
+      const action = key.getAttribute('data-action');
+
+      if (action === 'shift') {
+        playSound('gboard_tap');
+        isShift = !isShift;
+        updateGboardKeys();
+        return;
+      }
+
+      if (action === 'sym') {
+        playSound('gboard_tap');
+        if (isEmojiMode || isSymMode) {
+          isSymMode = false;
+          isEmojiMode = false;
+        } else {
+          isSymMode = true;
+          isEmojiMode = false;
+        }
+        updateGboardKeys();
+        return;
+      }
+
+      if (action === 'emoji') {
+        playSound('gboard_tap');
+        isEmojiMode = !isEmojiMode;
+        isSymMode = false;
+        updateGboardKeys();
+        return;
+      }
+
+      if (action === 'del') {
+        playSound('gboard_tap');
+        triggerVibration([30]);
+        if (outgoingBuffer.length > 0) {
+          outgoingBuffer = outgoingBuffer.slice(0, -1);
+          screen.textContent = screen.textContent.slice(0, -1);
+        }
+        return;
+      }
+
+      if (action === 'space') {
+        playSound('gboard_tap');
+        triggerVibration([20]);
+        if (outgoingBuffer.length < MAX_PAYLOAD_CHARS) {
+          outgoingBuffer += ' ';
+          appendText(' ');
+        }
+        return;
+      }
+
+      if (action === 'tx') {
+        playSound('send_beep');
+        flashActivityLED();
+        triggerVibration([40]);
+
+        const payload = outgoingBuffer.trim();
+        if (payload.length > 0) {
+          if (isEncrypted && !sharedSessionKey) {
+            appendText('\n[TX BLOCKED] NO E2EE SESSION KEY - CLICK "CONNECT PEER" FIRST\n> ');
+            return;
+          }
+
+          const finalPayload = isEncrypted ? await encryptAES(payload) : payload;
+          broadcastData({
+            type: 'DATA',
+            payload: finalPayload,
+            encrypted: isEncrypted
+          });
+          appendText(`\n[SENT <${isHost ? 'HOST' : 'RCVR'}>]: "${payload}" ${isEncrypted ? '(E2EE ENCRYPTED)' : ''}\n> `);
+          outgoingBuffer = "";
+        } else {
+          appendText('\n[TX FAIL] BUFFER EMPTY\n> ');
+        }
+        return;
+      }
+
+      if (keyVal) {
+        playSound('gboard_tap');
+        triggerVibration([20]);
+        if (outgoingBuffer.length < MAX_PAYLOAD_CHARS) {
+          outgoingBuffer += keyVal;
+          appendText(keyVal);
+        }
+
+        if (isShift && !isSymMode && !isEmojiMode) {
+          isShift = false;
+          updateGboardKeys();
+        }
+      }
+    });
+  });
+
+  sideDial.addEventListener('click', () => {
+    if (!isPowered) return;
+    dialAngle = (dialAngle + 30) % 360;
+    sideDial.style.transform = `rotate(${dialAngle}deg)`;
+    playSound('click');
+    appendText(`\nFREQ: ${(144.0 + (dialAngle / 36)).toFixed(3)} MHz\n> `);
+  });
+
+  let pot1Angle = 0;
+  document.getElementById('pot1').addEventListener('click', function() {
+    if (!isPowered) return;
+    pot1Angle = (pot1Angle + 45) % 360;
+    this.style.transform = `rotate(${pot1Angle}deg)`;
+    playSound('click');
+    appendText(`\nTRIM: ${pot1Angle}°\n> `);
+  });
+
+  let pot2Angle = 0;
+  document.getElementById('pot2').addEventListener('click', function() {
+    if (!isPowered) return;
+    pot2Angle = (pot2Angle + 45) % 360;
+    this.style.transform = `rotate(${pot2Angle}deg)`;
+    playSound('click');
+    appendText(`\nGAIN: +${(pot2Angle / 20).toFixed(1)}dB\n> `);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (!isPowered) return;
+    const raw = e.key;
+
+    if (settingsMenuMode) {
+      if (raw === 'ArrowUp') document.querySelector('[data-dpad="up"]').dispatchEvent(new Event('pointerdown'));
+      else if (raw === 'ArrowDown') document.querySelector('[data-dpad="down"]').dispatchEvent(new Event('pointerdown'));
+      else if (raw === 'ArrowLeft') document.querySelector('[data-dpad="left"]').dispatchEvent(new Event('pointerdown'));
+      else if (raw === 'ArrowRight') document.querySelector('[data-dpad="right"]').dispatchEvent(new Event('pointerdown'));
+      else if (raw === 'Enter') document.querySelector('[data-dpad="enter"]').dispatchEvent(new Event('pointerdown'));
+      else if (raw === 'Escape') closeSettingsWithPrompt();
+      return;
+    }
+
+    if (raw === 'Backspace') {
+      document.querySelector('[data-action="del"]').dispatchEvent(new Event('pointerdown'));
+    } else if (raw === 'Enter') {
+      document.querySelector('[data-action="tx"]').dispatchEvent(new Event('pointerdown'));
+    } else if (raw === ' ') {
+      document.querySelector('[data-action="space"]').dispatchEvent(new Event('pointerdown'));
+    } else if (raw.length === 1 && outgoingBuffer.length < MAX_PAYLOAD_CHARS) {
+      playSound('gboard_tap');
+      outgoingBuffer += raw;
+      appendText(raw);
+    }
+  });
+
+  initECDHKeyPair();
+  updateNetworkMeter();
+  updateGboardKeys();
+</script>
+</body>
+</html>
