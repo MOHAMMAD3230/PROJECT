@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full Song & Album Streaming Player</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card: #131b2e;
+      --card-hover: #1e293b;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --danger: #f43f5e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 140px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    /* Search Section */
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .search-row input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-row input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      padding: 0 18px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #04101e;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #334155;
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    /* Grid Layout for Search Results and Playlist */
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 720px) {
+      .layout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    .track-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      transition: background 0.2s;
+    }
+
+    .track-item:hover {
+      background: var(--card-hover);
+    }
+
+    .track-item.active {
+      border-left: 3px solid var(--accent);
+      background: #1e293b;
+    }
+
+    .track-item img {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #000;
+      flex-shrink: 0;
+    }
+
+    .track-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .track-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-artist {
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .action-icons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: color 0.2s;
+    }
+
+    .icon-btn:hover {
+      color: var(--text);
+    }
+
+    .icon-btn.remove:hover {
+      color: var(--danger);
+    }
+
+    /* Fixed Bottom Player */
+    .player-dock {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(19, 27, 46, 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+      z-index: 100;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .progress-bar-container input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .player-controls {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .current-track-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 40%;
+      overflow: hidden;
+    }
+
+    .current-track-info img {
+      width: 42px;
+      height: 42px;
+      border-radius: 6px;
+    }
+
+    .control-buttons {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .play-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent);
+      color: #04101e;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-notice {
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 30px 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Full Track Player</h1>
+      <p>Search entire songs & albums — queue them into your custom playlist</p>
+    </header>
+
+    <div class="search-row">
+      <input type="text" id="search-input" placeholder="Search track, artist, or entire album name..." onkeydown="if(event.key==='Enter') searchSongs()" />
+      <button class="btn btn-primary" onclick="searchSongs()">Search</button>
+    </div>
+
+    <div class="layout-grid">
+      <!-- Search Results -->
+      <div>
+        <div class="section-title">
+          <span>Search Results</span>
+          <button class="btn btn-secondary" id="add-all-btn" style="display:none;" onclick="addAllToPlaylist()">+ Add All</button>
+        </div>
+        <div class="panel" id="results-panel">
+          <div class="empty-notice">Search for an artist or album above to discover full songs.</div>
+        </div>
+      </div>
+
+      <!-- Playlist Queue -->
+      <div>
+        <div class="section-title">
+          <span>My Playlist (<span id="playlist-count">0</span>)</span>
+          <button class="btn btn-secondary" onclick="clearPlaylist()">Clear</button>
+        </div>
+        <div class="panel" id="playlist-panel">
+          <div class="empty-notice">Your playlist is empty. Add songs from search results.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Player Dock -->
+  <div class="player-dock">
+    <div class="progress-bar-container">
+      <span id="curr-time">0:00</span>
+      <input type="range" id="seek-bar" value="0" min="0" max="100" />
+      <span id="dur-time">0:00</span>
+    </div>
+    
+    <div class="player-controls">
+      <div class="current-track-info">
+        <img id="dock-thumb" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' fill='%231e293b'%3E%3Crect width='42' height='42'/%3E%3C/svg%3E" alt="" />
+        <div style="min-width: 0;">
+          <div class="track-title" id="dock-title">No Track Selected</div>
+          <div class="track-artist" id="dock-artist">—</div>
+        </div>
+      </div>
+
+      <div class="control-buttons">
+        <button class="icon-btn" onclick="prevTrack()" title="Previous">⏮</button>
+        <button class="play-circle" id="play-btn" onclick="togglePlay()">▶</button>
+        <button class="icon-btn" onclick="nextTrack()" title="Next">⏭</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio" preload="metadata"></audio>
+
+  <script>
+    let searchResults = [];
+    let playlist = [];
+    let currentTrackIdx = -1;
+
+    const audio = document.getElementById("audio");
+    const playBtn = document.getElementById("play-btn");
+    const dockTitle = document.getElementById("dock-title");
+    const dockArtist = document.getElementById("dock-artist");
+    const dockThumb = document.getElementById("dock-thumb");
+    const seekBar = document.getElementById("seek-bar");
+    const currTime = document.getElementById("curr-time");
+    const durTime = document.getElementById("dur-time");
+    const resultsPanel = document.getElementById("results-panel");
+    const playlistPanel = document.getElementById("playlist-panel");
+    const playlistCount = document.getElementById("playlist-count");
+    const addAllBtn = document.getElementById("add-all-btn");
+
+    // Extract best audio quality stream link (160kbps / 320kbps)
+    function getAudioStreamUrl(downloadUrls) {
+      if (!downloadUrls || !downloadUrls.length) return "";
+      const preferred = downloadUrls.find(d => d.quality === "320kbps" || d.quality === "160kbps");
+      return preferred ? preferred.url : downloadUrls[downloadUrls.length - 1].url;
+    }
+
+    // Extract best thumbnail image
+    function getArtworkUrl(images) {
+      if (!images || !images.length) return "";
+      return images[images.length - 1].url;
+    }
+
+    async function searchSongs() {
+      const q = document.getElementById("search-input").value.trim();
+      if (!q) return;
+
+      resultsPanel.innerHTML = '<div class="empty-notice">Searching full catalog...</div>';
+      addAllBtn.style.display = "none";
+
+      try {
+        // Query open public full-song endpoint
+        const res = await fetch(`https://saavn.dev/api/search/songs?query=${encodeURIComponent(q)}&limit=25`);
+        const json = await res.json();
+
+        if (!json.data || !json.data.results || json.data.results.length === 0) {
+          resultsPanel.innerHTML = '<div class="empty-notice">No results found.</div>';
+          return;
+        }
+
+        searchResults = json.data.results.map(song => {
+          const artistList = song.artists?.primary?.map(a => a.name).join(", ") || song.singers || "Unknown Artist";
+          return {
+            id: song.id,
+            name: song.name.replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
+            artist: artistList.replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
+            url: getAudioStreamUrl(song.downloadUrl),
+            image: getArtworkUrl(song.image),
+            duration: song.duration
+          };
+        }).filter(item => item.url !== "");
+
+        renderSearchResults();
+        addAllBtn.style.display = "inline-flex";
+      } catch (err) {
+        resultsPanel.innerHTML = '<div class="empty-notice" style="color:var(--danger)">Failed to fetch songs. Try again.</div>';
+      }
+    }
+
+    function renderSearchResults() {
+      resultsPanel.innerHTML = "";
+      searchResults.forEach((track, idx) => {
+        const item = document.createElement("div");
+        item.className = "track-item";
+        item.innerHTML = `
+          <img src="${track.image}" alt="" />
+          <div class="track-meta">
+            <div class="track-title">${track.name}</div>
+            <div class="track-artist">${track.artist}</div>
+          </div>
+          <div class="action-icons">
+            <button class="icon-btn" title="Play Now" onclick="playImmediate(${idx})">▶</button>
+            <button class="icon-btn" title="Add to Playlist" onclick="addToPlaylist(${idx})">＋</button>
+          </div>
+        `;
+        resultsPanel.appendChild(item);
+      });
+    }
+
+    function addToPlaylist(idx) {
+      const track = searchResults[idx];
+      playlist.push(track);
+      renderPlaylist();
+
+      // If nothing is playing, start playback with the added track
+      if (currentTrackIdx === -1) {
+        loadAndPlay(playlist.length - 1);
+      }
+    }
+
+    function addAllToPlaylist() {
+      if (!searchResults.length) return;
+      const startIdx = playlist.length;
+      playlist.push(...searchResults);
+      renderPlaylist();
+
+      if (currentTrackIdx === -1) {
+        loadAndPlay(startIdx);
+      }
+    }
+
+    function playImmediate(idx) {
+      const track = searchResults[idx];
+      playlist.push(track);
+      renderPlaylist();
+      loadAndPlay(playlist.length - 1);
+    }
+
+    function removeFromPlaylist(idx, e) {
+      e.stopPropagation();
+      playlist.splice(idx, 1);
+      if (currentTrackIdx === idx) {
+        if (playlist.length > 0) {
+          loadAndPlay(idx % playlist.length);
+        } else {
+          audio.pause();
+          audio.src = "";
+          currentTrackIdx = -1;
+          dockTitle.textContent = "No Track Selected";
+          dockArtist.textContent = "—";
+          playBtn.textContent = "▶";
+        }
+      } else if (currentTrackIdx > idx) {
+        currentTrackIdx--;
+      }
+      renderPlaylist();
+    }
+
+    function clearPlaylist() {
+      playlist = [];
+      currentTrackIdx = -1;
+      audio.pause();
+      audio.src = "";
+      dockTitle.textContent = "No Track Selected";
+      dockArtist.textContent = "—";
+      playBtn.textContent = "▶";
+      renderPlaylist();
+    }
+
+    function renderPlaylist() {
+      playlistCount.textContent = playlist.length;
+      if (playlist.length === 0) {
+        playlistPanel.innerHTML = '<div class="empty-notice">Your playlist is empty. Add songs from search results.</div>';
+        return;
+      }
+
+      playlistPanel.innerHTML = "";
+      playlist.forEach((track, idx) => {
+        const item = document.createElement("div");
+        item.className = `track-item ${idx === currentTrackIdx ? "active" : ""}`;
+        item.onclick = () => loadAndPlay(idx);
+        item.innerHTML = `
+          <img src="${track.image}" alt="" />
+          <div class="track-meta">
+            <div class="track-title">${track.name}</div>
+            <div class="track-artist">${track.artist}</div>
+          </div>
+          <div class="action-icons">
+            <button class="icon-btn remove" title="Remove" onclick="removeFromPlaylist(${idx}, event)">✕</button>
+          </div>
+        `;
+        playlistPanel.appendChild(item);
+      });
+    }
+
+    function loadAndPlay(idx) {
+      if (!playlist[idx]) return;
+      currentTrackIdx = idx;
+      const track = playlist[idx];
+
+      audio.src = track.url;
+      dockTitle.textContent = track.name;
+      dockArtist.textContent = track.artist;
+      dockThumb.src = track.image;
+
+      audio.play();
+      playBtn.textContent = "⏸";
+      renderPlaylist();
+    }
+
+    function togglePlay() {
+      if (!audio.src) {
+        if (playlist.length > 0) loadAndPlay(0);
+        return;
+      }
+      if (audio.paused) {
+        audio.play();
+        playBtn.textContent = "⏸";
+      } else {
+        audio.pause();
+        playBtn.textContent = "▶";
+      }
+    }
+
+    function nextTrack() {
+      if (!playlist.length) return;
+      const nextIdx = (currentTrackIdx + 1) % playlist.length;
+      loadAndPlay(nextIdx);
+    }
+
+    function prevTrack() {
+      if (!playlist.length) return;
+      const prevIdx = (currentTrackIdx - 1 + playlist.length) % playlist.length;
+      loadAndPlay(prevIdx);
+    }
+
+    function fmt(sec) {
+      if (isNaN(sec)) return "0:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? "0" : ""}${s}`;
+    }
+
+    audio.ontimeupdate = () => {
+      if (!isNaN(audio.duration)) {
+        seekBar.value = (audio.currentTime / audio.duration) * 100;
+        currTime.textContent = fmt(audio.currentTime);
+        durTime.textContent = fmt(audio.duration);
+      }
+    };
+
+    seekBar.oninput = () => {
+      if (!isNaN(audio.duration)) {
+        audio.currentTime = (seekBar.value / 100) * audio.duration;
+      }
+    };
+
+    audio.onended = () => {
+      nextTrack();
+    };
+  </script>
+</body>
+</html>
