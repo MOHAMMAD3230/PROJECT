@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Full Song & Album Streaming Player</title>
+  <title>Full Track & Album Player</title>
   <style>
     :root {
       --bg: #090d16;
@@ -36,7 +36,7 @@
 
     .container {
       width: 100%;
-      max-width: 800px;
+      max-width: 820px;
     }
 
     header {
@@ -56,7 +56,6 @@
       margin-top: 4px;
     }
 
-    /* Search Section */
     .search-row {
       display: flex;
       gap: 10px;
@@ -72,7 +71,6 @@
       border-radius: 10px;
       font-size: 0.95rem;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     .search-row input:focus {
@@ -114,7 +112,6 @@
       background: #475569;
     }
 
-    /* Grid Layout for Search Results and Playlist */
     .layout-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -208,7 +205,6 @@
       padding: 6px;
       border-radius: 6px;
       font-size: 1rem;
-      transition: color 0.2s;
     }
 
     .icon-btn:hover {
@@ -219,7 +215,6 @@
       color: var(--danger);
     }
 
-    /* Fixed Bottom Player */
     .player-dock {
       position: fixed;
       bottom: 0;
@@ -239,7 +234,7 @@
 
     .progress-bar-container {
       width: 100%;
-      max-width: 800px;
+      max-width: 820px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -255,7 +250,7 @@
 
     .player-controls {
       width: 100%;
-      max-width: 800px;
+      max-width: 820px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -265,7 +260,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      max-width: 40%;
+      max-width: 45%;
       overflow: hidden;
     }
 
@@ -308,40 +303,40 @@
   <div class="container">
     <header>
       <h1>Full Track Player</h1>
-      <p>Search entire songs & albums — queue them into your custom playlist</p>
+      <p>Search entire albums or tracks and build ad-free playlists</p>
     </header>
 
     <div class="search-row">
-      <input type="text" id="search-input" placeholder="Search track, artist, or entire album name..." onkeydown="if(event.key==='Enter') searchSongs()" />
+      <input type="text" id="search-input" placeholder="Search track or album (e.g., Kantara, Arijit Singh, Leo)..." onkeydown="if(event.key==='Enter') searchSongs()" />
       <button class="btn btn-primary" onclick="searchSongs()">Search</button>
     </div>
 
     <div class="layout-grid">
-      <!-- Search Results -->
+      <!-- Search Results Panel -->
       <div>
         <div class="section-title">
           <span>Search Results</span>
           <button class="btn btn-secondary" id="add-all-btn" style="display:none;" onclick="addAllToPlaylist()">+ Add All</button>
         </div>
         <div class="panel" id="results-panel">
-          <div class="empty-notice">Search for an artist or album above to discover full songs.</div>
+          <div class="empty-notice">Search for an artist or album above.</div>
         </div>
       </div>
 
-      <!-- Playlist Queue -->
+      <!-- Playlist Queue Panel -->
       <div>
         <div class="section-title">
           <span>My Playlist (<span id="playlist-count">0</span>)</span>
           <button class="btn btn-secondary" onclick="clearPlaylist()">Clear</button>
         </div>
         <div class="panel" id="playlist-panel">
-          <div class="empty-notice">Your playlist is empty. Add songs from search results.</div>
+          <div class="empty-notice">Playlist is empty. Add songs from search.</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Bottom Player Dock -->
+  <!-- Persistent Dock Player -->
   <div class="player-dock">
     <div class="progress-bar-container">
       <span id="curr-time">0:00</span>
@@ -386,52 +381,89 @@
     const playlistCount = document.getElementById("playlist-count");
     const addAllBtn = document.getElementById("add-all-btn");
 
-    // Extract best audio quality stream link (160kbps / 320kbps)
-    function getAudioStreamUrl(downloadUrls) {
-      if (!downloadUrls || !downloadUrls.length) return "";
-      const preferred = downloadUrls.find(d => d.quality === "320kbps" || d.quality === "160kbps");
-      return preferred ? preferred.url : downloadUrls[downloadUrls.length - 1].url;
+    function cleanString(str) {
+      if (!str) return "";
+      const txt = document.createElement("textarea");
+      txt.innerHTML = str;
+      return txt.value;
     }
 
-    // Extract best thumbnail image
-    function getArtworkUrl(images) {
-      if (!images || !images.length) return "";
-      return images[images.length - 1].url;
+    // Direct multi-endpoint fallback fetcher
+    async function fetchWithFallback(query) {
+      const endpoints = [
+        `https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}`,
+        `https://saavn.me/search/songs?query=${encodeURIComponent(query)}`,
+        `https://saavn.dev/api/search/songs?query=${encodeURIComponent(query)}`
+      ];
+
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const json = await res.json();
+          const items = json.data?.results || json.results || (Array.isArray(json.data) ? json.data : null);
+          if (items && items.length > 0) return items;
+        } catch (e) {
+          // Fall through to next mirror
+        }
+      }
+      throw new Error("All endpoints failed");
     }
 
     async function searchSongs() {
       const q = document.getElementById("search-input").value.trim();
       if (!q) return;
 
-      resultsPanel.innerHTML = '<div class="empty-notice">Searching full catalog...</div>';
+      resultsPanel.innerHTML = '<div class="empty-notice">Searching full catalog across mirrors...</div>';
       addAllBtn.style.display = "none";
 
       try {
-        // Query open public full-song endpoint
-        const res = await fetch(`https://saavn.dev/api/search/songs?query=${encodeURIComponent(q)}&limit=25`);
-        const json = await res.json();
+        const rawResults = await fetchWithFallback(q);
 
-        if (!json.data || !json.data.results || json.data.results.length === 0) {
-          resultsPanel.innerHTML = '<div class="empty-notice">No results found.</div>';
+        searchResults = rawResults.map(song => {
+          // Extract title
+          const name = cleanString(song.name || song.title || "Unknown Song");
+
+          // Extract artists
+          let artist = "Unknown Artist";
+          if (song.artists?.primary?.length) {
+            artist = song.artists.primary.map(a => a.name).join(", ");
+          } else if (song.primaryArtists) {
+            artist = song.primaryArtists;
+          } else if (song.singers) {
+            artist = song.singers;
+          }
+          artist = cleanString(artist);
+
+          // Extract audio URL
+          let audioUrl = "";
+          if (Array.isArray(song.downloadUrl) && song.downloadUrl.length > 0) {
+            const high = song.downloadUrl.find(d => d.quality === "320kbps" || d.quality === "160kbps");
+            audioUrl = high ? high.link || high.url : (song.downloadUrl[song.downloadUrl.length - 1].link || song.downloadUrl[song.downloadUrl.length - 1].url);
+          } else if (song.media_url) {
+            audioUrl = song.media_url;
+          }
+
+          // Extract artwork URL
+          let imageUrl = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' fill='%231e293b'%3E%3Crect width='44' height='44'/%3E%3C/svg%3E";
+          if (Array.isArray(song.image) && song.image.length > 0) {
+            imageUrl = song.image[song.image.length - 1].link || song.image[song.image.length - 1].url || imageUrl;
+          } else if (typeof song.image === "string") {
+            imageUrl = song.image;
+          }
+
+          return { name, artist, url: audioUrl, image: imageUrl };
+        }).filter(s => !!s.url);
+
+        if (searchResults.length === 0) {
+          resultsPanel.innerHTML = '<div class="empty-notice">No playable full streams found. Try another query.</div>';
           return;
         }
-
-        searchResults = json.data.results.map(song => {
-          const artistList = song.artists?.primary?.map(a => a.name).join(", ") || song.singers || "Unknown Artist";
-          return {
-            id: song.id,
-            name: song.name.replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
-            artist: artistList.replace(/&quot;/g, '"').replace(/&amp;/g, '&'),
-            url: getAudioStreamUrl(song.downloadUrl),
-            image: getArtworkUrl(song.image),
-            duration: song.duration
-          };
-        }).filter(item => item.url !== "");
 
         renderSearchResults();
         addAllBtn.style.display = "inline-flex";
       } catch (err) {
-        resultsPanel.innerHTML = '<div class="empty-notice" style="color:var(--danger)">Failed to fetch songs. Try again.</div>';
+        resultsPanel.innerHTML = '<div class="empty-notice" style="color:var(--danger)">Connection to music stream failed. Please test again in a moment.</div>';
       }
     }
 
@@ -441,7 +473,7 @@
         const item = document.createElement("div");
         item.className = "track-item";
         item.innerHTML = `
-          <img src="${track.image}" alt="" />
+          <img src="${track.image}" alt="" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'44\\' height=\\'44\\' fill=\\'%231e293b\\'%3E%3Crect width=\\'44\\' height=\\'44\\'/ %3E%3C/svg%3E'" />
           <div class="track-meta">
             <div class="track-title">${track.name}</div>
             <div class="track-artist">${track.artist}</div>
@@ -460,7 +492,6 @@
       playlist.push(track);
       renderPlaylist();
 
-      // If nothing is playing, start playback with the added track
       if (currentTrackIdx === -1) {
         loadAndPlay(playlist.length - 1);
       }
@@ -518,7 +549,7 @@
     function renderPlaylist() {
       playlistCount.textContent = playlist.length;
       if (playlist.length === 0) {
-        playlistPanel.innerHTML = '<div class="empty-notice">Your playlist is empty. Add songs from search results.</div>';
+        playlistPanel.innerHTML = '<div class="empty-notice">Playlist is empty. Add songs from search.</div>';
         return;
       }
 
@@ -528,7 +559,7 @@
         item.className = `track-item ${idx === currentTrackIdx ? "active" : ""}`;
         item.onclick = () => loadAndPlay(idx);
         item.innerHTML = `
-          <img src="${track.image}" alt="" />
+          <img src="${track.image}" alt="" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'44\\' height=\\'44\\' fill=\\'%231e293b\\'%3E%3Crect width=\\'44\\' height=\\'44\\'/ %3E%3C/svg%3E'" />
           <div class="track-meta">
             <div class="track-title">${track.name}</div>
             <div class="track-artist">${track.artist}</div>
@@ -551,7 +582,7 @@
       dockArtist.textContent = track.artist;
       dockThumb.src = track.image;
 
-      audio.play();
+      audio.play().catch(e => console.log("Playback error or user interaction required:", e));
       playBtn.textContent = "⏸";
       renderPlaylist();
     }
