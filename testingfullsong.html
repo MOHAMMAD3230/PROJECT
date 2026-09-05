@@ -163,8 +163,8 @@
     }
 
     .track-item img {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 6px;
       object-fit: cover;
       background: #000;
@@ -296,6 +296,17 @@
       text-align: center;
       padding: 30px 10px;
     }
+
+    /* Invisible YouTube player iframe */
+    #yt-hidden-player {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -307,7 +318,7 @@
     </header>
 
     <div class="search-row">
-      <input type="text" id="search-input" placeholder="Search track or album (e.g., Kantara, Arijit Singh, Leo)..." onkeydown="if(event.key==='Enter') searchSongs()" />
+      <input type="text" id="search-input" placeholder="Search song or album (e.g., Kantara, Leo, Kesariya)..." onkeydown="if(event.key==='Enter') searchSongs()" />
       <button class="btn btn-primary" onclick="searchSongs()">Search</button>
     </div>
 
@@ -361,14 +372,19 @@
     </div>
   </div>
 
-  <audio id="audio" preload="metadata"></audio>
+  <div id="yt-hidden-player"></div>
+
+  <!-- Load YouTube Iframe API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
+    let ytPlayer = null;
     let searchResults = [];
     let playlist = [];
     let currentTrackIdx = -1;
+    let progressTimer = null;
+    let isSeeking = false;
 
-    const audio = document.getElementById("audio");
     const playBtn = document.getElementById("play-btn");
     const dockTitle = document.getElementById("dock-title");
     const dockArtist = document.getElementById("dock-artist");
@@ -381,90 +397,83 @@
     const playlistCount = document.getElementById("playlist-count");
     const addAllBtn = document.getElementById("add-all-btn");
 
-    function cleanString(str) {
-      if (!str) return "";
-      const txt = document.createElement("textarea");
-      txt.innerHTML = str;
-      return txt.value;
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('yt-hidden-player', {
+        height: '200',
+        width: '200',
+        playerVars: {
+          playsinline: 1,
+          controls: 0,
+          disablekb: 1
+        },
+        events: {
+          'onStateChange': onPlayerStateChange
+        }
+      });
     }
 
-    // Direct multi-endpoint fallback fetcher
-    async function fetchWithFallback(query) {
-      const endpoints = [
-        `https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}`,
-        `https://saavn.me/search/songs?query=${encodeURIComponent(query)}`,
-        `https://saavn.dev/api/search/songs?query=${encodeURIComponent(query)}`
-      ];
-
-      for (const url of endpoints) {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) continue;
-          const json = await res.json();
-          const items = json.data?.results || json.results || (Array.isArray(json.data) ? json.data : null);
-          if (items && items.length > 0) return items;
-        } catch (e) {
-          // Fall through to next mirror
-        }
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        playBtn.textContent = "⏸";
+        startProgressLoop();
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        playBtn.textContent = "▶";
+        stopProgressLoop();
+      } else if (event.data === YT.PlayerState.ENDED) {
+        stopProgressLoop();
+        nextTrack();
       }
-      throw new Error("All endpoints failed");
     }
 
     async function searchSongs() {
       const q = document.getElementById("search-input").value.trim();
       if (!q) return;
 
-      resultsPanel.innerHTML = '<div class="empty-notice">Searching full catalog across mirrors...</div>';
+      resultsPanel.innerHTML = '<div class="empty-notice">Searching full catalog...</div>';
       addAllBtn.style.display = "none";
 
-      try {
-        const rawResults = await fetchWithFallback(q);
+      const instances = [
+        `https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(q + " song")}&filter=music_songs`,
+        `https://api.piped.privacydev.net/search?q=${encodeURIComponent(q + " song")}&filter=music_songs`,
+        `https://pipedapi.tokhmi.xyz/search?q=${encodeURIComponent(q + " song")}&filter=all`
+      ];
 
-        searchResults = rawResults.map(song => {
-          // Extract title
-          const name = cleanString(song.name || song.title || "Unknown Song");
-
-          // Extract artists
-          let artist = "Unknown Artist";
-          if (song.artists?.primary?.length) {
-            artist = song.artists.primary.map(a => a.name).join(", ");
-          } else if (song.primaryArtists) {
-            artist = song.primaryArtists;
-          } else if (song.singers) {
-            artist = song.singers;
+      let data = null;
+      for (const endpoint of instances) {
+        try {
+          const res = await fetch(endpoint);
+          if (res.ok) {
+            data = await res.json();
+            if (data.items && data.items.length > 0) break;
           }
-          artist = cleanString(artist);
-
-          // Extract audio URL
-          let audioUrl = "";
-          if (Array.isArray(song.downloadUrl) && song.downloadUrl.length > 0) {
-            const high = song.downloadUrl.find(d => d.quality === "320kbps" || d.quality === "160kbps");
-            audioUrl = high ? high.link || high.url : (song.downloadUrl[song.downloadUrl.length - 1].link || song.downloadUrl[song.downloadUrl.length - 1].url);
-          } else if (song.media_url) {
-            audioUrl = song.media_url;
-          }
-
-          // Extract artwork URL
-          let imageUrl = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' fill='%231e293b'%3E%3Crect width='44' height='44'/%3E%3C/svg%3E";
-          if (Array.isArray(song.image) && song.image.length > 0) {
-            imageUrl = song.image[song.image.length - 1].link || song.image[song.image.length - 1].url || imageUrl;
-          } else if (typeof song.image === "string") {
-            imageUrl = song.image;
-          }
-
-          return { name, artist, url: audioUrl, image: imageUrl };
-        }).filter(s => !!s.url);
-
-        if (searchResults.length === 0) {
-          resultsPanel.innerHTML = '<div class="empty-notice">No playable full streams found. Try another query.</div>';
-          return;
-        }
-
-        renderSearchResults();
-        addAllBtn.style.display = "inline-flex";
-      } catch (err) {
-        resultsPanel.innerHTML = '<div class="empty-notice" style="color:var(--danger)">Connection to music stream failed. Please test again in a moment.</div>';
+        } catch (e) {}
       }
+
+      if (!data || !data.items || data.items.length === 0) {
+        resultsPanel.innerHTML = '<div class="empty-notice" style="color:var(--danger)">No full songs found. Please try another keyword.</div>';
+        return;
+      }
+
+      searchResults = data.items
+        .filter(item => item.url && item.url.includes('/watch?v='))
+        .map(item => {
+          const videoId = item.url.split('v=')[1];
+          return {
+            id: videoId,
+            name: item.title,
+            artist: item.uploaderName || "Unknown Artist",
+            image: item.thumbnail || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+            duration: item.duration || 0
+          };
+        });
+
+      if (!searchResults.length) {
+        resultsPanel.innerHTML = '<div class="empty-notice">No playable full songs found.</div>';
+        return;
+      }
+
+      renderSearchResults();
+      addAllBtn.style.display = "inline-flex";
     }
 
     function renderSearchResults() {
@@ -473,7 +482,7 @@
         const item = document.createElement("div");
         item.className = "track-item";
         item.innerHTML = `
-          <img src="${track.image}" alt="" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'44\\' height=\\'44\\' fill=\\'%231e293b\\'%3E%3Crect width=\\'44\\' height=\\'44\\'/ %3E%3C/svg%3E'" />
+          <img src="${track.image}" alt="" />
           <div class="track-meta">
             <div class="track-title">${track.name}</div>
             <div class="track-artist">${track.artist}</div>
@@ -522,8 +531,7 @@
         if (playlist.length > 0) {
           loadAndPlay(idx % playlist.length);
         } else {
-          audio.pause();
-          audio.src = "";
+          if (ytPlayer) ytPlayer.stopVideo();
           currentTrackIdx = -1;
           dockTitle.textContent = "No Track Selected";
           dockArtist.textContent = "—";
@@ -538,8 +546,7 @@
     function clearPlaylist() {
       playlist = [];
       currentTrackIdx = -1;
-      audio.pause();
-      audio.src = "";
+      if (ytPlayer) ytPlayer.stopVideo();
       dockTitle.textContent = "No Track Selected";
       dockArtist.textContent = "—";
       playBtn.textContent = "▶";
@@ -559,7 +566,7 @@
         item.className = `track-item ${idx === currentTrackIdx ? "active" : ""}`;
         item.onclick = () => loadAndPlay(idx);
         item.innerHTML = `
-          <img src="${track.image}" alt="" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'44\\' height=\\'44\\' fill=\\'%231e293b\\'%3E%3Crect width=\\'44\\' height=\\'44\\'/ %3E%3C/svg%3E'" />
+          <img src="${track.image}" alt="" />
           <div class="track-meta">
             <div class="track-title">${track.name}</div>
             <div class="track-artist">${track.artist}</div>
@@ -573,31 +580,31 @@
     }
 
     function loadAndPlay(idx) {
-      if (!playlist[idx]) return;
+      if (!playlist[idx] || !ytPlayer) return;
       currentTrackIdx = idx;
       const track = playlist[idx];
 
-      audio.src = track.url;
       dockTitle.textContent = track.name;
       dockArtist.textContent = track.artist;
       dockThumb.src = track.image;
 
-      audio.play().catch(e => console.log("Playback error or user interaction required:", e));
+      ytPlayer.loadVideoById(track.id);
       playBtn.textContent = "⏸";
       renderPlaylist();
     }
 
     function togglePlay() {
-      if (!audio.src) {
-        if (playlist.length > 0) loadAndPlay(0);
+      if (!ytPlayer) return;
+      if (currentTrackIdx === -1 && playlist.length > 0) {
+        loadAndPlay(0);
         return;
       }
-      if (audio.paused) {
-        audio.play();
-        playBtn.textContent = "⏸";
+
+      const state = ytPlayer.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        ytPlayer.pauseVideo();
       } else {
-        audio.pause();
-        playBtn.textContent = "▶";
+        ytPlayer.playVideo();
       }
     }
 
@@ -620,22 +627,42 @@
       return `${m}:${s < 10 ? "0" : ""}${s}`;
     }
 
-    audio.ontimeupdate = () => {
-      if (!isNaN(audio.duration)) {
-        seekBar.value = (audio.currentTime / audio.duration) * 100;
-        currTime.textContent = fmt(audio.currentTime);
-        durTime.textContent = fmt(audio.duration);
-      }
-    };
+    function startProgressLoop() {
+      stopProgressLoop();
+      progressTimer = setInterval(() => {
+        if (!ytPlayer || isSeeking) return;
+        const cur = ytPlayer.getCurrentTime() || 0;
+        const dur = ytPlayer.getDuration() || 0;
+        if (dur > 0) {
+          seekBar.value = (cur / dur) * 100;
+          currTime.textContent = fmt(cur);
+          durTime.textContent = fmt(dur);
+        }
+      }, 500);
+    }
+
+    function stopProgressLoop() {
+      if (progressTimer) clearInterval(progressTimer);
+    }
+
+    seekBar.onmousedown = () => isSeeking = true;
+    seekBar.ontouchstart = () => isSeeking = true;
 
     seekBar.oninput = () => {
-      if (!isNaN(audio.duration)) {
-        audio.currentTime = (seekBar.value / 100) * audio.duration;
+      if (!ytPlayer) return;
+      const dur = ytPlayer.getDuration() || 0;
+      if (dur > 0) {
+        currTime.textContent = fmt((seekBar.value / 100) * dur);
       }
     };
 
-    audio.onended = () => {
-      nextTrack();
+    seekBar.onchange = () => {
+      if (!ytPlayer) return;
+      const dur = ytPlayer.getDuration() || 0;
+      if (dur > 0) {
+        ytPlayer.seekTo((seekBar.value / 100) * dur, true);
+      }
+      isSeeking = false;
     };
   </script>
 </body>
