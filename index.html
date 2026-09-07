@@ -34,23 +34,24 @@
     ════════════════════════════════════════════════════════════
   -->
   
-  <!-- ✅ Content Security Policy (单文件优化版) -->
- <meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; 
-               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
-               font-src https://fonts.gstatic.com; 
-               script-src 'self' https://www.googletagmanager.com 'sha256-[HASH_1_HERE]' 'sha256-[HASH_2_HERE]';
-               img-src 'self' data: https:;
-               connect-src 'self' https://www.google-analytics.com;
-               frame-ancestors 'none';
-               base-uri 'self';
-               form-action 'self';
-               upgrade-insecure-requests;">
-  
-  <!-- Additional Security Headers -->
-  <meta http-equiv="X-Frame-Options" content="DENY">
+<!-- ✅ Content Security Policy (Secure Single-File Version) -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self'; 
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                 font-src https://fonts.gstatic.com; 
+                 script-src 'self' https://www.googletagmanager.com 'sha256-5Om7cl/Q8MH4v3EIZJpl1Dh0zUtzNtt3pI8dMeBseMg=';
+                 img-src 'self' data: https:;
+                 connect-src 'self' https://www.google-analytics.com;
+                 base-uri 'self';
+                 form-action 'self';
+                 upgrade-insecure-requests;">
+
+  <!-- Additional Security Headers (Cleaned up for static hosting) -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="x-dns-prefetch-control" content="off">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- ✅ Privacy Controls -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
   
   <!-- Permissions Policy -->
@@ -1636,6 +1637,12 @@
     console.log('%c✓ MY_STUFF All-in-One Initialized', 'color: lime; font-weight: bold;');
     console.log('%c✓ Google Analytics Active (ID: GT-NC6T5LRJ)', 'color: yellow; font-weight: bold;');
     console.log('%c⚠️ Security Note: Single-file mode uses unsafe-inline for styles/scripts', 'color: orange; font-weight: bold;');
+
+    // Anti-Clickjacking: Prevent site from being framed
+if (window.top !== window.self) {
+    window.top.location = window.self.location;
+}
+    
   </script>
 </body>
 </html>
