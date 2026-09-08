@@ -36,80 +36,161 @@
   </script>
 
   <style>
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    :root {
+      --bg-fire: radial-gradient(circle at 50% 20%, rgba(255, 100, 0, 0.12) 0%, rgba(255, 50, 0, 0.04) 40%, transparent 70%);
+      --bg-snow: radial-gradient(circle at 50% 20%, rgba(0, 210, 255, 0.15) 0%, rgba(200, 230, 255, 0.06) 40%, transparent 70%);
     }
 
     body {
       margin: 0;
       padding: 0;
       min-height: 100vh;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: linear-gradient(-45deg, #1A1A40, #4A00E0, #8E2DE2, #F000FF);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #000000;
       color: #ffffff;
       overflow-x: hidden;
+      position: relative;
+      transition: background 0.5s ease;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg-fire);
+      pointer-events: none;
+      z-index: 1;
+      transition: background 0.5s ease;
+    }
+
+    body.frozen::before {
+      background: var(--bg-snow);
+    }
+
+    #pixelCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
     }
 
     .dashboard-container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 40px 20px;
+      position: relative;
+      z-index: 2;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 40px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.025);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 69, 0, 0.05);
+      transition: box-shadow 0.5s ease;
+    }
+
+    body.frozen .header {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 210, 255, 0.15);
+    }
+
+    @keyframes burnFire {
+      0% { color: #fff6bb; text-shadow: 0 0 4px #ff3300, 0 -2px 6px #ff6600, 2px -7px 10px #ff9900; }
+      100% { color: #fff6bb; text-shadow: 0 0 4px #ff3300, 0 -2px 6px #ff6600, 2px -18px 18px rgba(255, 0, 0, 0.8); }
+    }
+
+    @keyframes freezeSnow {
+      0% { color: #e0f7ff; text-shadow: 0 0 6px #00d2ff, 0 -2px 8px #ffffff; }
+      100% { color: #ffffff; text-shadow: 0 0 10px #ffffff, 0 -2px 12px #00d2ff; }
     }
 
     .header h1 {
-      font-size: 2.2rem;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
       font-weight: 800;
       letter-spacing: 2px;
-      margin: 0 0 10px 0;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      margin: 0 0 8px 0;
+      animation: burnFire 1.8s ease-in-out infinite alternate;
+    }
+
+    body.frozen .header h1 {
+      animation: freezeSnow 2s ease-in-out infinite alternate;
     }
 
     .header p {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 0.95rem;
       margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .control-panel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .coal-tab {
+      background: rgba(25, 25, 25, 0.8);
+      border: 1px solid rgba(255, 100, 0, 0.3);
+      padding: 10px 20px;
+      border-radius: 14px;
+      color: #ff9900;
+      font-weight: 600;
+      font-size: 0.9rem;
       letter-spacing: 1px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    body.frozen .coal-tab {
+      border-color: rgba(0, 210, 255, 0.4);
+      color: #00d2ff;
+      background: rgba(10, 30, 45, 0.8);
+    }
+
+    .coal-tab.active {
+      background: linear-gradient(135deg, #ff3300, #ff9900);
+      color: #ffffff;
+      border-color: #ffffff;
+      box-shadow: 0 0 25px rgba(255, 80, 0, 0.8);
     }
 
     .radio-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 25px;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 20px;
     }
 
-    /* Placeholder style before lazy loading triggers */
     .radio-card-placeholder {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
       height: 75px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255, 255, 255, 0.4);
       font-size: 14px;
-      letter-spacing: 1px;
     }
 
-    /* MyTuner Glass overrides */
+    /* Standard Liquid Glass Panel */
     .mytuner-widget {
       all: initial;
       display: block;
@@ -117,74 +198,111 @@
       max-width: 100%;
       overflow: hidden;
       max-height: 250px;
-      background: rgba(255, 255, 255, 0.1) !important;
-      backdrop-filter: blur(16px) !important;
-      -webkit-backdrop-filter: blur(16px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      border-radius: 20px !important;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      will-change: transform;
+      background: rgba(255, 255, 255, 0.035) !important;
+      backdrop-filter: blur(25px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+      border: 0.5px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 22px !important;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.2) !important;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Entire Panel Iced-In State when Frozen (Paused) */
+    body.frozen .mytuner-widget {
+      background: rgba(200, 235, 255, 0.06) !important;
+      border: 1px solid rgba(200, 240, 255, 0.4) !important;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(200, 235, 255, 0.4), 0 0 12px rgba(0, 210, 255, 0.25) !important;
+      filter: drop-shadow(0 0 2px rgba(0, 210, 255, 0.5));
     }
 
     .mytuner-widget:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4) !important;
-      background: rgba(255, 255, 255, 0.15) !important;
+      transform: translateY(-3px) scale(1.01);
+      background: rgba(255, 100, 0, 0.05) !important;
+      border-color: rgba(255, 120, 30, 0.35) !important;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 80, 0, 0.15) !important;
+    }
+
+    body.frozen .mytuner-widget:hover {
+      background: rgba(200, 235, 255, 0.1) !important;
+      border-color: rgba(0, 210, 255, 0.6) !important;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(200, 235, 255, 0.6), 0 0 20px rgba(0, 210, 255, 0.4) !important;
     }
 
     .mytuner-widget * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     .mytuner-widget [id$="top-bar"] { background: transparent !important; }
     
     .player-radio-name { 
-      color: #ffffff !important; 
-      text-shadow: 0 2px 4px rgba(0,0,0,0.4); 
+      color: rgba(255, 255, 255, 0.95) !important; 
       width: calc(100% - 74px - 10px); 
       float: left; 
       overflow: hidden; 
       text-overflow: ellipsis; 
       white-space: nowrap; 
       margin-left: 12px; 
-      font-weight: 700; 
-      font-size: 17px;
+      font-weight: 600; 
+      font-size: 16px;
     }
     
     ul[id$="song-history"] {
-      background-color: rgba(0, 0, 0, 0.2) !important;
-      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-      color: rgba(255, 255, 255, 0.8) !important;
+      background-color: rgba(0, 0, 0, 0.3) !important;
+      border-top: 0.5px solid rgba(255, 255, 255, 0.08) !important;
+      color: rgba(255, 255, 255, 0.6) !important;
     }
     
-    .main-play-button { padding: 5px; border-radius: 50%; width: 44px; height: 44px; float: left; margin-left: 5px; margin-right: 15px; margin-top: 10px; cursor: pointer; background-color: rgba(255,255,255,0.9); box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: inline-block; transition: all 0.2s ease; }
-    .main-play-button:hover { background-color: #ffffff; transform: scale(1.05); }
-    .main-play-button.disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.7; }
-    .main-play-button div { background: url("https://mytuner-radio.com/static/icons/widgets/BT_Play/BT_Play@2x.png") no-repeat center; background-size: 16px; width: 34px; height: 34px; margin-left: 2px; }
+    /* Transparent Glass Play Button */
+    .main-play-button { 
+      padding: 5px; 
+      border-radius: 50%; 
+      width: 44px; 
+      height: 44px; 
+      float: left; 
+      margin-left: 5px; 
+      margin-right: 15px; 
+      margin-top: 10px; 
+      cursor: pointer; 
+      background: rgba(255, 255, 255, 0.06); 
+      backdrop-filter: blur(15px) saturate(180%);
+      -webkit-backdrop-filter: blur(15px) saturate(180%);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.3); 
+      display: inline-block; 
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
+      border: 0.5px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .main-play-button:hover { 
+      transform: scale(1.08); 
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); 
+    }
+
+    .main-play-button.disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.5; }
+    .main-play-button div { background: url("https://mytuner-radio.com/static/icons/widgets/BT_Play/BT_Play@2x.png") no-repeat center; background-size: 16px; width: 34px; height: 34px; margin-left: 2px; filter: invert(1); opacity: 0.85; }
     .main-play-button.loading div { background: url("https://static2.mytuner.mobi/static/images/sprite-loading.gif") no-repeat center; filter: grayscale(1); background-size: 28px; margin-left: 2px; }
-    .main-play-button.playing div { background: url("https://mytuner-radio.com/static/icons/widgets/BT_Pause/BT_Pause@2x.png") no-repeat center; background-size: 16px; margin-left: 2px; }
+    .main-play-button.playing div { background: url("https://mytuner-radio.com/static/icons/widgets/BT_Pause/BT_Pause@2x.png") no-repeat center; background-size: 16px; margin-left: 2px; filter: invert(1); opacity: 0.85; }
     
     input[type=range][orient=vertical] { writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 8px; padding: 0 5px; }
     
     .volume-controls { width: 35px; height: 35px; display: inline-block; position: absolute; margin-left: 5px; margin-top: 14px; padding-top: 0; border-radius: 20px; box-sizing: content-box !important; z-index: 10; border: 1px solid transparent; transition: background 0.3s, padding 0.3s, margin 0.3s, border 0.3s; overflow: hidden; }
-    .volume-controls:hover { padding-top: 140px; margin-top: -126px; background-color: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; backdrop-filter: blur(10px); }
+    .volume-controls:hover { padding-top: 140px; margin-top: -126px; background-color: rgba(20, 20, 20, 0.8); border: 0.5px solid rgba(255,140,0,0.3); border-radius: 20px; backdrop-filter: blur(20px); }
     .volume-controls:hover > .volume-control { display: block; }
     .volume-controls .volume-control { opacity: 0; margin-top: -126px; margin-left: 13px; position: absolute; transition: 0.3s all; }
     .volume-controls:hover .volume-control { opacity: 1; }
-    .volume-controls .volume-indicator { cursor: pointer; display: block; fill: #ffffff !important; }
+    .volume-controls .volume-indicator { cursor: pointer; display: block; fill: rgba(255,255,255,0.85) !important; }
     
     .player-radio-link { width: calc(100% - 65px - 84px - 37px - 12px); height: 100%; display: inline-block; line-height: 65px; cursor: pointer; text-decoration: none; }
-    .player-radio-link img { float: left; height: 50px; border-radius: 10px; margin-top: 7px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); object-fit: cover; }
+    .player-radio-link img { float: left; height: 48px; border-radius: 12px; margin-top: 8.5px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); object-fit: cover; }
     
-    .player-mytuner-logo { margin-left: 47px; display: inline-block; vertical-align: top; opacity: 0.8; transition: opacity 0.2s; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5)); }
+    .player-mytuner-logo { margin-left: 47px; display: inline-block; vertical-align: top; opacity: 0.6; transition: opacity 0.2s; }
     .player-mytuner-logo:hover { opacity: 1; }
-    .player-mytuner-logo img { height: 30px; width: auto; vertical-align: middle; }
+    .player-mytuner-logo img { height: 28px; width: auto; vertical-align: middle; }
     
-    ul[id$="song-history"]::-webkit-scrollbar { width: 6px; }
-    ul[id$="song-history"]::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
-    ul[id$="song-history"]::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+    ul[id$="song-history"]::-webkit-scrollbar { width: 5px; }
+    ul[id$="song-history"]::-webkit-scrollbar-track { background: transparent; }
+    ul[id$="song-history"]::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
     @media (max-width: 768px) {
       .dashboard-container { padding: 20px 10px; }
-      .header h1 { font-size: 1.8rem; }
       .radio-grid { grid-template-columns: 1fr; gap: 15px; }
     }
     
@@ -196,211 +314,254 @@
   </style>
 </head>
 
-<body>
+<body class="frozen">
+  <canvas id="pixelCanvas"></canvas>
+
   <div class="dashboard-container">
     <div class="header">
       <h1>LIVE RADIOS</h1>
-      <p>Optimized Glass Edition</p>
+      <p>iOS Liquid Glass Edition</p>
+    </div>
+
+    <div class="control-panel">
+      <button id="coalTab" class="coal-tab">❄️ ANTARCTICA SNOW: FROZEN</button>
     </div>
     
-    <div class="radio-grid">
-
-      <!-- Widget 1: AIR Vijayawada -->
-      <div class="lazy-widget-wrapper" data-target-id="eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vy">
-        <div class="radio-card-placeholder">Loading AIR Vijayawada...</div>
-        <template>
-          <div id="eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vy" class="mytuner-widget" data-target="465924" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vytop-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vyplay-button" class="main-play-button disabled" data-id="eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vy"><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/air-vijayawada-465924/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/5w9ghg2r7uaa.png" alt="AIR Vijayawada">
-                <span class="player-radio-name">AIR Vijayawada</span>
-              </a>
-              <div class="volume-controls"><input id="eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vyvolume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vyvolume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vysong-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 2: VB:Telugu Hyderabad -->
-      <div class="lazy-widget-wrapper" data-target-id="esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk=">
-        <div class="radio-card-placeholder">Loading VB:Telugu Hyderabad...</div>
-        <template>
-          <div id="esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk=" class="mytuner-widget" data-target="501080" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk=top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk=play-button" class="main-play-button disabled" data-id="esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk="><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/vbtelugu-hyderabad-501080/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/wfleyqstkxe9.jpg" alt="VB:Telugu Hyderabad">
-                <span class="player-radio-name">VB:Telugu Hyderabad</span>
-              </a>
-              <div class="volume-controls"><input id="esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk=volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk=volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk=song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 3: AP 9 FM -->
-      <div class="lazy-widget-wrapper" data-target-id="bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A=">
-        <div class="radio-card-placeholder">Loading AP 9 FM...</div>
-        <template>
-          <div id="bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A=" class="mytuner-widget" data-target="509864" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A=top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A=play-button" class="main-play-button disabled" data-id="bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A="><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/ap-9-fm-509864/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/864/ap-9-fm.809abf34.png" alt="AP 9 FM">
-                <span class="player-radio-name">AP 9 FM</span>
-              </a>
-              <div class="volume-controls"><input id="bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A=volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A=volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A=song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 4: Virijallu FM -->
-      <div class="lazy-widget-wrapper" data-target-id="fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51C">
-        <div class="radio-card-placeholder">Loading Virijallu FM...</div>
-        <template>
-          <div id="fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51C" class="mytuner-widget" data-target="464074" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51Ctop-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51Cplay-button" class="main-play-button disabled" data-id="fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51C"><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/virijallu-fm-464074/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/fcrx3rsxrgxd.png" alt="Virijallu FM">
-                <span class="player-radio-name">Virijallu FM</span>
-              </a>
-              <div class="volume-controls"><input id="fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51Cvolume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51Cvolume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51Csong-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 5: Telugu Top 100 -->
-      <div class="lazy-widget-wrapper" data-target-id="wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ==">
-        <div class="radio-card-placeholder">Loading Telugu Top 100...</div>
-        <template>
-          <div id="wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ==" class="mytuner-widget" data-target="513869" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ==top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ==play-button" class="main-play-button disabled" data-id="wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ=="><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/telugu-top-100-513869/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/869/telugu-top-100.5199b359.jpg" alt="Telugu Top 100">
-                <span class="player-radio-name">Telugu Top 100</span>
-              </a>
-              <div class="volume-controls"><input id="wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ==volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ==volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ==song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 6: AIR TELUGU -->
-      <div class="lazy-widget-wrapper" data-target-id="w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw==">
-        <div class="radio-card-placeholder">Loading AIR Telugu...</div>
-        <template>
-          <div id="w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw==" class="mytuner-widget" data-target="448034" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw==top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw==play-button" class="main-play-button disabled" data-id="w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw=="><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/air-telugu-448034/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/034/air-telugu.da89c6c1.jpg" alt="AIR Telugu">
-                <span class="player-radio-name">AIR Telugu</span>
-              </a>
-              <div class="volume-controls"><input id="w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw==volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw==volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw==song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 7: TELUGU KOKILA RADIO -->
-      <div class="lazy-widget-wrapper" data-target-id="MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg==">
-        <div class="radio-card-placeholder">Loading TeluguKokila Radio...</div>
-        <template>
-          <div id="MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg==" class="mytuner-widget" data-target="416994" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg==top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg==play-button" class="main-play-button disabled" data-id="MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg=="><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/telugukokila-radio-416994/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/994/telugukokila-radio.3b4d752f.png" alt="TeluguKokila Radio">
-                <span class="player-radio-name">TeluguKokila Radio</span>
-              </a>
-              <div class="volume-controls"><input id="MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg==volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg==volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg==song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 8: Mirchi Love Hindi live -->
-      <div class="lazy-widget-wrapper" data-target-id="w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA=">
-        <div class="radio-card-placeholder">Loading Mirchi Love Hindi...</div>
-        <template>
-          <div id="w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA=" class="mytuner-widget" data-target="474854" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA=top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA=play-button" class="main-play-button disabled" data-id="w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA="><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/mirchi-love-hindi-474854/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/854/mirchi-love-hindi.fed06220.png" alt="Mirchi Love Hindi">
-                <span class="player-radio-name">Mirchi Love Hindi</span>
-              </a>
-              <div class="volume-controls"><input id="w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA=volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA=volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA=song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 9: Tamil Top 100 live -->
-      <div class="lazy-widget-wrapper" data-target-id="w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I=">
-        <div class="radio-card-placeholder">Loading Tamil Top 100...</div>
-        <template>
-          <div id="w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I=" class="mytuner-widget" data-target="514322" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I=top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I=play-button" class="main-play-button disabled" data-id="w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I="><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/tamil-top-100-514322/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/322/tamil-top-100.1adb0cb4.jpg" alt="Tamil Top 100">
-                <span class="player-radio-name">Tamil Top 100</span>
-              </a>
-              <div class="volume-controls"><input id="w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I=volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I=volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I=song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-      <!-- Widget 10: Radio Mirchi Tamil FM live -->
-      <div class="lazy-widget-wrapper" data-target-id="wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw==">
-        <div class="radio-card-placeholder">Loading Radio Mirchi Tamil...</div>
-        <template>
-          <div id="wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw==" class="mytuner-widget" data-target="456674" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
-            <div id="wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw==top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
-              <div id="wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw==play-button" class="main-play-button disabled" data-id="wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw=="><div class="play-image"></div></div>
-              <a class="player-radio-link" href="https://mytuner-radio.com/radio/radio-mirchi-tamil-fm-456674/?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank">
-                <img src="https://static2.mytuner.mobi/media/tvos_radios/674/radio-mirchi-tamil-fm.4dee4ff8.jpg" alt="Radio Mirchi Tamil FM">
-                <span class="player-radio-name">Radio Mirchi Tamil</span>
-              </a>
-              <div class="volume-controls"><input id="wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw==volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw==volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
-              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
-            </div>
-            <ul id="wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw==song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
-          </div>
-        </template>
-      </div>
-
-    </div>
+    <div class="radio-grid" id="radioGrid"></div>
   </div>
 
   <script>
+    const stations = [
+      { id: "eMO6PsKzfsOMVsOVw53DrMO4Q8KoaHDDgcK1ZsK3w6Vy", target: "465924", name: "AIR Vijayawada", img: "https://static2.mytuner.mobi/media/tvos_radios/5w9ghg2r7uaa.png", link: "https://mytuner-radio.com/radio/air-vijayawada-465924/?utm_source=widget&utm_medium=player" },
+      { id: "esObw7dieUjDpXTDsHrCqUfDpsO5R30maMONPFk=", target: "501080", name: "VB:Telugu Hyderabad", img: "https://static2.mytuner.mobi/media/tvos_radios/wfleyqstkxe9.jpg", link: "https://mytuner-radio.com/radio/vbtelugu-hyderabad-501080/?utm_source=widget&utm_medium=player" },
+      { id: "bFjCuzZNw6zCucKlw6jDpsOZw5HCpix6bFrDsT1Yw5A=", target: "509864", name: "AP 9 FM", img: "https://static2.mytuner.mobi/media/tvos_radios/864/ap-9-fm.809abf34.png", link: "https://mytuner-radio.com/radio/ap-9-fm-509864/?utm_source=widget&utm_medium=player" },
+      { id: "fcOjwrwyak4qYcO8LcOHMsO6wrovXMK4R8Ktw51C", target: "464074", name: "Virijallu FM", img: "https://static2.mytuner.mobi/media/tvos_radios/fcrx3rsxrgxd.png", link: "https://mytuner-radio.com/radio/virijallu-fm-464074/?utm_source=widget&utm_medium=player" },
+      { id: "wqbDo8OOw6HDmEtFwqFww5rDn3nCrsOMwqExwq1Yw75CPQ==", target: "513869", name: "Telugu Top 100", img: "https://static2.mytuner.mobi/media/tvos_radios/869/telugu-top-100.5199b359.jpg", link: "https://mytuner-radio.com/radio/telugu-top-100-513869/?utm_source=widget&utm_medium=player" },
+      { id: "w73Ds8KrTnVXIkJtWTXDt8K5wrpmLGZtNkHDpw==", target: "448034", name: "AIR Telugu", img: "https://static2.mytuner.mobi/media/tvos_radios/034/air-telugu.da89c6c1.jpg", link: "https://mytuner-radio.com/radio/air-telugu-448034/?utm_source=widget&utm_medium=player" },
+      { id: "MjnDj8Ovw47CtjDDrcO2wqLDgMK/RsOlwrgmbMORM8K2Tg==", target: "416994", name: "TeluguKokila Radio", img: "https://static2.mytuner.mobi/media/tvos_radios/994/telugukokila-radio.3b4d752f.png", link: "https://mytuner-radio.com/radio/telugukokila-radio-416994/?utm_source=widget&utm_medium=player" },
+      { id: "w73DiGYzw7Vsw6jCp1vCpSbDjlnDicOmMVrCvWBkwrA=", target: "474854", name: "Mirchi Love Hindi", img: "https://static2.mytuner.mobi/media/tvos_radios/854/mirchi-love-hindi.fed06220.png", link: "https://mytuner-radio.com/radio/mirchi-love-hindi-474854/?utm_source=widget&utm_medium=player" },
+      { id: "w65Twr9bw5pKSC5Fw6/Csy5zwq7Dg8ODJsOaw4hZw7I=", target: "514322", name: "Tamil Top 100", img: "https://static2.mytuner.mobi/media/tvos_radios/322/tamil-top-100.1adb0cb4.jpg", link: "https://mytuner-radio.com/radio/tamil-top-100-514322/?utm_source=widget&utm_medium=player" },
+      { id: "wqfCo8OIKMOzw6bDm3PDu8Onw6HDu8Okb3Zdw43DjMOXw4jDpw==", target: "456674", name: "Radio Mirchi Tamil", img: "https://static2.mytuner.mobi/media/tvos_radios/674/radio-mirchi-tamil-fm.4dee4ff8.jpg", link: "https://mytuner-radio.com/radio/radio-mirchi-tamil-fm-456674/?utm_source=widget&utm_medium=player" }
+    ];
+
+    const grid = document.getElementById('radioGrid');
+    stations.forEach(st => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-widget-wrapper';
+      wrapper.setAttribute('data-target-id', st.id);
+      
+      wrapper.innerHTML = `
+        <div class="radio-card-placeholder">Loading ${st.name}...</div>
+        <template>
+          <div id="${st.id}" class="mytuner-widget" data-target="${st.target}" data-requires_initialization="true" data-autoplay="false" data-hidehistory="false">
+            <div id="${st.id}top-bar" style="height: 75px; width: 100%; display: block; padding: 5px; line-height: 65px;">
+              <div id="${st.id}play-button" class="main-play-button disabled" data-id="${st.id}"><div class="play-image"></div></div>
+              <a class="player-radio-link" href="${st.link}" rel="noopener" target="_blank">
+                <img src="${st.img}" alt="${st.name}">
+                <span class="player-radio-name">${st.name}</span>
+              </a>
+              <div class="volume-controls"><input id="${st.id}volume-control" class="volume-control slider" max="100" min="1" orient="vertical" type="range" value="100"><svg id="${st.id}volume-indicator" class="volume-indicator" height="30" width="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin: 2px;"><path d="M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z"></path></svg></div>
+              <a class="player-mytuner-logo" href="https://mytuner-radio.com?utm_source=widget&amp;utm_medium=player" rel="noopener" target="_blank"><img src="https://mytuner-radio.com/static/icons/widgets/MyTuner_Logo/MyTunerLogo_Normal.png" alt="Listen on myTuner radio!"></a>
+            </div>
+            <ul id="${st.id}song-history" data-border="1" data-bordercolor="#f1f5f9" style="width: 100%; max-height: calc(415px); padding: 0px; margin: 0px; overflow-y: scroll;"></ul>
+          </div>
+        </template>
+      `;
+      grid.appendChild(wrapper);
+    });
+
     // ==========================================
-    // OPTIMIZED LAZY LOADING & INITIALIZATION
+    // FX PARTICLE SYSTEM (HIGH DENSITY & EXTENDED LIFE)
+    // ==========================================
+    const canvas = document.getElementById('pixelCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let particles = [];
+    let isPlaying = false;
+    
+    const fireColors = ['#ff2a00', '#ff5500', '#ff8800', '#ffcc00', '#ffffff', '#ff3333'];
+    const snowColors = ['#ffffff', '#e0f7ff', '#b9e8ff', '#9adfff', '#c5f2ff', '#a6e3ff'];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function updateThemeStatus() {
+      const playingWidgets = document.querySelectorAll('.main-play-button.playing');
+      const shouldBurn = playingWidgets.length > 0;
+      
+      const tab = document.getElementById('coalTab');
+      if (shouldBurn !== isPlaying) {
+        isPlaying = shouldBurn;
+        if (isPlaying) {
+          document.body.classList.remove('frozen');
+          tab.classList.add('active');
+          tab.innerHTML = '🔥 COAL IGNITION: BURNING (ACTIVE)';
+          triggerExplosion(window.innerWidth / 2, window.innerHeight / 2, 140, 'fire');
+        } else {
+          document.body.classList.add('frozen');
+          tab.classList.remove('active');
+          tab.innerHTML = '❄️ ANTARCTICA SNOW: FROZEN';
+          triggerExplosion(window.innerWidth / 2, window.innerHeight / 2, 140, 'snow');
+        }
+      }
+    }
+
+    class Particle {
+      constructor(x, y, mode, type = 'ambient') {
+        this.x = x;
+        this.y = y;
+        this.mode = mode;
+        this.type = type;
+        
+        if (mode === 'fire') {
+          if (type === 'burst') {
+            this.size = Math.random() * 5 + 2;
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 12 + 3;
+            this.vx = Math.cos(angle) * speed;
+            this.vy = Math.sin(angle) * speed;
+            this.maxLife = Math.random() * 75 + 40; // Increased Life span
+          } else if (type === 'side') {
+            this.size = Math.random() * 3.5 + 1;
+            this.vx = (x === 0 ? 1 : -1) * (Math.random() * 4 + 1.5);
+            this.vy = (Math.random() - 0.5) * 5;
+            this.maxLife = Math.random() * 70 + 30; // Increased Life span
+          } else {
+            this.size = Math.random() * 2.5 + 1;
+            this.vx = (Math.random() - 0.5) * 0.8;
+            this.vy = -Math.random() * 1.5 - 0.5;
+            this.maxLife = Math.random() * 120 + 60; // Increased Life span
+          }
+          this.color = fireColors[Math.floor(Math.random() * fireColors.length)];
+        } else {
+          if (type === 'burst') {
+            this.size = Math.random() * 5 + 2;
+            const angle = Math.random() * Math.PI * 2;
+            this.vx = Math.cos(angle) * (Math.random() * 5 + 2);
+            this.vy = Math.sin(angle) * (Math.random() * 5 + 2);
+            this.maxLife = Math.random() * 90 + 50; // Increased Life span
+          } else {
+            this.size = Math.random() * 3.5 + 1.5; 
+            this.vx = (Math.random() - 0.5) * 1.2; 
+            this.vy = Math.random() * 1.5 + 0.4;   
+            this.maxLife = Math.random() * 240 + 120; // Long-lasting drifting snow flakes
+          }
+          this.color = snowColors[Math.floor(Math.random() * snowColors.length)];
+        }
+
+        this.life = 0;
+        this.alpha = 1;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        if (this.mode === 'fire') {
+          if (this.type === 'burst' || this.type === 'side') {
+            this.vx *= 0.95;
+            this.vy *= 0.95;
+            this.vy += 0.05;
+          }
+        } else {
+          if (this.type !== 'burst') {
+            this.vx += (Math.random() - 0.5) * 0.1;
+          }
+        }
+
+        this.life++;
+        this.alpha = 1 - (this.life / this.maxLife);
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = this.mode === 'fire' ? 10 : 8;
+        ctx.shadowColor = this.color;
+        ctx.fillRect(Math.floor(this.x), Math.floor(this.y), this.size, this.size);
+        ctx.restore();
+      }
+    }
+
+    function triggerExplosion(x, y, count, mode) {
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle(x, y, mode, 'burst'));
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const playBtn = e.target.closest('.main-play-button');
+      if (playBtn) {
+        const rect = playBtn.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const currentMode = isPlaying ? 'snow' : 'fire';
+        for (let i = 0; i < 60; i++) {
+          particles.push(new Particle(centerX, centerY, currentMode, 'burst'));
+        }
+        setTimeout(updateThemeStatus, 300);
+      }
+    });
+
+    function spawnSideElements() {
+      if (!isPlaying) return;
+      if (Math.random() < 0.8) {
+        particles.push(new Particle(0, Math.random() * canvas.height, 'fire', 'side'));
+      }
+      if (Math.random() < 0.8) {
+        particles.push(new Particle(canvas.width, Math.random() * canvas.height, 'fire', 'side'));
+      }
+    }
+
+    function spawnBackgroundParticles() {
+      const currentMode = isPlaying ? 'fire' : 'snow';
+      // Maximized density configuration
+      const limit = 350;
+      const spawnChance = 0.98;
+      
+      if (particles.length < limit && Math.random() < spawnChance) {
+        if (currentMode === 'snow') {
+          particles.push(new Particle(Math.random() * canvas.width, -10, 'snow', 'ambient'));
+        } else {
+          particles.push(new Particle(Math.random() * canvas.width, canvas.height + 10, 'fire', 'ambient'));
+        }
+      }
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      if (!e.target.closest('.main-play-button')) {
+        const activeMode = isPlaying ? 'fire' : 'snow';
+        triggerExplosion(e.clientX, e.clientY, 60, activeMode);
+      }
+    });
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      updateThemeStatus();
+      spawnBackgroundParticles();
+      spawnSideElements();
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        
+        if (particles[i].life >= particles[i].maxLife || particles[i].alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+      
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // ==========================================
+    // ROBUST LAZY LOADING & INITIALIZATION
     // ==========================================
     var mytuner_scripts = mytuner_scripts || {};
     mytuner_scripts["player-v1.js_queue"] = mytuner_scripts["player-v1.js_queue"] || [];
@@ -434,7 +595,7 @@
       loadScript("https://mytuner-radio.com/static/js/widgets/widget-player-v1.js");
     }
 
-    // Intersection Observer to lazy-load widgets as they enter the user's viewport
+    // Fix for all panels including the first two: Immediate observation & sequential initialization fallback
     document.addEventListener("DOMContentLoaded", () => {
       const wrappers = document.querySelectorAll('.lazy-widget-wrapper');
 
@@ -445,26 +606,27 @@
             const template = wrapper.querySelector('template');
             const targetId = wrapper.getAttribute('data-target-id');
             
-            // Swap placeholder with real widget content
-            const content = template.content.cloneNode(true);
-            wrapper.innerHTML = '';
-            wrapper.appendChild(content);
+            if (template && !wrapper.querySelector('.mytuner-widget')) {
+              const content = template.content.cloneNode(true);
+              wrapper.innerHTML = '';
+              wrapper.appendChild(content);
 
-            // Initialize the specific MyTuner player instance
-            const initWidget = () => {
-              mytuner_scripts["player-v1.js"](targetId);
-            };
+              const initWidget = () => {
+                if (typeof mytuner_scripts["player-v1.js"] === 'function') {
+                  mytuner_scripts["player-v1.js"](targetId);
+                }
+              };
 
-            if (mytuner_scripts["player-v1.js-imported"]) {
-              initWidget();
-            } else {
-              mytuner_scripts["player-v1.js_queue"].push(initWidget);
+              if (mytuner_scripts["player-v1.js-imported"]) {
+                initWidget();
+              } else {
+                mytuner_scripts["player-v1.js_queue"].push(initWidget);
+              }
             }
-
             observer.unobserve(wrapper);
           }
         });
-      }, { rootMargin: '200px 0px', threshold: 0.01 });
+      }, { rootMargin: '400px 0px', threshold: 0 }); // Expanded rootMargin guarantees early triggers for top panels
 
       wrappers.forEach(wrapper => observer.observe(wrapper));
     });
