@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oslo S — Traffic Control · Dispatch Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+/* error trap: must be its own script tag so it survives errors elsewhere */
+window.addEventListener('error',function(e){
+  var b=document.getElementById('errbar');
+  if(b){b.style.display='block';b.textContent='SCRIPT ERROR — '+e.message+'  (line '+e.lineno+')';}
+});
+</script>
+<style>
+:root{
+  --bg:#0f1113; --panel:#121417; --line:#262b31; --line2:#1d2126;
+  --ink:#e9e6df; --mut:#8a9097; --dim:#565c63;
+  --amber:#f2a93b; --grn:#3ecf6e; --red:#e5484d; --board:#f6c600;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:'IBM Plex Mono',monospace;font-size:13px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1480px;margin:0 auto;padding:0 26px}
+::selection{background:var(--amber);color:#141310}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#2b3138;border:2px solid var(--bg);border-radius:6px}
+button{font-family:inherit;cursor:pointer}
+#errbar{display:none;background:#e5484d;color:#fff;font:12px/1.5 'IBM Plex Mono',monospace;padding:8px 26px;letter-spacing:.04em}
+.ic{display:inline-flex;flex-shrink:0}
+.ic svg{width:13px;height:13px}
+.ic.big svg{width:30px;height:30px;stroke-width:1.3}
+
+/* masthead */
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-top:24px;padding-bottom:16px;position:relative}
+.mast::after{content:"";position:absolute;left:26px;right:26px;bottom:0;height:1px;background:var(--line)}
+.overline{font-size:10.5px;letter-spacing:.2em;color:var(--mut);display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.lamp{width:8px;height:8px;background:var(--amber);display:inline-block;animation:lampblink 1.6s steps(2) infinite}
+.lamp.off{background:#3a4149;animation:none}
+@keyframes lampblink{50%{opacity:.35}}
+h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(34px,4.4vw,54px);line-height:.95;letter-spacing:.015em;text-transform:uppercase}
+h1 em{font-style:normal;color:var(--amber)}
+.m-right{text-align:right;flex-shrink:0}
+.clock{font-size:34px;font-weight:500;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.shift{font-size:10px;letter-spacing:.16em;color:var(--dim);margin-top:4px}
+
+/* stat strip */
+.statbar{display:flex;flex-wrap:wrap;padding-top:12px;padding-bottom:14px}
+.stat{padding-right:26px;margin-right:26px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:none;margin-right:0;padding-right:0}
+.sl{display:block;font-size:9.5px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-bottom:3px}
+.sv{font-size:14.5px;font-weight:500;font-variant-numeric:tabular-nums}
+.sv b{color:var(--amber);font-weight:600}
+
+/* schematic */
+.schem{position:relative;border:1px solid var(--line);background:#111316;margin-top:4px}
+.schem svg{display:block;width:100%;height:auto;max-height:62vh}
+.figcap{position:absolute;top:10px;left:12px;font-size:9.5px;letter-spacing:.14em;color:var(--dim);pointer-events:none}
+.lockout{position:absolute;bottom:10px;right:12px;font-size:9.5px;letter-spacing:.12em;color:var(--dim);pointer-events:none;font-variant-numeric:tabular-nums}
+#tip{position:absolute;pointer-events:none;display:none;background:#0b0d0fef;border:1px solid #3a4149;padding:7px 10px;font-size:11px;line-height:1.5;z-index:5;white-space:nowrap;transform:translate(-50%,-130%)}
+#tip b{color:var(--amber);font-weight:600}
+#tip .tl{color:var(--mut)}
+.train{cursor:pointer}
+.train .car{stroke:#0f1113;stroke-width:.9}
+.train.held .car{stroke:var(--amber);stroke-width:1.4;animation:carpulse 1s infinite}
+@keyframes carpulse{50%{stroke-opacity:.25}}
+.train.gone{opacity:0;transition:opacity .5s}
+
+/* lower layout */
+.lower{display:grid;grid-template-columns:1.38fr 1fr;gap:22px;margin:22px 0 8px;align-items:start}
+
+/* departure board */
+.bhead{background:#141414;color:var(--board);display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid #000;border-bottom:none}
+.bhead .bt{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:16px;letter-spacing:.18em}
+.bhead .bs{font-size:9.5px;letter-spacing:.16em;color:#8f8757}
+.board{background:var(--board);border:1px solid #000;overflow:hidden}
+.bcols,.brow{display:grid;grid-template-columns:60px 82px 1fr 50px 106px;gap:10px;align-items:center;padding:0 14px}
+.bcols{height:24px;font-size:9px;letter-spacing:.12em;color:rgba(20,19,16,.62);border-bottom:1px solid rgba(0,0,0,.28)}
+.brow{height:44px;border-bottom:1px solid rgba(0,0,0,.16);color:#151410;cursor:pointer;font-variant-numeric:tabular-nums}
+.brow.ghost{opacity:.22;pointer-events:none}
+.brow:not(.ghost):hover{background:#ffd91f}
+.brow.sel{background:#151310;color:var(--board)}
+.brow.sel:hover{background:#1d1b15}
+.brow.flash{animation:rowflash .9s}
+@keyframes rowflash{0%{background:#fff0a8}100%{}}
+.c-time{font-size:13.5px;font-weight:600}
+.c-no{font-size:12px;font-weight:500;white-space:nowrap}
+.catbar{display:inline-block;width:13px;height:5px;margin-right:6px;vertical-align:middle}
+.c-dest{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-trk{font-size:15px;font-weight:600;text-align:center}
+.c-st{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-align:right;white-space:nowrap}
+.st-ok{color:#14691f}
+.st-late{color:#b3261e}
+.st-boarding{animation:bpulse 1.1s infinite}
+.st-hold{color:#b3261e}
+.brow.sel .st-late,.brow.sel .st-hold{color:#ff7b70}
+.brow.sel .st-ok{color:#8fe3a4}
+
+/* console */
+.console{border:1px solid var(--line);background:var(--panel)}
+.chead{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.16em;color:var(--mut)}
+.chead b{color:var(--ink);font-weight:500}
+.sec{padding:14px 16px}
+.selhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.tag{font-size:9.5px;letter-spacing:.14em;border:1px solid;padding:3px 7px;font-weight:600}
+.selno{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;letter-spacing:.02em;line-height:1}
+.seldest{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;color:var(--mut);letter-spacing:.04em}
+.selroute{font-size:10.5px;color:var(--dim);letter-spacing:.06em;margin-bottom:12px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:11px 18px}
+.kv .l{display:block;font-size:9px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-bottom:2px}
+.kv .v{font-size:12.5px;font-variant-numeric:tabular-nums}
+.v .g{color:var(--grn)} .v .r{color:var(--red)} .v .a{color:var(--amber)}
+.acts{display:flex;gap:8px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid #3a4149;background:transparent;color:var(--ink);font-size:10.5px;letter-spacing:.1em;padding:8px 12px;font-weight:500}
+.btn:hover{border-color:var(--amber);color:var(--amber)}
+.btn.on{background:var(--amber);border-color:var(--amber);color:#141310}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.trkrow{display:flex;align-items:center;gap:7px;margin-top:12px;flex-wrap:wrap}
+.trkrow .lbl{font-size:9px;letter-spacing:.14em;color:var(--dim);margin-right:4px}
+.tbtn{width:28px;height:26px;border:1px solid #3a4149;background:transparent;color:var(--mut);font-size:11px}
+.tbtn:hover{border-color:var(--amber);color:var(--amber)}
+.tbtn.on{background:var(--amber);border-color:var(--amber);color:#141310;font-weight:600}
+#notice{min-height:16px;margin-top:12px;font-size:10.5px;color:var(--amber);letter-spacing:.04em}
+.empty{padding:34px 16px;text-align:center;color:var(--dim)}
+.empty p{margin-top:12px;font-size:11.5px;letter-spacing:.1em;line-height:1.7}
+.empty span{font-size:10px;color:#454b52;letter-spacing:.05em}
+.simbar{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sbl{font-size:9px;letter-spacing:.14em;color:var(--dim)}
+.sg{display:flex}
+.sgb{border:1px solid #3a4149;border-left:none;background:transparent;color:var(--mut);font-size:11px;padding:6px 11px;font-variant-numeric:tabular-nums}
+.sgb:first-child{border-left:1px solid #3a4149}
+.sgb svg{width:12px;height:12px;display:block}
+.sgb:hover{color:var(--amber)}
+.sgb.on{color:var(--amber);border-color:var(--amber);background:rgba(242,169,59,.08)}
+.simbar .btn{margin-left:auto;padding:6px 10px}
+.loghead{padding:9px 16px 7px;font-size:9.5px;letter-spacing:.16em;color:var(--dim);border-bottom:1px solid var(--line2)}
+#log{height:172px;overflow-y:auto;padding:6px 16px}
+.lg{padding:5px 0;border-bottom:1px dashed var(--line2);font-size:10.8px;line-height:1.5}
+.lg .lt{color:#5f656c;margin-right:8px}
+.lg .g{color:var(--grn)} .lg .r{color:var(--red)} .lg .a{color:var(--amber)} .lg .m{color:var(--mut)}
+
+footer{margin-top:10px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:14px;padding-bottom:30px;font-size:10px;letter-spacing:.1em;color:var(--dim)}
+kbd{border:1px solid #3a4149;padding:1px 6px;font-size:9.5px;color:var(--mut);margin:0 2px}
+
+@media(max-width:1120px){
+  .lower{grid-template-columns:1fr}
+  .mast{flex-direction:column;align-items:flex-start}
+  .m-right{text-align:left}
+  .c-dest{font-size:16px}
+}
+@media(max-width:640px){
+  .bcols,.brow{grid-template-columns:52px 64px 1fr 38px 84px;gap:6px;padding:0 10px}
+  .c-dest{font-size:14px}
+  h1{font-size:34px}
+}
+</style>
+</head>
+<body>
+
+<div id="errbar"></div>
+<noscript><div style="background:#e5484d;color:#fff;padding:10px 26px;font-size:12px">JavaScript is disabled — this dispatcher console cannot run without it.</div></noscript>
+
+<header class="wrap mast">
+  <div>
+    <div class="overline"><span class="lamp" id="lamp"></span>RAIL TRAFFIC ADMINISTRATION · DISPATCH POSITION 1 · INTERLOCKING OSL</div>
+    <h1>Oslo Sentralstasjon<em>.</em></h1>
+  </div>
+  <div class="m-right">
+    <div class="clock" id="clock">16:00:00</div>
+    <div class="shift">SIM SHIFT E · TERMINAL STATION · ALL SERVICES FICTIONAL</div>
+  </div>
+</header>
+
+<div class="wrap statbar">
+  <div class="stat"><span class="sl">In movement</span><span class="sv" id="stMove">0</span></div>
+  <div class="stat"><span class="sl">On time</span><span class="sv" id="stOT">—</span></div>
+  <div class="stat"><span class="sl">Avg delay</span><span class="sv" id="stAvg">—</span></div>
+  <div class="stat"><span class="sl">Next departure</span><span class="sv" id="stNext">—</span></div>
+</div>
+
+<section class="wrap schem" id="schemWrap">
+  <svg id="schem" viewBox="0 0 1200 512" preserveAspectRatio="xMidYMid meet"></svg>
+  <div class="figcap">FIG. 01 — STATION INTERLOCKING OSL · TERMINAL THROAT · SCALE NONE</div>
+  <div class="lockout" id="lockout">LOCKS 0 · RESOURCES 26</div>
+  <div id="tip"></div>
+</section>
+
+<section class="wrap lower">
+  <div>
+    <div class="bhead"><span class="bt">AVGANGER · DEPARTURES</span><span class="bs">OSLO S · ALL LINES</span></div>
+    <div class="board">
+      <div class="bcols"><span>TIME</span><span>TRAIN</span><span>DESTINATION</span><span style="text-align:center">TRK</span><span style="text-align:right">STATUS</span></div>
+      <div id="boardRows"></div>
+    </div>
+  </div>
+  <div class="console">
+    <div class="chead"><b>DISPATCH CONSOLE — POSITION 1</b><span id="chTime">16:00:00</span></div>
+    <div class="sec" id="cDetail"></div>
+    <div class="simbar">
+      <span class="sbl">SIM RATE</span>
+      <div class="sg" id="rateGrp">
+        <button class="sgb" data-rate="0" title="Pause"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 5v14M15 5v14"/></svg></button>
+        <button class="sgb" data-rate="1">1×</button>
+        <button class="sgb" data-rate="3">3×</button>
+        <button class="sgb on" data-rate="10">10×</button>
+        <button class="sgb" data-rate="30">30×</button>
+      </div>
+      <button class="btn" id="resetBtn"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span>RESET</button>
+    </div>
+    <div class="loghead">EVENT LOG · TRAFIKKLEDER</div>
+    <div id="log"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>SEGMENT-LOCK ROUTING · ROUTE RELEASE ON CLEAR · CONFLICTS DETECTED AT FLAT JUNCTIONS</span>
+    <span><kbd>SPACE</kbd> pause <kbd>H</kbd> hold <kbd>ESC</kbd> deselect</span>
+  </div>
+</footer>
+
+<script>
+'use strict';
+/* ============================================================
+   OSLO S — TERMINAL STATION DISPATCH SIMULATOR
+   Single file · plain ES5 · no external libraries
+   ============================================================ */
+
+/* ---------- tiny helpers ---------- */
+function $(s){return document.querySelector(s);}
+function el(t,a,p){var n=document.createElementNS('http://www.w3.org/2000/svg',t);
+  if(a){for(var k in a){n.setAttribute(k,a[k]);}}
+  if(p){p.appendChild(n);}
+  return n;}
+function pad2(n){n=Math.floor(n);return n<10?('0'+n):(''+n);}
+function fmtT(t){t=Math.floor(t)%86400;return pad2(t/3600)+':'+pad2((t%3600)/60);}
+function fmtS(t){t=Math.floor(t)%86400;return fmtT(t)+':'+pad2(t%60);}
+
+var ICONS={
+  hand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.9-2.3l-3.7-3.6a2 2 0 0 1 2.8-2.8L7 15"/></svg>',
+  prio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 11-5-5-5 5"/><path d="m17 18-5-5-5 5"/></svg>',
+  train:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="13" rx="3"/><path d="M5 10h14"/><path d="M9.5 13.5h.01M14.5 13.5h.01"/><path d="m8.5 19-1.5 2.5M15.5 19l1.5 2.5"/></svg>'
+};
+
+/* ---------- fixed geometry (viewBox 1200 x 512) ---------- */
+var VW=1200,VH=512,START=16*3600;
+var MAINS={E:{y:120,name:'LINE 400 · ØST',sig:'Ø1'},W:{y:388,name:'LINE 450 · VEST',sig:'V1'}};
+var TRACKS=[
+  {id:1,y:62,plat:1,buf:150},{id:2,y:100,plat:1,buf:150},{id:3,y:138,plat:1,buf:150},{id:4,y:176,plat:1,buf:150},
+  {id:5,y:296,plat:1,buf:150},{id:6,y:334,plat:1,buf:150},
+  {id:'S1',y:432,plat:0,buf:210},{id:'S2',y:468,plat:0,buf:210}];
+var TAKEOFF={
+  E:{1:780,2:740,3:734,4:712,5:800,6:860,S1:1020,S2:1140},
+  W:{1:1162,2:1102,3:1030,4:952,5:782,6:754,S1:700,S2:726}};
+var THROAT=640,LEAD=1240,OUTEND=1420,SIGX=884;
+var SIGD=LEAD-(SIGX-18); /* stop 18px short of entry signal */
+
+/* physics (px/s, px/s^2) */
+var VMAIN=62,VBR=24,VTRK=27,ACC=17,BRK=13,BRKMAX=32,GAP=34,SIMSTEP=0.05;
+var CATS={
+  EXPRESS:{color:'#e5484d',cars:4,h:9,vmax:66,label:'EXPRESS'},
+  REGIONAL:{color:'#f0a63a',cars:3,h:9.5,vmax:60,label:'REGIONAL'},
+  LOCAL:{color:'#d8d5cc',cars:3,h:9.5,vmax:60,label:'LOCAL'},
+  WORK:{color:'#7d8894',cars:2,h:10,vmax:42,label:'WORK'}};
+function carLen(c){return c.cars*32+(c.cars-1)*3;}
+
+/* ---------- bezier + path machinery ---------- */
+function bez(p0,c1,c2,p1,n){
+  var o=[],i,t,u;
+  for(i=0;i<=n;i++){
+    t=i/n;u=1-t;
+    o.push([
+      u*u*u*p0[0]+3*u*u*t*c1[0]+3*u*t*t*c2[0]+t*t*t*p1[0],
+      u*u*u*p0[1]+3*u*u*t*c1[1]+3*u*t*t*c2[1]+t*t*t*p1[1]]);
+  }
+  return o;
+}
+function curveFor(m,tk){
+  var tx=TAKEOFF[m][tk.id],My=MAINS[m].y;
+  var e=(tx-THROAT)*0.55;if(e<26){e=26;}
+  return bez([tx,My],[tx-e,My],[THROAT+e,tk.y],[THROAT,tk.y],60);
+}
+function cumOf(pts){
+  var c=[0],i;
+  for(i=1;i<pts.length;i++){
+    var dx=pts[i][0]-pts[i-1][0],dy=pts[i][1]-pts[i-1][1];
+    c.push(c[i-1]+Math.sqrt(dx*dx+dy*dy));
+  }
+  return c;
+}
+function mkPath(pts,limits){var c=cumOf(pts);return{pts:pts,cum:c,len:c[c.length-1],limits:limits};}
+function pathAt(p,d){
+  if(d<0){d=0;}if(d>p.len){d=p.len;}
+  var i=1;
+  while(i<p.cum.length-1&&p.cum[i]<d){i++;}
+  var seg=p.cum[i]-p.cum[i-1];if(seg<=0){seg=1;}
+  var f=(d-p.cum[i-1])/seg;
+  var a=p.pts[i-1],b=p.pts[i];
+  var dx=b[0]-a[0],dy=b[1]-a[1];
+  return{x:a[0]+dx*f,y:a[1]+dy*f,ang:Math.atan2(dy,dx)};
+}
+function vLim(p,d){
+  var v=999;
+  for(var i=0;i<p.limits.length;i++){
+    if(d>=p.limits[i][0]){v=p.limits[i][1];}else{break;}
+  }
+  return v;
+}
+
+/* ---------- build in/out paths per track per main ---------- */
+var PATHS={};
+TRACKS.forEach(function(tk){
+  var stopX=tk.buf+12;
+  PATHS[tk.id]={};
+  ['E','W'].forEach(function(m){
+    var My=MAINS[m].y;
+    var curve=curveFor(m,tk);
+    var c=cumOf(curve),dCurve=c[c.length-1];
+    var dMain=LEAD-TAKEOFF[m][tk.id];
+    var dTrk=THROAT-stopX;
+    var inPts=[[LEAD,My]],i;
+    for(i=1;i<curve.length;i++){inPts.push(curve[i]);}
+    inPts.push([stopX,tk.y]);
+    var outPts=inPts.slice().reverse();
+    outPts.push([OUTEND,My]);
+    PATHS[tk.id][m]={
+      pIn:mkPath(inPts,[[0,VMAIN],[dMain,VBR],[dMain+dCurve,VTRK]]),
+      pOut:mkPath(outPts,[[0,VTRK],[dTrk,VBR],[dTrk+dCurve,VMAIN]])
+    };
+  });
+});
+
+/* ---------- conflict detection between branches and opposite main ---------- */
+var BR={},CONFL={};
+TRACKS.forEach(function(tk){
+  ['E','W'].forEach(function(m){
+    var k='B:'+m+':'+tk.id;
+    BR[k]=curveFor(m,tk);
+    CONFL[k]=[];
+  });
+});
+function curvesClose(A,B,tol){
+  var t2=tol*tol,i,j;
+  for(i=2;i<A.length-2;i++){
+    var ax=A[i][0],ay=A[i][1];
+    for(j=2;j<B.length-2;j++){
+      var dx=ax-B[j][0],dy=ay-B[j][1];
+      if(dx*dx+dy*dy<=t2){return true;}
+    }
+  }
+  return false;
+}
+var bKeys=[],bk;
+for(bk in BR){bKeys.push(bk);}
+var ci,cj;
+for(ci=0;ci<bKeys.length;ci++){
+  for(cj=ci+1;cj<bKeys.length;cj++){
+    var k1=bKeys[ci],k2=bKeys[cj];
+    if(k1.charAt(2)===k2.charAt(2)){continue;} /* same-main branches never cross each other */
+    if(curvesClose(BR[k1],BR[k2],10)){CONFL[k1].push(k2);CONFL[k2].push(k1);}
+  }
+}
+TRACKS.forEach(function(tk){
+  ['E','W'].forEach(function(m){
+    var pts=BR['B:'+m+':'+tk.id];
+    ['E','W'].forEach(function(m2){
+      if(m2===m){return;}
+      var y2=MAINS[m2].y;
+      for(var i=2;i<pts.length-2;i++){
+        var px=pts[i][0],py=pts[i][1];
+        if(Math.abs(py-y2)<=5&&px>648&&px<1235){
+          CONFL['B:'+m+':'+tk.id].push('M:'+m2);
+          break;
+        }
+      }
+    });
+  });
+});
+function routeRes(m,tk){
+  return ['M:'+m,'B:'+m+':'+tk,'T:'+tk].concat(CONFL['B:'+m+':'+tk]);
+}
+
+/* ============================================================
+   STATIC SCHEMATIC
+   ============================================================ */
+var svg,gHi,gTrain,sigE,sigW;
+var exitSig={},hiEl={},trackLine={};
+function polyD(pts){
+  var d='M'+pts[0][0].toFixed(1)+' '+pts[0][1].toFixed(1),i;
+  for(i=1;i<pts.length;i++){d+='L'+pts[i][0].toFixed(1)+' '+pts[i][1].toFixed(1);}
+  return d;
+}
+function buildStatic(){
+  svg=$('#schem');
+  var defs=el('defs',null,svg);
+  var pat=el('pattern',{id:'dots',width:26,height:26,patternUnits:'userSpaceOnUse'},defs);
+  el('circle',{cx:1,cy:1,r:0.7,fill:'#ffffff',opacity:'0.045'},pat);
+  el('rect',{x:0,y:0,width:VW,height:VH,fill:'url(#dots)'},svg);
+  var gBase=el('g',null,svg);
+  var gSig=el('g',null,svg);
+  gHi=el('g',null,svg);
+  gTrain=el('g',null,svg);
+  var i,m,tk;
+  /* main lines */
+  for(m in MAINS){
+    el('line',{x1:646,y1:MAINS[m].y,x2:LEAD,y2:MAINS[m].y,stroke:'#454c54','stroke-width':1.6},gBase);
+    var mt=el('text',{x:1194,y:MAINS[m].y-9,'text-anchor':'end','font-family':'IBM Plex Mono, monospace','font-size':10,fill:'#6a7076','letter-spacing':'1.5'},gBase);
+    mt.textContent=MAINS[m].name;
+  }
+  /* branch curves */
+  for(i=0;i<TRACKS.length;i++){
+    tk=TRACKS[i];
+    for(m in MAINS){
+      el('path',{d:polyD(BR['B:'+m+':'+tk.id]),fill:'none',stroke:'#454c54','stroke-width':1.6},gBase);
+    }
+  }
+  /* tracks, platforms, buffers, numbers */
+  for(i=0;i<TRACKS.length;i++){
+    tk=TRACKS[i];
+    trackLine[tk.id]=el('line',{x1:tk.buf,y1:tk.y,x2:THROAT,y2:tk.y,stroke:'#3a4048','stroke-width':1.6},gBase);
+    if(tk.plat){
+      el('rect',{x:178,y:tk.y+6,width:402,height:13,fill:'#1a1e23'},gBase);
+      el('line',{x1:178,y1:tk.y+7.5,x2:580,y2:tk.y+7.5,stroke:'#f2a93b',opacity:'0.14','stroke-width':2},gBase);
+    }
+    var bc=tk.plat?'#565d64':'#3d434a';
+    el('path',{d:'M'+tk.buf+' '+(tk.y-6)+'L'+tk.buf+' '+(tk.y+6),stroke:bc,'stroke-width':3},gBase);
+    el('path',{d:'M'+(tk.buf+6)+' '+(tk.y-6)+'L'+(tk.buf+6)+' '+(tk.y+6),stroke:bc,'stroke-width':1.4},gBase);
+    var num=el('text',{x:134,y:tk.y+6,'text-anchor':'middle','font-family':'Barlow Condensed, sans-serif','font-weight':600,'font-size':tk.plat?24:19,fill:tk.plat?'#8b9198':'#4c525a'},gBase);
+    num.textContent=tk.id;
+  }
+  /* entry signals */
+  function mkEntry(m){
+    var y=MAINS[m].y,g=el('g',null,gSig);
+    el('line',{x1:SIGX,y1:y-2,x2:SIGX,y2:y-19,stroke:'#565d64','stroke-width':1.6},g);
+    var r=el('circle',{cx:SIGX,cy:y-9,r:2.8,fill:'#e5484d'},g);
+    var gr=el('circle',{cx:SIGX,cy:y-16,r:2.8,fill:'#3ecf6e',opacity:0.14},g);
+    var t=el('text',{x:SIGX,y:y-25,'text-anchor':'middle','font-family':'IBM Plex Mono, monospace','font-size':9,fill:'#6a7076'},g);
+    t.textContent=MAINS[m].sig;
+    return{red:r,green:gr};
+  }
+  sigE=mkEntry('E');sigW=mkEntry('W');
+  /* exit signals */
+  for(i=0;i<TRACKS.length;i++){
+    tk=TRACKS[i];
+    el('line',{x1:650,y1:tk.y,x2:650,y2:tk.y-6,stroke:'#565d64','stroke-width':1.3},gSig);
+    exitSig[tk.id]=el('circle',{cx:650,cy:tk.y-9,r:2.4,fill:'#e5484d'},gSig);
+  }
+  /* route highlights */
+  for(i=0;i<TRACKS.length;i++){
+    tk=TRACKS[i];
+    for(m in MAINS){
+      hiEl['B:'+m+':'+tk.id]=el('path',{d:polyD(PATHS[tk.id][m].pIn.pts),fill:'none','stroke-width':4.5,opacity:0,stroke:'#ffffff','stroke-linecap':'round'},gHi);
+    }
+  }
+  /* legend */
+  (function(){
+    var g=el('g',null,gBase);
+    el('rect',{x:306,y:214,width:318,height:74,fill:'#0e1013',opacity:0.86,stroke:'#262b31'},g);
+    var ttl=el('text',{x:322,y:234,'font-family':'Barlow Condensed, sans-serif','font-weight':600,'font-size':13,fill:'#9aa0a6','letter-spacing':'1.5'},g);
+    ttl.textContent='INTERLOCKING — OSLO S';
+    var cats=[['EXPRESS','#e5484d'],['REGIONAL','#f0a63a'],['LOCAL','#d8d5cc'],['WORK','#7d8894']];
+    for(var j=0;j<cats.length;j++){
+      var x=322+(j%2)*160,y=250+Math.floor(j/2)*16;
+      el('rect',{x:x,y:y-5,width:18,height:5,fill:cats[j][1]},g);
+      var t=el('text',{x:x+26,y:y,'font-family':'IBM Plex Mono, monospace','font-size':9,fill:'#8a9097','letter-spacing':'1'},g);
+      t.textContent=cats[j][0];
+    }
+    el('circle',{cx:327,cy:279.5,r:2.6,fill:'#e5484d'},g);
+    el('circle',{cx:371,cy:279.5,r:2.6,fill:'#3ecf6e'},g);
+    var t2=el('text',{x:336,y:283,'font-family':'IBM Plex Mono, monospace','font-size':9,fill:'#8a9097','letter-spacing':'1'},g);
+    t2.textContent='STOP';
+    var t3=el('text',{x:380,y:283,'font-family':'IBM Plex Mono, monospace','font-size':9,fill:'#8a9097','letter-spacing':'1'},g);
+    t3.textContent='PROCEED';
+    var t4=el('text',{x:446,y:283,'font-family':'IBM Plex Mono, monospace','font-size':8.5,fill:'#565c63','letter-spacing':'0.8'},g);
+    t4.textContent='CLICK A TRAIN TO DISPATCH';
+  })();
+}
+function setEntry(m,green){
+  var s=(m==='E')?sigE:sigW;
+  s.red.setAttribute('opacity',green?0.14:1);
+  s.green.setAttribute('opacity',green?1:0.14);
+}
+function setExit(tk,green){
+  var e=exitSig[tk];
+  if(e){e.setAttribute('fill',green?'#3ecf6e':'#e5484d');}
+}
+
+/* ============================================================
+   TIMETABLE
+   ============================================================ */
+var TPL=[
+  {no:'F1',cat:'EXPRESS',line:'E',depLine:'E',orig:'Gardermoen',dest:'Gardermoen',head:20,off:0,dwell:120,tracks:[1,2]},
+  {no:'L2',cat:'LOCAL',line:'E',depLine:'E',orig:'Kløfta',dest:'Kløfta',head:20,off:4,dwell:100,tracks:[2,3]},
+  {no:'RE10',cat:'REGIONAL',line:'E',depLine:'W',orig:'Lillestrøm',dest:'Drammen',head:30,off:7,dwell:180,tracks:[3,4]},
+  {no:'L1',cat:'LOCAL',line:'W',depLine:'W',orig:'Asker',dest:'Asker',head:20,off:2,dwell:100,tracks:[5,6]},
+  {no:'RE11',cat:'REGIONAL',line:'W',depLine:'E',orig:'Skien',dest:'Lillestrøm',head:30,off:20,dwell:180,tracks:[5,6]},
+  {no:'UT',cat:'WORK',line:'W',depLine:'W',orig:'Depot',dest:'Depot · unit move',head:47,off:30,dwell:300,tracks:['S1','S2'],work:true}];
+function allocTrack(tpl,arr,dep){
+  var cands,i,j,q;
+  if(tpl.work){cands=tpl.tracks.slice();}
+  else{
+    cands=tpl.tracks.slice();
+    for(i=0;i<TRACKS.length;i++){
+      if(TRACKS[i].plat&&tpl.tracks.indexOf(TRACKS[i].id)<0){cands.push(TRACKS[i].id);}
+    }
+  }
+  for(j=0;j<cands.length;j++){
+    var id=cands[j],free=true;
+    for(q=0;q<services.length;q++){
+      var s=services[q];
+      if(s.done){continue;}
+      if(String(s.track)!==String(id)){continue;}
+      if(s.arr<dep+100&&s.dep>arr-100){free=false;break;}
+    }
+    if(free){return id;}
+  }
+  return cands[0];
+}
+function fillServices(){
+  var i,j;
+  for(i=0;i<TPL.length;i++){
+    var tp=TPL[i];
+    if(tp.next===undefined){tp.next=START+60+tp.off*60;}
+    while(tp.next<simT+4500){
+      var arr=tp.next,dep=arr+tp.dwell;
+      tp.seq=(tp.seq||0)+1;
+      services.push({id:tp.no+'-'+pad2(tp.seq),cat:tp.cat,line:tp.line,depLine:tp.depLine,
+        orig:tp.orig,dest:tp.dest,track:allocTrack(tp,arr,dep),arr:arr,dep:dep,
+        train:null,done:false,arrDelay:0,depDelay:0});
+      tp.next+=tp.head*60;
+    }
+  }
+  var keep=[];
+  for(j=0;j<services.length;j++){
+    var s=services[j];
+    if(!s.done||simT-s.dep<600){keep.push(s);}
+  }
+  services=keep;
+}
+
+/* ============================================================
+   SIMULATION STATE
+   ============================================================ */
+var simT=START,rate=10,lastRate=10;
+var services=[],trains=[],locks={},selId=null,hovId=null,boardPrev={};
+var logEl=null,boardRows=null,rowEls=[];
+
+function addLog(html){
+  var d=document.createElement('div');
+  d.className='lg';
+  d.innerHTML='<span class="lt">'+fmtS(simT)+'</span>'+html;
+  logEl.insertBefore(d,logEl.firstChild);
+  while(logEl.childNodes.length>60){logEl.removeChild(logEl.lastChild);}
+}
+function dTxt(min){
+  return min>=1?('<span class="a">+'+min+' MIN</span>'):'<span class="g">ON TIME</span>';
+}
+function lockCount(){var n=0,k;for(k in locks){n++;}return n;}
+
+/* ---------- trains ---------- */
+function frontX(t){return pathAt(t.path,t.d).x;}
+function trySpawn(sv){
+  if(sv.train||sv.done){return;}
+  if(simT<sv.arr-110){return;}
+  var i,o;
+  for(i=0;i<trains.length;i++){
+    o=trains[i];
+    if(o.main===sv.line&&frontX(o)>1120){return;}
+    if(o.state==='departing'&&o.depMain===sv.line&&pathAt(o.path,o.d).x>VW-80){return;}
+  }
+  var c=CATS[sv.cat];
+  var t={id:sv.id,sv:sv,cat:sv.cat,color:c.color,main:sv.line,depMain:sv.depLine,track:sv.track,
+    path:PATHS[sv.track][sv.line].pIn,pathOut:PATHS[sv.track][sv.depLine].pOut,
+    d:2,v:0,len:carLen(c),carW:32,carH:c.h,state:'approach',held:false,prio:false,
+    route:null,reqT:undefined,finished:false};
+  var g=el('g',{'class':'train'},gTrain);
+  t.cars=[];
+  for(i=0;i<c.cars;i++){
+    t.cars.push(el('rect',{'class':'car',x:-16,y:-c.h/2,width:32,height:c.h,rx:2.5,fill:c.color},g));
+  }
+  t.light=el('circle',{r:1.8,fill:'#5a5f66'},g);
+  t.label=el('text',{'font-family':'IBM Plex Mono, monospace','font-size':9.5,'font-weight':600,
+    fill:'#cfd4d9','text-anchor':'middle',stroke:'#101214','stroke-width':3,'paint-order':'stroke'},g);
+  t.label.textContent=sv.id;
+  t.ring=el('circle',{r:16,fill:'none',stroke:'#f2a93b','stroke-width':1.2,'stroke-dasharray':'5 4',opacity:0},g);
+  t.g=g;
+  sv.train=t;
+  trains.push(t);
+  addLog(sv.id+' <span class="m">entered from</span> '+MAINS[sv.line].name+' <span class="m">— on approach</span>');
+}
+function leaderAhead(t){
+  var mx=frontX(t),best=null,bx=-1e9,i,o,ox;
+  for(i=0;i<trains.length;i++){
+    o=trains[i];
+    if(o===t||o.main!==t.main){continue;}
+    if(o.state!=='approach'&&o.state!=='entering'){continue;}
+    ox=frontX(o);
+    if(ox<mx-1&&ox>bx){bx=ox;best=o;}
+  }
+  return best;
+}
+function mainApproachBusy(m){
+  var i;
+  for(i=0;i<trains.length;i++){
+    if(trains[i].main===m&&(trains[i].state==='approach'||trains[i].state==='entering')){return true;}
+  }
+  return false;
+}
+function canRoute(t,m,tk){
+  var res=routeRes(m,tk),i;
+  for(i=0;i<res.length;i++){
+    var v=locks[res[i]];
+    if(v!==undefined&&v!==t.id){return false;}
+  }
+  return true;
+}
+function grantRoute(t,dir){
+  var m=(dir==='in')?t.main:t.depMain;
+  var tk=t.track;
+  var res=routeRes(m,tk),i;
+  for(i=0;i<res.length;i++){locks[res[i]]=t.id;}
+  t.route={m:m,tk:tk,res:res,dir:dir};
+  var h=hiEl['B:'+m+':'+tk];
+  h.setAttribute('stroke',t.color);
+  h.setAttribute('opacity',0.34);
+  trackLine[tk].setAttribute('stroke','#6a737c');
+  if(dir==='in'){
+    t.state='entering';
+    addLog('Route set — <span class="g">'+MAINS[m].sig+' cleared</span> → Track '+tk+' · '+t.id);
+  }else{
+    addLog('Route set — Track '+tk+' exit <span class="g">cleared</span> → '+MAINS[m].name+' · '+t.id);
+  }
+}
+function releaseRoute(t,keepTrack){
+  if(!t.route){return;}
+  var res=t.route.res,i;
+  for(i=0;i<res.length;i++){
+    if(keepTrack&&res[i]==='T:'+t.track){continue;}
+    if(locks[res[i]]===t.id){delete locks[res[i]];}
+  }
+  hiEl['B:'+t.route.m+':'+t.route.tk].setAttribute('opacity',0);
+  if(!keepTrack){
+    trackLine[t.track].setAttribute('stroke','#3a4048');
+    setExit(t.track,false);
+  }
+  t.route=null;
+}
+function arrive(t){
+  t.v=0;t.state='dwell';
+  var dl=simT-t.sv.arr;t.sv.arrDelay=dl>0?dl:0;
+  releaseRoute(t,true);
+  addLog(t.id+' <span class="m">arrived</span> Track '+t.track+' · '+dTxt(Math.floor(t.sv.arrDelay/60)));
+}
+function stepTrain(t,dt){
+  if(t.state==='approach'||t.state==='entering'){
+    var p=t.path,tgt=p.len;
+    if(t.state==='approach'){
+      if(!t.route){tgt=SIGD;}
+      var a=leaderAhead(t);
+      if(a){var lim=LEAD-(frontX(a)+GAP+a.len);if(lim<tgt){tgt=lim;}}
+    }
+    var gap=tgt-t.d;if(gap<0){gap=0;}
+    var vB=Math.sqrt(2*BRK*gap);
+    var vT=vLim(p,t.d);
+    if(vB<vT){vT=vB;}
+    if(CATS[t.cat].vmax<vT){vT=CATS[t.cat].vmax;}
+    if(t.held){vT=0;}
+    if(vT>t.v){t.v+=ACC*dt;if(t.v>vT){t.v=vT;}}
+    else{t.v-=BRKMAX*dt;if(t.v<vT){t.v=vT;}}
+    if(t.v<0.05&&vT===0){t.v=0;}
+    t.d+=t.v*dt;
+    if(t.state==='entering'&&t.d>=p.len-0.5&&t.v<2.2){arrive(t);}
+  }else if(t.state==='departing'){
+    var p2=t.path;
+    var vT2=vLim(p2,t.d);
+    if(CATS[t.cat].vmax<vT2){vT2=CATS[t.cat].vmax;}
+    if(t.held){vT2=0;}
+    if(vT2>t.v){t.v+=ACC*dt;if(t.v>vT2){t.v=vT2;}}
+    else{t.v-=BRKMAX*dt;if(t.v<vT2){t.v=vT2;}}
+    t.d+=t.v*dt;
+    var rearD=t.d-(t.len+10);
+    if(rearD>0&&pathAt(p2,rearD).x>VW+15){t.finished=true;}
+  }
+}
+function dispatcher(){
+  var reqs=[],i;
+  for(i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.route){continue;}
+    if(t.state==='approach'&&frontX(t)<1010&&simT>=t.sv.arr-80){reqs.push({t:t,dir:'in'});}
+    else if(t.state==='dwell'&&!t.held&&simT>=t.sv.dep-45&&!mainApproachBusy(t.depMain)){reqs.push({t:t,dir:'out'});}
+  }
+  if(!reqs.length){return;}
+  for(i=0;i<reqs.length;i++){if(reqs[i].t.reqT===undefined){reqs[i].t.reqT=simT;}}
+  reqs.sort(function(a,b){
+    if(a.t.prio!==b.t.prio){return a.t.prio?-1:1;}
+    return a.t.reqT-b.t.reqT;
+  });
+  for(i=0;i<reqs.length;i++){
+    var r=reqs[i];
+    if(r.t.route){continue;}
+    var m=(r.dir==='in')?r.t.main:r.t.depMain;
+    if(canRoute(r.t,m,r.t.track)){grantRoute(r.t,r.dir);}
+  }
+}
+function stepSim(dt){
+  var i;
+  simT+=dt;
+  fillServices();
+  for(i=0;i<services.length;i++){trySpawn(services[i]);}
+  dispatcher();
+  for(i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.state==='dwell'&&t.route&&t.route.dir==='out'&&simT>=t.sv.dep-1&&!t.held){
+      t.state='departing';t.path=t.pathOut;t.d=0;t.v=0;
+      var dl=simT-t.sv.dep;t.sv.depDelay=dl>0?dl:0;
+      addLog(t.id+' <span class="m">departed</span> → '+t.sv.dest+' · '+dTxt(Math.floor(t.sv.depDelay/60)));
+    }
+    stepTrain(t,dt);
+  }
+  for(i=trains.length-1;i>=0;i--){
+    if(trains[i].finished){
+      var tf=trains[i];
+      releaseRoute(tf,false);
+      tf.sv.done=true;
+      tf.g.classList.add('gone');
+      (function(g){setTimeout(function(){if(g.parentNode){g.parentNode.removeChild(g);}},500);})(tf.g);
+      trains.splice(i,1);
+    }
+  }
+}
+function svDelay(sv){
+  if(sv.done){return sv.depDelay;}
+  var t=sv.train;
+  if(!t){return 0;}
+  var rem,e;
+  if(t.state==='approach'){rem=t.path.len-t.d;e=simT+rem/24+16-sv.arr;return e>0?e:0;}
+  if(t.state==='entering'){rem=t.path.len-t.d;e=simT+rem/22+4-sv.arr;return e>0?e:0;}
+  if(t.state==='dwell'){var a=t.arrDelay;if(simT-sv.dep>a){a=simT-sv.dep;}return a>0?a:0;}
+  e=simT-sv.dep;return e>0?e:0;
+}
+
+/* ============================================================
+   RENDERING
+   ============================================================ */
+function anyRoute(m,dir){
+  var i;
+  for(i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.route&&t.route.dir===dir&&t.route.m===m){return true;}
+  }
+  return false;
+}
+function renderFrame(){
+  var i,j;
+  for(i=0;i<trains.length;i++){
+    var t=trains[i];
+    var f=pathAt(t.path,t.d);
+    for(j=0;j<t.cars.length;j++){
+      var cd=t.d-t.carW/2-j*(t.carW+3);
+      if(cd<1){cd=1;}
+      var pt=pathAt(t.path,cd);
+      t.cars[j].setAttribute('transform','translate('+pt.x.toFixed(2)+','+pt.y.toFixed(2)+') rotate('+(pt.ang*57.2958).toFixed(1)+')');
+    }
+    var lp=pathAt(t.path,t.d+2);
+    t.light.setAttribute('cx',lp.x);t.light.setAttribute('cy',lp.y);
+    t.light.setAttribute('fill',t.v>2?'#f5e9c8':'#5a5f66');
+    t.label.setAttribute('x',f.x);t.label.setAttribute('y',f.y-11);
+    var active=(t.id===selId)||(t.id===hovId);
+    t.ring.setAttribute('opacity',active?1:0);
+    if(active){
+      t.ring.setAttribute('cx',f.x);t.ring.setAttribute('cy',f.y);
+      t.ring.setAttribute('stroke',t.id===selId?'#f2a93b':'#8a9097');
+    }
+    if(t.held){t.g.classList.add('held');}else{t.g.classList.remove('held');}
+  }
+  setEntry('E',anyRoute('E','in'));
+  setEntry('W',anyRoute('W','in'));
+  for(i=0;i<TRACKS.length;i++){
+    var tk=TRACKS[i],green=false;
+    for(j=0;j<trains.length;j++){
+      var t2=trains[j];
+      if(t2.route&&t2.route.dir==='out'&&String(t2.route.tk)===String(tk.id)){green=true;break;}
+    }
+    setExit(tk.id,green);
+  }
+}
+
+/* ============================================================
+   DEPARTURE BOARD
+   ============================================================ */
+var STATES={approach:'ON APPROACH',entering:'ARRIVING',dwell:'AT PLATFORM',departing:'DEPARTING'};
+function stateTxt(t){return STATES[t.state]||t.state;}
+function statusOf(sv){
+  var t=sv.train;
+  if(t&&t.held){return{txt:'HELD',cls:'st-hold'};}
+  if(t&&t.state==='departing'){return{txt:'DEPARTING',cls:''};}
+  if(t&&t.state==='dwell'&&(sv.dep-simT)<=120){return{txt:'BOARDING',cls:'st-boarding'};}
+  var dm=Math.floor(svDelay(sv)/60);
+  if(dm>=1){return{txt:'+'+dm+' MIN',cls:'st-late'};}
+  return{txt:'ON TIME',cls:'st-ok'};
+}
+function updateBoard(){
+  var list=[],i;
+  for(i=0;i<services.length;i++){if(!services[i].done){list.push(services[i]);}}
+  list.sort(function(a,b){return a.dep-b.dep;});
+  if(list.length>10){list.length=10;}
+  for(i=0;i<10;i++){
+    var row=rowEls[i];
+    if(!row){row=document.createElement('div');boardRows.appendChild(row);rowEls[i]=row;}
+    var sv=list[i];
+    if(!sv){
+      if(row.getAttribute('data-id')){
+        row.removeAttribute('data-id');
+        row.innerHTML='<span></span><span></span><span></span><span></span><span></span>';
+      }
+      row.classList.add('ghost');row.classList.remove('sel');
+      continue;
+    }
+    row.classList.remove('ghost');
+    if(row.getAttribute('data-id')!==sv.id){
+      row.setAttribute('data-id',sv.id);
+      row.innerHTML='<span class="c-time">'+fmtT(sv.dep)+'</span>'
+        +'<span class="c-no"><span class="catbar" style="background:'+CATS[sv.cat].color+'"></span>'+sv.id+'</span>'
+        +'<span class="c-dest">'+sv.dest+'</span>'
+        +'<span class="c-trk">'+sv.track+'</span>'
+        +'<span class="c-st"></span>';
+    }
+    if(sv.id===selId){row.classList.add('sel');}else{row.classList.remove('sel');}
+    var st=statusOf(sv);
+    var cell=row.querySelector('.c-st');
+    cell.textContent=st.txt;
+    cell.className='c-st '+st.cls;
+    var prev=boardPrev[sv.id];
+    if(prev!==undefined&&prev!==st.txt){
+      row.classList.remove('flash');void row.offsetWidth;row.classList.add('flash');
+    }
+    boardPrev[sv.id]=st.txt;
+  }
+}
+
+/* ============================================================
+   STATS + CONSOLE
+   ============================================================ */
+function updateStats(){
+  $('#clock').textContent=fmtS(simT);
+  $('#chTime').textContent=fmtS(simT);
+  var act=[],i;
+  for(i=0;i<services.length;i++){if(!services[i].done){act.push(services[i]);}}
+  var moving=0,ot=0,sum=0;
+  for(i=0;i<trains.length;i++){if(trains[i].v>1||trains[i].state==='departing'){moving++;}}
+  for(i=0;i<act.length;i++){var d=svDelay(act[i]);if(d<60){ot++;}sum+=d;}
+  $('#stMove').textContent=''+moving;
+  $('#stOT').textContent=act.length?(Math.round(ot/act.length*100)+' %'):'—';
+  var avg=act.length?(sum/act.length/60):0;
+  $('#stAvg').innerHTML=avg<0.05?'0.0 MIN':'<b>+'+avg.toFixed(1)+'</b> MIN';
+  var nx=null;
+  for(i=0;i<act.length;i++){if(!nx||act[i].dep<nx.dep){nx=act[i];}}
+  if(nx){
+    var rem=nx.dep-simT;
+    var eta=rem>0?('in '+pad2(rem/60)+':'+pad2(rem%60)):'NOW';
+    $('#stNext').textContent=fmtT(nx.dep)+' · TRK '+nx.track+' · '+eta;
+  }else{
+    $('#stNext').textContent='—';
+  }
+  $('#lockout').textContent='LOCKS '+lockCount()+' · RESOURCES 26';
+  if(rate===0){$('#lamp').classList.add('off');}else{$('#lamp').classList.remove('off');}
+}
+var noticeTimer=null;
+function notice(msg){
+  var n=$('#notice');
+  if(!n){return;}
+  n.textContent=msg?('» '+msg):'';
+  if(noticeTimer){clearTimeout(noticeTimer);}
+  if(msg){noticeTimer=setTimeout(function(){var x=$('#notice');if(x){x.textContent='';}},4000);}
+}
+function select(id){selId=id;buildConsole();updateBoard();}
+function findSel(){
+  var i;
+  for(i=0;i<services.length;i++){if(services[i].id===selId){return services[i];}}
+  return null;
+}
+function buildConsole(){
+  var box=$('#cDetail');
+  var sv=findSel(),i;
+  if(!sv){
+    box.innerHTML='<div class="empty"><span class="ic big">'+ICONS.train+'</span>'
+      +'<p>NO TRAIN SELECTED<br><span>Click a train on the diagram, or a row on the departure board.</span></p></div>';
+    return;
+  }
+  var c=CATS[sv.cat],t=sv.train;
+  var keys=(sv.cat==='WORK')?['S1','S2']:[1,2,3,4,5,6];
+  var btns='';
+  for(i=0;i<keys.length;i++){
+    var onK=(String(sv.track)===String(keys[i]))?' on':'';
+    btns+='<button class="tbtn'+onK+'" data-tk="'+keys[i]+'">'+keys[i]+'</button>';
+  }
+  box.innerHTML='<div class="selhead">'
+    +'<span class="tag" style="color:'+c.color+';border-color:'+c.color+'">'+c.label+'</span>'
+    +'<span class="selno">'+sv.id+'</span>'
+    +'<span class="seldest">→ '+sv.dest+'</span></div>'
+    +'<div class="selroute">FROM '+sv.orig.toUpperCase()+' · '+MAINS[sv.line].name+' → '+MAINS[sv.depLine].name+'</div>'
+    +'<div class="kv">'
+    +'<div><span class="l">Sched arrival</span><span class="v" id="cv-a">'+fmtT(sv.arr)+'</span></div>'
+    +'<div><span class="l">Sched departure</span><span class="v" id="cv-d">'+fmtT(sv.dep)+'</span></div>'
+    +'<div><span class="l">Track</span><span class="v" id="cv-t">'+sv.track+'</span></div>'
+    +'<div><span class="l">Delay</span><span class="v" id="cv-y">—</span></div>'
+    +'<div><span class="l">Speed</span><span class="v" id="cv-s">0 KM/H</span></div>'
+    +'<div><span class="l">State</span><span class="v" id="cv-x">'+(t?stateTxt(t):'STANDBY')+'</span></div>'
+    +'<div><span class="l">Signal</span><span class="v" id="cv-g">—</span></div>'
+    +'<div><span class="l">Priority</span><span class="v" id="cv-p">'+((t&&t.prio)?'<span class="a">ACTIVE</span>':'—')+'</span></div>'
+    +'</div>'
+    +'<div class="acts">'
+    +'<button class="btn" id="btnHold"'+(t?'':' disabled')+'><span class="ic">'+ICONS.hand+'</span><span>'+((t&&t.held)?'RELEASE':'HOLD')+'</span></button>'
+    +'<button class="btn'+((t&&t.prio)?' on':'')+'" id="btnPrio"'+(t?'':' disabled')+'><span class="ic">'+ICONS.prio+'</span><span>PRIORITY</span></button>'
+    +'</div>'
+    +'<div class="trkrow"><span class="lbl">REASSIGN</span>'+btns+'</div>'
+    +'<div id="notice"></div>';
+  $('#btnHold').addEventListener('click',function(){
+    var s2=findSel();
+    if(!s2||!s2.train){return;}
+    var tr=s2.train;
+    tr.held=!tr.held;
+    addLog(tr.held?(s2.id+' <span class="r">HELD</span> by dispatcher'):(s2.id+' <span class="a">released</span> by dispatcher'));
+    notice(tr.held?'Train held — route requests and departure suspended':'Train released — resuming automatic dispatch');
+    buildConsole();
+  });
+  $('#btnPrio').addEventListener('click',function(){
+    var s2=findSel();
+    if(!s2||!s2.train){return;}
+    var tr=s2.train;
+    tr.prio=!tr.prio;
+    addLog(s2.id+' dispatch priority <span class="'+(tr.prio?'a':'m')+'">'+(tr.prio?'SET':'CLEARED')+'</span>');
+    notice(tr.prio?'Priority set — train routed ahead of the queue':'Priority cleared — normal ordering');
+    buildConsole();
+  });
+  var tb=box.querySelectorAll('.tbtn');
+  for(i=0;i<tb.length;i++){
+    (function(btn){
+      btn.addEventListener('click',function(){
+        var s3=findSel();
+        if(!s3||!s3.train){return;}
+        var tr=s3.train;
+        if(tr.state!=='approach'){notice('Only trains still on approach can be replatformed');return;}
+        var id=btn.getAttribute('data-tk'),q;
+        for(q=0;q<trains.length;q++){
+          var o=trains[q];
+          if(o!==tr&&String(o.track)===String(id)&&(o.state==='dwell'||o.state==='entering')){
+            notice('Track '+id+' is occupied — assignment refused');return;
+          }
+        }
+        var old=tr.track;
+        tr.track=id;s3.track=id;
+        tr.path=PATHS[id][tr.main].pIn;
+        tr.pathOut=PATHS[id][tr.depMain].pOut;
+        addLog(s3.id+' <span class="m">replatformed</span> Track '+old+' → Track '+id);
+        notice('Replatformed to track '+id);
+        buildConsole();updateBoard();
+      });
+    })(tb[i]);
+  }
+}
+function updateConsoleVals(){
+  var sv=findSel();
+  if(!sv){return;}
+  var ya=$('#cv-y');
+  if(!ya){return;}
+  var t=sv.train,dm=Math.floor(svDelay(sv)/60);
+  ya.innerHTML=dm>=1?('<span class="r">+'+dm+' MIN</span>'):'<span class="g">ON TIME</span>';
+  $('#cv-s').textContent=t?(Math.round(t.v*2.7)+' KM/H'):'0 KM/H';
+  $('#cv-x').textContent=t?stateTxt(t):'STANDBY';
+  var sg='—';
+  if(t){
+    var prog=t.route?'<span class="g">PROCEED</span>':'<span class="r">STOP</span>';
+    if(t.state==='approach'||t.state==='entering'){sg=MAINS[t.main].sig+' · '+prog;}
+    else{sg='TRK '+t.track+' EXIT · '+prog;}
+  }
+  $('#cv-g').innerHTML=sg;
+  $('#cv-t').textContent=sv.track;
+  $('#cv-p').innerHTML=(t&&t.prio)?'<span class="a">ACTIVE</span>':'—';
+}
+
+/* ============================================================
+   SCHEMATIC PICKING + TOOLTIP
+   ============================================================ */
+function vbXY(e){
+  var r=svg.getBoundingClientRect();
+  var s=Math.min(r.width/VW,r.height/VH);
+  if(!(s>0)){s=1;}
+  return{x:(e.clientX-r.left-(r.width-VW*s)/2)/s,y:(e.clientY-r.top-(r.height-VH*s)/2)/s};
+}
+function pick(e){
+  var p=vbXY(e),best=null,bd=22,i;
+  for(i=0;i<trains.length;i++){
+    var t=trains[i];
+    var q1=pathAt(t.path,t.d);
+    var q2=pathAt(t.path,Math.max(1,t.d-t.len/2));
+    var d1=Math.sqrt((q1.x-p.x)*(q1.x-p.x)+(q1.y-p.y)*(q1.y-p.y));
+    var d2=Math.sqrt((q2.x-p.x)*(q2.x-p.x)+(q2.y-p.y)*(q2.y-p.y));
+    if(d1<bd){bd=d1;best=t;}
+    if(d2<bd){bd=d2;best=t;}
+  }
+  return best;
+}
+function hideTip(){var tip=$('#tip');if(tip){tip.style.display='none';}}
+function svgMove(e){
+  var t=pick(e);
+  hovId=t?t.id:null;
+  svg.style.cursor=t?'pointer':'default';
+  if(t){
+    var wr=$('#schemWrap').getBoundingClientRect();
+    var tip=$('#tip');
+    tip.style.display='block';
+    tip.style.left=(e.clientX-wr.left)+'px';
+    tip.style.top=(e.clientY-wr.top)+'px';
+    var dm=Math.floor(svDelay(t.sv)/60);
+    tip.innerHTML='<b>'+t.id+'</b> · '+CATS[t.cat].label+'<br><span class="tl">'+t.sv.dest+' · '
+      +(dm>=1?('<span style="color:#e5484d">+'+dm+' min</span>'):'on time')
+      +' · '+Math.round(t.v*2.7)+' km/h</span>';
+  }else{hideTip();}
+}
+
+/* ============================================================
+   CONTROLS + INIT
+   ============================================================ */
+function setRate(r){
+  rate=r;if(r>0){lastRate=r;}
+  var btns=document.querySelectorAll('.sgb'),i;
+  for(i=0;i<btns.length;i++){
+    if(parseInt(btns[i].getAttribute('data-rate'),10)===r){btns[i].classList.add('on');}
+    else{btns[i].classList.remove('on');}
+  }
+}
+function wireUI(){
+  $('#rateGrp').addEventListener('click',function(e){
+    var b=e.target?e.target.closest('.sgb'):null;
+    if(!b){return;}
+    setRate(parseInt(b.getAttribute('data-rate'),10));
+  });
+  $('#resetBtn').addEventListener('click',function(){initSim();});
+  document.addEventListener('keydown',function(e){
+    if(e.code==='Space'){e.preventDefault();setRate(rate===0?lastRate:0);}
+    else if(e.key==='h'||e.key==='H'){var b=$('#btnHold');if(b&&!b.disabled){b.click();}}
+    else if(e.key==='Escape'){select(null);}
+  });
+  svg.addEventListener('pointermove',svgMove);
+  svg.addEventListener('pointerleave',function(){hovId=null;hideTip();});
+  svg.addEventListener('click',function(e){var t=pick(e);select(t?t.id:null);});
+  boardRows.addEventListener('click',function(e){
+    var r=e.target?e.target.closest('.brow'):null;
+    if(!r){return;}
+    var id=r.getAttribute('data-id');
+    if(id){select(id);}
+  });
+  boardRows.addEventListener('mouseover',function(e){
+    var r=e.target?e.target.closest('.brow'):null;
+    var id=r?r.getAttribute('data-id'):null;
+    hovId=id||null;
+  });
+  boardRows.addEventListener('mouseleave',function(){hovId=null;});
+}
+function initSim(){
+  simT=START;services=[];trains=[];locks={};
+  selId=null;hovId=null;boardPrev={};
+  while(gTrain.firstChild){gTrain.removeChild(gTrain.firstChild);}
+  var i,k;
+  for(i=0;i<TPL.length;i++){TPL[i].next=undefined;TPL[i].seq=0;}
+  for(k in hiEl){hiEl[k].setAttribute('opacity',0);}
+  for(k in trackLine){trackLine[k].setAttribute('stroke','#3a4048');}
+  setEntry('E',false);setEntry('W',false);
+  for(i=0;i<TRACKS.length;i++){setExit(TRACKS[i].id,false);}
+  logEl.innerHTML='';
+  fillServices();
+  addLog('<span class="g">SHIFT E OPEN</span> · interlocking OSL normal · 6 line groups loaded');
+  addLog('Timetable horizon 75 min · route locking armed · <span class="m">dispatcher on duty</span>');
+  buildConsole();updateBoard();updateStats();
+}
+function boot(){
+  buildStatic();
+  logEl=$('#log');
+  boardRows=$('#boardRows');
+  wireUI();
+  initSim();
+  var last=performance.now(),acc=0;
+  function frame(now){
+    var dt=(now-last)/1000;if(dt>0.08){dt=0.08;}
+    last=now;
+    if(rate>0){
+      acc+=dt*rate;
+      var guard=0;
+      while(acc>=SIMSTEP&&guard<120){stepSim(SIMSTEP);acc-=SIMSTEP;guard++;}
+    }
+    renderFrame();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  setInterval(function(){updateBoard();updateStats();updateConsoleVals();},250);
+}
+try{boot();}catch(err){
+  if(window.console&&console.error){console.error(err);}
+  var eb=document.getElementById('errbar');
+  if(eb){eb.style.display='block';eb.textContent='SCRIPT ERROR — '+err.message;}
+}
+</script>
+</body>
+</html>
