@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'GT-NC6T5LRJ');
+</script> 
+
+ <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
+  
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>OSLO S · DISPATCHER — Zoomed Out Interlocking Simulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script>
+window.addEventListener('error',function(e){
+  var b=document.getElementById('errbar');
+  if(b){b.style.display='block';b.textContent='SCRIPT ERROR — '+e.message+' (line '+e.lineno+')';}
+});
+</script>
+<style>
+:root{
+  --bg:#0b0d10; --panel:#121519; --line:#272e37; --line2:#1c2229;
+  --ink:#edf2f7; --mut:#9aa4b0; --dim:#616c7a;
+  --amber:#f2a93b; --grn:#3ecf6e; --red:#e5484d; --blue:#38bdf8; --purple:#c084fc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);width:100%;height:100%;overflow:hidden;position:fixed}
+body{font-family:'IBM Plex Mono',monospace;font-size:12.5px;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+.app-container{display:flex;flex-direction:column;width:100%;height:100vh;height:100dvh;max-width:1920px;margin:0 auto;padding:6px 16px;overflow:hidden;position:relative}
+button{font-family:inherit;cursor:pointer;user-select:none;outline:none}
+#errbar{display:none;background:#e5484d;color:#fff;font:11px/1.4 'IBM Plex Mono',monospace;padding:5px 14px;flex-shrink:0}
+
+/* Header & HUD */
+.titlebar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:2px 0 4px;flex-shrink:0}
+.titlebar h1{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(22px,2.2vw,32px);line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.titlebar h1 em{font-style:normal;color:var(--amber)}
+.titlebar .sub{font-size:9.5px;letter-spacing:.16em;color:var(--dim)}
+
+.hud{display:flex;align-items:center;gap:8px;padding:4px 0;flex-shrink:0}
+.hchip{border:1px solid var(--line);padding:5px 10px;white-space:nowrap;background:var(--panel);border-radius:3px}
+.hchip .l{display:block;font-size:8.5px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-bottom:1px}
+.hchip .v{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+#hRevenue .v{color:var(--grn)}
+#hScore .v{color:var(--amber)}
+.qwrap{flex:1;min-width:130px}
+.qbar{height:8px;border:1px solid #3a4149;margin-top:3px;position:relative;background:#171a1f;border-radius:2px}
+.qbar i{position:absolute;left:0;top:0;bottom:0;background:var(--amber);width:0%}
+.pips{display:flex;gap:4px;margin-top:3px}
+.pip{width:16px;height:8px;background:var(--grn);border-radius:1px}
+.pip.lost{background:#2a2e34}
+.hbtns{display:flex;gap:5px;margin-left:auto}
+.hb{border:1px solid #3a4149;background:transparent;color:var(--mut);font-size:10.5px;padding:5px 11px;letter-spacing:.06em;border-radius:2px}
+.hb:hover{border-color:var(--amber);color:var(--amber)}
+.hb.on{background:var(--amber);border-color:var(--amber);color:#141310;font-weight:700}
+
+/* Schematic Area */
+.schem{position:relative;border:1px solid var(--line);background:#0e1014;flex:1 1 auto;min-height:300px;max-height:68vh;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:crosshair;contain:strict;border-radius:4px}
+.schem svg{display:block;width:100%;height:100%;overflow:hidden}
+.figcap{position:absolute;top:8px;left:12px;font-size:10px;letter-spacing:.15em;color:var(--dim);pointer-events:none}
+#tip{position:absolute;pointer-events:none;display:none;background:#090b0ee6;border:1px solid #3a4149;padding:6px 10px;font-size:11px;line-height:1.4;z-index:25;white-space:nowrap;transform:translate(-50%,-130%);border-radius:3px}
+#tip b{color:var(--amber)}
+#toasts{position:absolute;top:10px;right:16px;z-index:30;display:flex;flex-direction:column;gap:5px;align-items:flex-end;pointer-events:none}
+.toast{background:#090b0ef0;border:1px solid #3a4149;border-left:4px solid var(--amber);padding:6px 14px;font-size:11px;letter-spacing:.03em;animation:tin .18s;border-radius:2px}
+.toast.bad{border-left-color:var(--red);color:#ffb3b6}
+.toast.good{border-left-color:var(--grn);color:#b3ffcb}
+.toast.warn{border-left-color:var(--amber);color:#ffe5a3}
+@keyframes tin{from{opacity:0;transform:translateY(-5px)}}
+#banner{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:28;pointer-events:none}
+#banner .in{background:#090b0ee6;border:2px solid var(--amber);padding:22px 50px;text-align:center;border-radius:4px}
+#banner .t1{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:42px;letter-spacing:.06em;color:var(--amber)}
+#banner .t2{font-size:12px;letter-spacing:.18em;color:var(--mut);margin-top:6px}
+.shake{animation:shk .45s}
+@keyframes shk{10%{transform:translate(-5px,3px)}25%{transform:translate(4px,-2px)}40%{transform:translate(-4px,-3px)}55%{transform:translate(4px,2px)}70%{transform:translate(-2px,1px)}85%{transform:translate(1px,-1px)}}
+
+@keyframes readyPulse{0%,100%{fill:var(--amber);stroke:#ffffff;stroke-width:2px}50%{fill:#ffc86b;stroke:var(--amber);stroke-width:1.2px}}
+.car-ready{animation:readyPulse 1s infinite}
+@keyframes wigwag1{0%,49%{fill:#e5484d;opacity:1}50%,100%{fill:#3a2022;opacity:0.3}}
+@keyframes wigwag2{0%,49%{fill:#3a2022;opacity:0.3}50%,100%{fill:#e5484d;opacity:1}}
+.flash-left{animation:wigwag1 0.7s infinite}
+.flash-right{animation:wigwag2 0.7s infinite}
+.no-pointer{pointer-events:none}
+
+/* Modals */
+.ovl{position:fixed;inset:0;background:rgba(6,7,9,.94);display:flex;align-items:center;justify-content:center;z-index:99}
+.ovl .card{background:var(--panel);border:1px solid #3a4149;padding:26px 36px;max-width:660px;width:92%;border-radius:4px}
+.ovl h2{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:36px;letter-spacing:.04em;line-height:1}
+.ovl h2 em{font-style:normal;color:var(--amber)}
+.ovl .sub{font-size:10px;letter-spacing:.18em;color:var(--dim);margin:5px 0 14px}
+.ovl ol{margin:0 0 14px 18px;font-size:12px;line-height:1.9;color:var(--mut)}
+.ovl ol b{color:var(--ink)}
+.ovl .keys{font-size:10px;color:var(--dim);line-height:1.8;margin-bottom:16px}
+kbd{border:1px solid #3a4149;padding:1px 6px;font-size:9.5px;color:var(--mut);margin:0 2px;background:#14171a;border-radius:2px}
+.bigbtn{display:inline-block;background:var(--amber);border:1px solid var(--amber);color:#141310;font-weight:700;font-size:13px;letter-spacing:.12em;padding:12px 32px;border-radius:3px}
+.bigbtn:hover{background:#ffbe55}
+#ovOver{display:none}
+.gostats{display:flex;gap:18px;margin:14px 0 18px;flex-wrap:wrap}
+.gostats div{border-left:2px solid var(--line);padding-left:12px}
+.gostats .n{font-size:22px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums}
+.gostats .t{font-size:9px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+
+/* Lower Desk Split */
+.desk{display:grid;grid-template-columns:1fr 1.15fr;gap:10px;margin-top:6px;flex:1 1 auto;min-height:0;overflow:hidden}
+.panelbox{border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0;overflow:hidden;border-radius:3px}
+.phead{padding:6px 10px;border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:.14em;color:var(--dim);display:flex;justify-content:space-between;flex-shrink:0}
+#qstrip{flex:1 1 auto;overflow-y:auto;min-height:0}
+.qcard{display:block;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line2);padding:7px 10px;color:var(--ink);transition:all .12s}
+.qcard:hover{background:#161a1f}
+.qcard.sel{background:#1a1d14;box-shadow:inset 3px 0 0 var(--amber)}
+.qcard.ready-card{border-left:3px solid var(--amber);background:rgba(242,169,59,.07)}
+.qc-top{display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px}
+.qc-top b{font-weight:700}
+.qc-st{font-size:9px;letter-spacing:.08em;color:var(--dim)}
+.qc-st.rdy{color:var(--amber);font-weight:700;animation:bl .9s infinite}
+.qc-st.brd{color:var(--grn)}
+@keyframes bl{50%{opacity:.35}}
+.qc-mid{display:flex;align-items:baseline;gap:8px}
+.qc-dest{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:.02em;text-transform:uppercase}
+.qc-fixed{font-size:9.5px;color:var(--mut);letter-spacing:.05em}
+.qc-pax{font-size:9.5px;color:var(--grn);margin-top:1px}
+.qc-time{font-size:9px;color:var(--amber);margin-top:1px}
+.qc-arrow{font-size:10px;font-weight:700;letter-spacing:.06em}
+.qc-bar{height:4px;background:#22262b;margin-top:5px;position:relative;border-radius:1px}
+.qc-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--grn)}
+.qempty{padding:20px 10px;color:var(--dim);font-size:10.5px;letter-spacing:.06em;line-height:1.7}
+
+.desk-right-content{flex:1 1 auto;overflow-y:auto;min-height:0;display:flex;flex-direction:column}
+.selinfo{padding:8px 10px;border-bottom:1px solid var(--line);flex-shrink:0}
+.selinfo .no{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;line-height:1}
+.selinfo .ds{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--mut)}
+.selinfo .hint{font-size:10px;color:var(--dim);letter-spacing:.04em;margin-top:3px;line-height:1.5}
+
+.service-strip{display:flex;gap:6px;padding:6px 10px;background:#101317;border-bottom:1px solid var(--line);flex-shrink:0}
+.btn-emergency{flex:1;background:rgba(229,72,77,.18);border:1px solid var(--red);color:#ff9fa3;padding:6px 8px;font-weight:700;font-size:10.5px;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;border-radius:2px}
+.btn-emergency:hover:not(:disabled){background:var(--red);color:#fff}
+.btn-depot{flex:1;background:rgba(56,189,248,.15);border:1px solid var(--blue);color:#bae6fd;padding:6px 8px;font-weight:700;font-size:10.5px;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;border-radius:2px}
+.btn-depot:hover:not(:disabled){background:var(--blue);color:#0f172a}
+.btn-depot:disabled,.btn-emergency:disabled{opacity:.35;cursor:not-allowed}
+
+.admit{padding:8px 10px;border-bottom:1px solid var(--line);flex-shrink:0}
+.albl{font-size:9px;letter-spacing:.14em;color:var(--dim);margin-bottom:5px}
+.agrid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.ab{border:1px solid #3a4149;background:transparent;color:var(--ink);font-size:12px;font-weight:700;padding:6px 0;position:relative;border-radius:2px}
+.ab:hover{border-color:var(--amber);color:var(--amber)}
+.ab.fixed-target{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber);background:rgba(242,169,59,.1)}
+.ab.occ{color:#4a5058;border-color:#2a2f35;text-decoration:line-through;cursor:not-allowed}
+.ab.blocked-hazard{border-color:var(--red);background:rgba(229,72,77,.15);color:var(--red);cursor:not-allowed}
+.ab.risk{border-color:var(--red);color:var(--red)}
+
+.dispatch{padding:8px 10px;border-bottom:1px solid var(--line);flex-shrink:0}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.db{border:1px solid #3a4149;background:transparent;padding:9px 0;font-size:12.5px;font-weight:700;letter-spacing:.06em;color:var(--ink);border-radius:2px}
+.db:hover{border-color:var(--amber);color:var(--amber)}
+.db.highlight-ready{background:var(--amber);border-color:var(--amber);color:#141310;font-weight:800}
+.db.risk{border-color:var(--red);color:var(--red)}
+.db:disabled{opacity:.3;cursor:not-allowed}
+.bprog{height:5px;background:#22262b;margin-top:6px;position:relative;display:none;border-radius:1px}
+.bprog i{position:absolute;left:0;top:0;bottom:0;background:var(--grn)}
+.bplbl{font-size:8.5px;letter-spacing:.12em;color:var(--grn);margin-top:3px;display:none}
+
+.road-ctl{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-bottom:1px solid var(--line);background:#101317;flex-shrink:0}
+.road-ctl .t{font-size:9.5px;letter-spacing:.12em;color:var(--mut)}
+.rc-btn{padding:5px 12px;font-weight:700;font-size:10.5px;letter-spacing:.08em;border:1px solid #3a4149;background:transparent;color:var(--ink);transition:all .15s;border-radius:2px}
+.rc-btn.closed{background:var(--red);border-color:var(--red);color:#fff}
+.rc-btn.open{background:var(--grn);border-color:var(--grn);color:#101214}
+
+.loghead{padding:6px 10px 4px;font-size:9px;letter-spacing:.14em;color:var(--dim);flex-shrink:0}
+#log{flex:1 1 auto;overflow-y:auto;padding:2px 10px 6px;min-height:50px}
+.lg{padding:3px 0;border-bottom:1px dashed var(--line2);font-size:9.5px;line-height:1.4}
+.lg .lt{color:#5f656c;margin-right:6px}
+.lg .g{color:var(--grn)}.lg .r{color:var(--red)}.lg .a{color:var(--amber)}.lg .m{color:var(--mut)}.lg .b{color:var(--blue)}
+
+footer{flex-shrink:0;padding:4px 0 2px;font-size:8.5px;letter-spacing:.08em;color:var(--dim);display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line2)}
+@media(max-width:1020px){.desk{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="errbar"></div>
+
+<div class="app-container">
+  <div class="titlebar">
+    <div>
+      <div class="sub">RAIL TRAFFIC CONTROL & AUTOMATED DEPOT DISPATCH CONSOLE</div>
+      <h1>Oslo Sentralstasjon<em>.</em></h1>
+    </div>
+    <div class="sub" id="shiftLbl">CONTINUOUS SHIFT · ZOOMED OUT VIEW ACTIVE</div>
+  </div>
+
+  <div class="hud">
+    <div class="hchip"><span class="l">Level</span><span class="v" id="hLevel">1</span></div>
+    <div class="hchip" id="hRevenue"><span class="l">Treasury (NOK)</span><span class="v">kr <span id="hRevV">25,000</span></span></div>
+    <div class="hchip qwrap"><span class="l">Shift Quota <span id="hQuotaTxt">0 / 4</span></span><span class="qbar"><i id="hQuota"></i></span></div>
+    <div class="hchip" id="hScore"><span class="l">Score</span><span class="v" id="hScoreV">0</span></div>
+    <div class="hchip" id="hCombo"><span class="l">Combo</span><span class="v" id="hComboV">×1</span></div>
+    <div class="hchip"><span class="l">Safety</span><span class="pips"><span class="pip" id="pip0"></span><span class="pip" id="pip1"></span><span class="pip" id="pip2"></span></span></div>
+    <div class="hchip"><span class="l">Clock</span><span class="v" id="hClock">16:00</span></div>
+    <div class="hbtns">
+      <button class="hb" id="bPause">PAUSE</button>
+      <button class="hb on" data-rate="1">1×</button>
+      <button class="hb" data-rate="2">2×</button>
+      <button class="hb" data-rate="3">3×</button>
+    </div>
+  </div>
+
+  <section class="schem" id="schemWrap">
+    <svg id="schem" viewBox="-30 15 1340 480" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="figcap">INTERLOCKING DIAGRAM · LINE 500 SERVICE BYPASS & RYEN LEVEL CROSSING</div>
+    <div id="toasts"></div>
+    <div id="banner"><div class="in"><div class="t1" id="banT1"></div><div class="t2" id="banT2"></div></div></div>
+    <div id="tip"></div>
+  </section>
+
+  <section class="desk">
+    <div class="panelbox">
+      <div class="phead"><span>TRAFFIC QUEUE · INBOUND SERVICES</span><span id="queueCount">0 WAITING</span></div>
+      <div id="qstrip"></div>
+    </div>
+
+    <div class="panelbox">
+      <div class="phead"><span>CONTROL DESK & OVERHAUL</span><span id="incidentNotice" style="color:var(--amber)">ALL TRACKS NORMAL</span></div>
+      
+      <div class="desk-right-content">
+        <div class="service-strip">
+          <button class="btn-emergency" id="btnDispatchEmergency">DISPATCH EMERGENCY TRAIN [E]</button>
+          <button class="btn-depot" id="btnRouteDepot">ROUTE SELECTED TO DEPOT [D]</button>
+        </div>
+
+        <div class="road-ctl">
+          <div>
+            <div class="t">RYEN ROAD GATES</div>
+            <div style="font-size:10px;font-weight:700;margin-top:1px" id="gateStatusText">GATES: OPEN (ROAD FLOWING)</div>
+          </div>
+          <button class="rc-btn open" id="btnGateToggle">CLOSE BARRIERS [B]</button>
+        </div>
+
+        <div class="selinfo" id="selInfo"></div>
+        <div class="admit">
+          <div class="albl">ADMIT TO ASSIGNED PLATFORM — KEYS 1–6</div>
+          <div class="agrid" id="agrid"></div>
+        </div>
+        <div class="dispatch">
+          <div class="albl">DISPATCH — CHECK REQUIRED EXIT (YELLOW = READY)</div>
+          <div class="dgrid">
+            <button class="db" id="dbE">→ ØST</button>
+            <button class="db" id="dbW">VEST →</button>
+          </div>
+          <div class="bprog" id="bprog"><i id="bprogI"></i></div>
+          <div class="bplbl" id="bplbl">BOARDING PASSENGERS…</div>
+        </div>
+        <div class="loghead">SYSTEM REVENUE & INCIDENT LOG</div>
+        <div id="log"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>PASSENGER COUNTS DISPLAYED DIRECTLY BEFORE TERMINAL BUFFER HEADS</span>
+    <span><kbd>1–6</kbd> admit <kbd>←</kbd><kbd>→</kbd> dispatch <kbd>E</kbd> repair <kbd>D</kbd> depot <kbd>B</kbd> crossing <kbd>SPACE</kbd> pause</span>
+  </footer>
+</div>
+
+<div class="ovl" id="ovStart"><div class="card">
+  <h2>Oslo S · <em>Dispatcher</em></h2>
+  <div class="sub">REALISTIC INTEGRATED INTERLOCKING, PASSENGER REVENUE & REPAIR DEPOT</div>
+  <ol>
+    <li><b>Station Passenger Counts:</b> Real-time passenger counts appear <b>directly before each terminal number (1–6)</b>. Trains collect <b>kr 65 per passenger</b> when boarding.</li>
+    <li><b>Chained Emergency Repairs (<kbd>E</kbd>):</b> When emergencies break out, dispatch the Emergency Train to patch the track. If multiple platforms fail, pressing <kbd>E</kbd> chains them sequentially.</li>
+    <li><b>Depot Repairs:</b> Approaching trains with mechanical issues can be routed to the <b>Depot</b> (<kbd>D</kbd>) for repairs.</li>
+    <li><b>Level Crossing Safety (<kbd>B</kbd>):</b> Close barriers before routing across the highway to avoid collisions.</li>
+  </ol>
+  <div class="keys"><kbd>1</kbd>–<kbd>6</kbd> admit &nbsp; <kbd>←</kbd><kbd>→</kbd> dispatch &nbsp; <kbd>E</kbd> emergency &nbsp; <kbd>D</kbd> depot &nbsp; <kbd>B</kbd> gates</div>
+  <button class="bigbtn" id="bStart">START SHIFT</button>
+</div></div>
+
+<div class="ovl" id="ovOver"><div class="card">
+  <h2>Shift <em>over</em></h2>
+  <div class="sub">SAFETY THRESHOLD BREACHED OR TREASURY DEPLETED</div>
+  <div class="gostats">
+    <div><div class="n" id="goRevenue">0</div><div class="t">Treasury (kr)</div></div>
+    <div><div class="n" id="goScore">0</div><div class="t">Final score</div></div>
+    <div><div class="n" id="goDeliv">0</div><div class="t">Delivered</div></div>
+    <div><div class="n" id="goCombo">×1</div><div class="t">Best combo</div></div>
+  </div>
+  <button class="bigbtn" id="bRestart">NEW SHIFT</button>
+</div></div>
+
+<script>
+'use strict';
+function $(s){return document.querySelector(s);}
+function el(t,a,p){
+  var n=document.createElementNS('http://www.w3.org/2000/svg',t);
+  if(a){for(var k in a){n.setAttribute(k,a[k]);}}
+  if(p){p.appendChild(n);}
+  return n;
+}
+function pad2(n){n=Math.floor(n);return n<10?('0'+n):(''+n);}
+function fmtT(t){t=Math.floor(t)%86400;return pad2(t/3600)+':'+pad2((t%3600)/60);}
+function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+
+var VW=1200,VH=512,LEAD=1240,OUTEND=1420,THROAT=640,SIGX=884;
+var DSTOP=LEAD-(SIGX+18);
+var ROAD_X=980;
+
+var MAINS={
+  E:{inY:106, outY:136, name:'LINE 400 · ØST', sig:'Ø1'},
+  W:{inY:374, outY:404, name:'LINE 450 · VEST', sig:'V1'},
+  S:{y:238, name:'LINE 500 · DEPOT BYPASS', sig:'D1'}
+};
+
+var TRACKS=[
+  {id:1,y:62,buf:150,pax:80},{id:2,y:100,buf:150,pax:120},{id:3,y:138,buf:150,pax:95},
+  {id:4,y:176,buf:150,pax:110},{id:5,y:296,buf:150,pax:135},{id:6,y:334,buf:150,pax:70},
+  {id:'DEPOT',y:238,buf:210,pax:0,special:true}
+];
+
+var TAKEOFF={
+  E:{1:760,2:730,3:720,4:750,5:800,6:840,DEPOT:770},
+  W:{1:860,2:835,3:810,4:780,5:740,6:720,DEPOT:790},
+  S:{1:680,2:690,3:700,4:710,5:710,6:700,DEPOT:640}
+};
+
+var VMAIN=62,VBR=24,VTRK=27,ACC=16,BRK=14,BRKMAX=34,SIMSTEP=0.04;
+var EXCOL={E:'#e5484d',W:'#3ecf6e',S:'#c084fc'};
+var EXNAME={E:'ØST',W:'VEST',S:'DEPOT'};
+
+var FIXED_ROUTES=[
+  {code:'F1', cat:'F', orig:'Gardermoen', dest:'Gardermoen', fixedTrack:1, entry:'E', exit:'E', cars:4, vmax:66, maxDwell:18, fare:75},
+  {code:'RE10', cat:'RE', orig:'Lillestrøm', dest:'Drammen', fixedTrack:2, entry:'E', exit:'W', cars:3, vmax:58, maxDwell:20, fare:65},
+  {code:'L1', cat:'L', orig:'Kløfta', dest:'Asker', fixedTrack:3, entry:'E', exit:'W', cars:3, vmax:52, maxDwell:16, fare:50},
+  {code:'RE11', cat:'RE', orig:'Skien', dest:'Eidsvoll', fixedTrack:4, entry:'W', exit:'E', cars:3, vmax:58, maxDwell:20, fare:65},
+  {code:'L2', cat:'L', orig:'Kongsberg', dest:'Lillestrøm', fixedTrack:5, entry:'W', exit:'E', cars:3, vmax:52, maxDwell:16, fare:50},
+  {code:'F2', cat:'F', orig:'Asker', dest:'Gardermoen', fixedTrack:6, entry:'W', exit:'E', cars:4, vmax:66, maxDwell:18, fare:75}
+];
+
+function bez(p0,c1,c2,p1,n){
+  var o=[],i,t,u;
+  for(i=0;i<=n;i++){
+    t=i/n;u=1-t;
+    o.push([
+      u*u*u*p0[0]+3*u*u*t*c1[0]+3*u*t*t*c2[0]+t*t*t*p1[0],
+      u*u*u*p0[1]+3*u*u*t*c1[1]+3*u*t*t*c2[1]+t*t*t*p1[1]
+    ]);
+  }
+  return o;
+}
+function cumOf(pts){
+  var c=[0],i;
+  for(i=1;i<pts.length;i++){
+    var dx=pts[i][0]-pts[i-1][0],dy=pts[i][1]-pts[i-1][1];
+    c.push(c[i-1]+Math.sqrt(dx*dx+dy*dy));
+  }
+  return c;
+}
+function mkPath(pts,lim){var c=cumOf(pts);return{pts:pts,cum:c,len:c[c.length-1],lim:lim};}
+function pathAt(p,d){
+  if(!p||!p.pts||p.pts.length===0) return {x:0,y:0,ang:0};
+  if(d<0) d=0;
+  if(d>p.len) d=p.len;
+  var i=1;while(i<p.cum.length-1&&p.cum[i]<d)i++;
+  var seg=p.cum[i]-p.cum[i-1];if(seg<=0)seg=1;
+  var f=(d-p.cum[i-1])/seg,a=p.pts[i-1],b=p.pts[i];
+  var dx=b[0]-a[0],dy=b[1]-a[1];
+  return{x:a[0]+dx*f,y:a[1]+dy*f,ang:Math.atan2(dy,dx)};
+}
+function vLim(p,d){
+  if(!p||!p.lim) return 999;
+  for(var i=0;i<p.lim.length;i++){
+    if(d>=p.lim[i][0]){return p.lim[i][1];}
+  }
+  return 999;
+}
+function polyD(pts){
+  if(!pts||pts.length===0) return '';
+  var d='M'+pts[0][0].toFixed(1)+' '+pts[0][1].toFixed(1),i;
+  for(i=1;i<pts.length;i++){d+='L'+pts[i][0].toFixed(1)+' '+pts[i][1].toFixed(1);}
+  return d;
+}
+
+var PATHS={},APATH={};
+(function(){
+  var i,m;
+  for(m in MAINS){
+    var my=(m==='S')?MAINS[m].y:MAINS[m].inY;
+    APATH[m]=mkPath([[LEAD,my],[652,my]],[[0,VMAIN]]);
+  }
+  for(i=0;i<TRACKS.length;i++){
+    var tk=TRACKS[i],stopX=tk.buf+12;
+    PATHS[tk.id]={};
+    ['E','W','S'].forEach(function(m){
+      var inY=(m==='S')?MAINS.S.y:MAINS[m].inY;
+      var outY=(m==='S')?MAINS.S.y:MAINS[m].outY;
+      var tx=TAKEOFF[m][tk.id]||750;
+      var e=(tx-THROAT)*0.5;if(e<24)e=24;
+
+      var curveIn=bez([tx,inY],[tx-e,inY],[THROAT+e,tk.y],[THROAT,tk.y],48);
+      var cIn=cumOf(curveIn),dCurveIn=cIn[cIn.length-1];
+      var dMainIn=LEAD-tx,dTrkIn=THROAT-stopX;
+      var inPts=[[LEAD,inY],[tx,inY]];
+      for(var j=1;j<curveIn.length;j++)inPts.push(curveIn[j]);
+      inPts.push([stopX,tk.y]);
+
+      var curveOut=bez([THROAT,tk.y],[THROAT+e,tk.y],[tx-e,outY],[tx,outY],48);
+      var cOut=cumOf(curveOut),dCurveOut=cOut[cOut.length-1];
+      var dTrkOut=THROAT-stopX;
+      var outPts=[[stopX,tk.y],[THROAT,tk.y]];
+      for(var k=1;k<curveOut.length;k++)outPts.push(curveOut[k]);
+      outPts.push([tx,outY],[OUTEND,outY]);
+
+      PATHS[tk.id][m]={
+        pIn:mkPath(inPts,[[0,VMAIN],[dMainIn,VBR],[dMainIn+dCurveIn,VTRK]]),
+        pOut:mkPath(outPts,[[0,VTRK],[dTrkOut,VBR],[dTrkOut+dCurveOut,VMAIN]])
+      };
+    });
+  }
+})();
+
+function pathIdParts(id){
+  var p=id.split(':');
+  if(p[0]==='A')return{kind:'A',main:p[1],track:null,dir:-1};
+  if(p[0]==='in')return{kind:'in',main:p[1],track:p[2],dir:-1};
+  return{kind:'out',main:p[2],track:p[1],dir:1};
+}
+var PATHGEOM={},CONF={};
+function confAdd(a,b){CONF[a]=CONF[a]||{};CONF[a][b]=1;CONF[b]=CONF[b]||{};CONF[b][a]=1;}
+function segX(a,b,c,d){
+  var d1x=b[0]-a[0],d1y=b[1]-a[1],d2x=d[0]-c[0],d2y=d[1]-c[1];
+  var den=d1x*d2y-d1y*d2x;if(Math.abs(den)<1e-9)return false;
+  var t=((c[0]-a[0])*d2y-(c[1]-a[1])*d2x)/den,u=((c[0]-a[0])*d1y-(c[1]-a[1])*d1x)/den;
+  return t>0.02&&t<0.98&&u>0.02&&u<0.98;
+}
+function geoCross(A,B){
+  var i,j;
+  for(i=1;i<A.length-1;i++)for(j=1;j<B.length-1;j++)
+    if(segX(A[i],A[i+1],B[j],B[j+1]))return true;
+  return false;
+}
+(function(){
+  var id,m,tk,i;
+  for(m in MAINS){PATHGEOM['A:'+m]=APATH[m].pts;}
+  for(i=0;i<TRACKS.length;i++){
+    tk=TRACKS[i];
+    ['E','W','S'].forEach(function(m){
+      PATHGEOM['in:'+m+':'+tk.id]=PATHS[tk.id][m].pIn.pts;
+      PATHGEOM['out:'+tk.id+':'+m]=PATHS[tk.id][m].pOut.pts;
+    });
+  }
+  var ids=[];for(id in PATHGEOM)ids.push(id);
+  var a,b,pa,pb;
+  for(a=0;a<ids.length;a++)for(b=a+1;b<ids.length;b++){
+    var A=ids[a],B=ids[b];pa=pathIdParts(A);pb=pathIdParts(B);
+    if(pa.track&&pb.track&&pa.track===pb.track){confAdd(A,B);continue;}
+    if(pa.kind==='A'&&pb.kind==='A')continue;
+    if(geoCross(PATHGEOM[A],PATHGEOM[B]))confAdd(A,B);
+  }
+})();
+function hasConflict(id){
+  var c=CONF[id];if(!c)return false;
+  for(var i=0;i<trains.length;i++){
+    var t=trains[i];
+    if((t.state==='entering'||t.state==='departing')&&c[t.pathId])return true;
+  }
+  return false;
+}
+
+var svg,gRoot,gBase,gServiceLine,gRoad,gRoadGates,gHi,gHazards,gPaxDisplays,gTr,gVehicles,gFx,sigE,sigW,sigDepot,exitSig={};
+var gateUpperNorth,gateLowerNorth,gateUpperSouth,gateLowerSouth;
+var gateWigWagNorth,gateWigWagSouth;
+var paxTextEls={};
+
+function buildStatic(){
+  svg=$('#schem');
+  gRoot=el('g',null,svg);
+  var defs=el('defs',null,gRoot);
+
+  var pat=el('pattern',{id:'dots',width:26,height:26,patternUnits:'userSpaceOnUse'},defs);
+  el('circle',{cx:1,cy:1,r:0.8,fill:'#fff',opacity:'0.06'},pat);
+  el('rect',{x:0,y:0,width:VW,height:VH,fill:'url(#dots)'},gRoot);
+
+  var pWk=el('pattern',{id:'stripes',width:14,height:14,patternTransform:'rotate(45)',patternUnits:'userSpaceOnUse'},defs);
+  el('rect',{x:0,y:0,width:7,height:14,fill:'#f2a93b',opacity:0.4},pWk);
+  el('rect',{x:7,y:0,width:7,height:14,fill:'#16181d',opacity:0.85},pWk);
+
+  var pGate=el('pattern',{id:'gateStripes',width:16,height:8,patternTransform:'rotate(45)',patternUnits:'userSpaceOnUse'},defs);
+  el('rect',{x:0,y:0,width:8,height:8,fill:'#ffffff'},pGate);
+  el('rect',{x:8,y:0,width:8,height:8,fill:'#e5484d'},pGate);
+
+  gBase=el('g',{class:'no-pointer'},gRoot);
+  gServiceLine=el('g',{class:'no-pointer'},gRoot);
+  gRoad=el('g',{class:'no-pointer'},gRoot);
+  gHazards=el('g',{class:'no-pointer'},gRoot);
+  gPaxDisplays=el('g',{class:'no-pointer'},gRoot);
+  gHi=el('g',{class:'no-pointer'},gRoot);
+  gTr=el('g',null,gRoot);
+  gVehicles=el('g',{class:'no-pointer'},gRoot);
+  gRoadGates=el('g',{class:'no-pointer'},gRoot);
+  gFx=el('g',{class:'no-pointer'},gRoot);
+
+  var m,i,tk;
+
+  el('rect',{x:ROAD_X-28,y:0,width:56,height:VH,fill:'#181c22'},gRoad);
+  el('line',{x1:ROAD_X,y1:0,x2:ROAD_X,y2:VH,stroke:'#e9e6df','stroke-width':2,'stroke-dasharray':'10 8',opacity:0.3},gRoad);
+  
+  el('line',{x1:ROAD_X-28,y1:84,x2:ROAD_X,y2:84,stroke:'#ffffff','stroke-width':3.5,opacity:0.9},gRoad);
+  el('line',{x1:ROAD_X,y1:158,x2:ROAD_X+28,y2:158,stroke:'#ffffff','stroke-width':3.5,opacity:0.9},gRoad);
+  el('line',{x1:ROAD_X-28,y1:352,x2:ROAD_X,y2:352,stroke:'#ffffff','stroke-width':3.5,opacity:0.9},gRoad);
+  el('line',{x1:ROAD_X,y1:426,x2:ROAD_X+28,y2:426,stroke:'#ffffff','stroke-width':3.5,opacity:0.9},gRoad);
+
+  var roadLbl=el('text',{x:ROAD_X,y:26,'text-anchor':'middle','font-family':'Barlow Condensed, sans-serif','font-weight':'700','font-size':13,fill:'#9aa4b0','letter-spacing':'2'},gRoad);
+  roadLbl.textContent='RYEN HIGHWAY · ROAD CROSSING';
+
+  gateUpperNorth=el('line',{x1:ROAD_X-28,y1:88,x2:ROAD_X+28,y2:88,stroke:'url(#gateStripes)','stroke-width':7,'stroke-linecap':'round'},gRoadGates);
+  gateLowerNorth=el('line',{x1:ROAD_X-28,y1:154,x2:ROAD_X+28,y2:154,stroke:'url(#gateStripes)','stroke-width':7,'stroke-linecap':'round'},gRoadGates);
+  gateWigWagNorth=el('g',{opacity:0},gRoadGates);
+  el('circle',{cx:ROAD_X-32,cy:88,r:4.5,class:'flash-left'},gateWigWagNorth);
+  el('circle',{cx:ROAD_X-42,cy:88,r:4.5,class:'flash-right'},gateWigWagNorth);
+  el('circle',{cx:ROAD_X+32,cy:154,r:4.5,class:'flash-left'},gateWigWagNorth);
+  el('circle',{cx:ROAD_X+42,cy:154,r:4.5,class:'flash-right'},gateWigWagNorth);
+
+  gateUpperSouth=el('line',{x1:ROAD_X-28,y1:356,x2:ROAD_X+28,y2:356,stroke:'url(#gateStripes)','stroke-width':7,'stroke-linecap':'round'},gRoadGates);
+  gateLowerSouth=el('line',{x1:ROAD_X-28,y1:422,x2:ROAD_X+28,y2:422,stroke:'url(#gateStripes)','stroke-width':7,'stroke-linecap':'round'},gRoadGates);
+  gateWigWagSouth=el('g',{opacity:0},gRoadGates);
+  el('circle',{cx:ROAD_X-32,cy:356,r:4.5,class:'flash-left'},gateWigWagSouth);
+  el('circle',{cx:ROAD_X-42,cy:356,r:4.5,class:'flash-right'},gateWigWagSouth);
+  el('circle',{cx:ROAD_X+32,cy:422,r:4.5,class:'flash-left'},gateWigWagSouth);
+  el('circle',{cx:ROAD_X+42,cy:422,r:4.5,class:'flash-right'},gateWigWagSouth);
+
+  el('line',{x1:646,y1:MAINS.S.y,x2:LEAD,y2:MAINS.S.y,stroke:'#c084fc','stroke-width':2.6,'stroke-dasharray':'8 5',opacity:0.85},gServiceLine);
+  var mtServ=el('text',{x:1194,y:MAINS.S.y-10,'text-anchor':'end','font-family':'IBM Plex Mono','font-size':11,'font-weight':'600',fill:'#c084fc','letter-spacing':'1.5'},gServiceLine);
+  mtServ.textContent='LINE 500 · DEPOT & EMERGENCY BYPASS';
+
+  for(m in {E:1,W:1}){
+    el('line',{x1:646,y1:MAINS[m].inY,x2:LEAD,y2:MAINS[m].inY,stroke:'#4e5763','stroke-width':2.6},gBase);
+    var mtIn=el('text',{x:1194,y:MAINS[m].inY-8,'text-anchor':'end','font-family':'IBM Plex Mono, monospace','font-size':10.5,'font-weight':'600',fill:'#7b8694','letter-spacing':'1.5'},gBase);
+    mtIn.textContent=MAINS[m].name+' [ARRIVALS]';
+
+    el('line',{x1:646,y1:MAINS[m].outY,x2:OUTEND,y2:MAINS[m].outY,stroke:'#3e4652','stroke-width':2.6},gBase);
+    var mtOut=el('text',{x:1194,y:MAINS[m].outY+16,'text-anchor':'end','font-family':'IBM Plex Mono, monospace','font-size':10.5,'font-weight':'600',fill:'#626d7a','letter-spacing':'1.5'},gBase);
+    mtOut.textContent=MAINS[m].name+' [DEPARTURES]';
+  }
+
+  for(i=0;i<TRACKS.length;i++){
+    tk=TRACKS[i];
+    ['E','W'].forEach(function(mm){
+      var ptsIn=PATHS[tk.id][mm].pIn.pts;
+      el('path',{d:polyD(ptsIn.slice(0,ptsIn.length-1)),fill:'none',stroke:'#454e5a','stroke-width':2.2},gBase);
+      var ptsOut=PATHS[tk.id][mm].pOut.pts;
+      el('path',{d:polyD(ptsOut.slice(1,ptsOut.length)),fill:'none',stroke:'#373f4a','stroke-width':2.2},gBase);
+    });
+
+    var ptsServ=PATHS[tk.id]['S'].pIn.pts;
+    el('path',{d:polyD(ptsServ),fill:'none',stroke:'#9333ea','stroke-width':1.8,'stroke-dasharray':'5 5',opacity:0.6},gServiceLine);
+
+    var strokeCol=tk.special?'#c084fc':'#454e5a';
+    el('line',{x1:tk.buf,y1:tk.y,x2:THROAT,y2:tk.y,stroke:strokeCol,'stroke-width':2.8},gBase);
+
+    if(!tk.special){
+      el('rect',{x:174,y:tk.y+8,width:408,height:15,fill:'#1b1f26'},gBase);
+      el('line',{x1:174,y1:tk.y+9.5,x2:582,y2:tk.y+9.5,stroke:'#f2a93b',opacity:'0.18','stroke-width':2.5},gBase);
+
+      el('rect',{x:22,y:tk.y-14,width:88,height:26,rx:3,fill:'#12161c',stroke:'#35404e','stroke-width':1.2},gPaxDisplays);
+      el('text',{x:32,y:tk.y+4,'font-family':'IBM Plex Mono','font-size':11,fill:'#616f80'},gPaxDisplays).textContent='👥';
+      paxTextEls[tk.id]=el('text',{x:67,y:tk.y+4,'text-anchor':'middle','font-family':'IBM Plex Mono','font-size':11.5,'font-weight':700,fill:'#3ecf6e'},gPaxDisplays);
+      paxTextEls[tk.id].textContent=tk.pax+' pax';
+    }else{
+      el('rect',{x:220,y:tk.y-17,width:350,height:34,fill:'rgba(192,132,252,0.1)',stroke:'#c084fc','stroke-width':1.6},gBase);
+      var dLbl=el('text',{x:395,y:tk.y+5,'text-anchor':'middle','font-family':'Barlow Condensed, sans-serif','font-weight':'700','font-size':14,fill:'#c084fc','letter-spacing':'1.8'},gBase);
+      dLbl.textContent='MAINTENANCE WORKSHOP & OVERHAUL DEPOT';
+    }
+
+    var bc=tk.special?'#a855f7':'#636f7d';
+    el('path',{d:'M'+tk.buf+' '+(tk.y-8)+'L'+tk.buf+' '+(tk.y+8),stroke:bc,'stroke-width':4},gBase);
+    
+    var num=el('text',{x:134,y:tk.y+8,'text-anchor':'middle','font-family':'Barlow Condensed, sans-serif','font-weight':800,'font-size':tk.special?18:30,fill:tk.special?'#c084fc':'#9aa4b0'},gBase);
+    num.textContent=tk.id;
+
+    if(!tk.special){
+      el('line',{x1:650,y1:tk.y,x2:650,y2:tk.y-8,stroke:'#636f7d','stroke-width':1.8},gBase);
+      exitSig[tk.id]=el('circle',{cx:650,cy:tk.y-11,r:3.2,fill:'#e5484d'},gBase);
+    }
+  }
+
+  function mkEntry(mm,y){
+    var g=el('g',null,gBase);
+    el('line',{x1:SIGX,y1:y-2,x2:SIGX,y2:y-22,stroke:'#636f7d','stroke-width':1.8},g);
+    var r=el('circle',{cx:SIGX,cy:y-10,r:3.4,fill:'#e5484d'},g);
+    var gr=el('circle',{cx:SIGX,cy:y-18,r:3.4,fill:'#3ecf6e',opacity:0.14},g);
+    var t=el('text',{x:SIGX,y:y-28,'text-anchor':'middle','font-family':'IBM Plex Mono, monospace','font-weight':'700','font-size':10,fill:'#7b8694'},g);
+    t.textContent=MAINS[mm].sig;
+    return{red:r,green:gr};
+  }
+  sigE=mkEntry('E',MAINS.E.inY);
+  sigW=mkEntry('W',MAINS.W.inY);
+  sigDepot=mkEntry('S',MAINS.S.y);
+}
+
+function setEntry(mm,green){
+  var s=(mm==='E')?sigE:((mm==='W')?sigW:sigDepot);
+  if(s){
+    s.red.setAttribute('opacity',green?0.14:1);
+    s.green.setAttribute('opacity',green?1:0.14);
+  }
+}
+function setExit(tk,stateColor){
+  if(exitSig[tk]){
+    exitSig[tk].setAttribute('fill',stateColor);
+  }
+}
+
+/* Game Variables */
+var running=false,paused=false,rate=1;
+var simT=16*3600,level=1,score=0,revenue=25000,combo=1,bestCombo=1,safety=3;
+var quota=4,delivered=0,deliveredTotal=0;
+var spawnInt=18,patienceMax=240,dwellTime=14;
+var spawnT=3;
+var trains=[],rescues=[],pendingResc=[],emergencyTrain=null,fxTexts=[],booms=[];
+var flashT=0,shakeT=0,levelPauseT=0;
+var selId=null,hovId=null;
+var catalogIndex=0;
+
+var barriersClosed=false;
+var roadVehicles=[];
+var nextVehicleT=0.5;
+
+var activeHazards=[];
+var nextScenarioCheckT=35;
+
+var logEl=null;
+function addLog(html){
+  if(!logEl) return;
+  var d=document.createElement('div');d.className='lg';
+  d.innerHTML='<span class="lt">'+fmtT(simT)+'</span>'+html;
+  logEl.insertBefore(d,logEl.firstChild);
+  while(logEl.childNodes.length>45)logEl.removeChild(logEl.lastChild);
+}
+function toast(msg,cls){
+  var box=$('#toasts');
+  if(!box) return;
+  var d=document.createElement('div');
+  d.className='toast'+(cls?(' '+cls):'');d.textContent=msg;box.appendChild(d);
+  while(box.childNodes.length>4)box.removeChild(box.firstChild);
+  setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},3800);
+}
+function floatTxt(x,y,txt,col){fxTexts.push({x:x,y:y,txt:txt,col:col,life:1.5});}
+function levelParams(){
+  quota=3+level;
+  spawnInt=Math.max(9,19-1.2*level);
+  patienceMax=Math.max(180,240-8*level);
+  dwellTime=Math.max(10,15-0.4*level);
+}
+
+function replenishPassengers(){
+  for(var i=0;i<TRACKS.length;i++){
+    var tk=TRACKS[i];
+    if(tk.special) continue;
+    if(Math.random()<0.08){
+      tk.pax=Math.min(240, tk.pax+Math.floor(1+Math.random()*3));
+      if(paxTextEls[tk.id]){
+        paxTextEls[tk.id].textContent=tk.pax+' pax';
+      }
+    }
+  }
+}
+
+var serviceCounter=1;
+function makeFixedService(){
+  var r=FIXED_ROUTES[catalogIndex % FIXED_ROUTES.length];
+  catalogIndex++;
+  return{
+    id:r.code+'-'+pad2(serviceCounter++),
+    code:r.code,
+    cat:r.cat,
+    entry:r.entry,
+    exit:r.exit,
+    orig:r.orig,
+    dest:r.dest,
+    fixedTrack:r.fixedTrack,
+    cars:r.cars,
+    vmax:r.vmax,
+    fare:r.fare,
+    dwellLimit:r.maxDwell,
+    schedDepT:simT+patienceMax*0.75,
+    pm:patienceMax,
+    done:false
+  };
+}
+
+function frontX(t){return pathAt(t.path,t.d).x;}
+function countQueue(mm){
+  var n=0,i;
+  for(i=0;i<trains.length;i++)
+    if(trains[i].main===mm&&trains[i].state==='approach')n++;
+  return n;
+}
+function edgeClear(mm){
+  for(var i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.main===mm&&t.state==='approach'&&frontX(t)>1080)return false;
+  }
+  return true;
+}
+
+function spawnTrain(sv){
+  var mm=sv.entry;
+  if(countQueue(mm)>=3)return false;
+  if(!edgeClear(mm))return false;
+
+  var t={
+    sv:sv,id:sv.id,cat:sv.cat,color:EXCOL[sv.exit],exit:sv.exit,
+    main:mm,track:null,fixedTrack:sv.fixedTrack,
+    pm:sv.pm,pat:sv.pm,
+    schedDepT:sv.schedDepT,
+    path:APATH[mm],pathId:'A:'+mm,d:2,v:0,
+    len:sv.cars*44+(sv.cars-1)*4,carW:44,carH:14,
+    state:'approach',boarding:0,boardedPax:0,wreckT:0,glow:null,smoke:null,smokeT:0
+  };
+  var g=el('g',{'class':'train','data-id':t.id},gTr);
+  t.cars=[];
+  for(var i=0;i<sv.cars;i++)
+    t.cars.push(el('rect',{x:-22,y:-7,width:44,height:14,rx:3,fill:t.color,stroke:'#0b0d10','stroke-width':1.2},g));
+  t.label=el('text',{'font-family':'IBM Plex Mono, monospace','font-size':11,'font-weight':700,
+    fill:'#e9eff6','text-anchor':'middle',stroke:'#0b0d10','stroke-width':3.5,'paint-order':'stroke'},g);
+  t.label.textContent=sv.id;
+  t.barBg=el('rect',{x:-22,y:-23,width:44,height:4,fill:'#22262b'},g);
+  t.bar=el('rect',{x:-22,y:-23,width:44,height:4,fill:'#3ecf6e'},g);
+  t.ring=el('circle',{r:24,fill:'none',stroke:'#f2a93b','stroke-width':1.8,'stroke-dasharray':'6 4',opacity:0},g);
+  t.hitbox=el('circle',{r:32,fill:'transparent'},g);
+  t.g=g;t.sv=sv;sv.train=t;
+  trains.push(t);
+  addLog(t.id+' from <b>'+sv.orig+'</b> inbound on '+MAINS[mm].name+' · <i>Target P'+sv.fixedTrack+'</i>');
+  return true;
+}
+
+function cleanTrain(t){
+  if(t.glow&&t.glow.parentNode)t.glow.parentNode.removeChild(t.glow);
+  if(t.smoke){
+    t.smoke.forEach(function(s){if(s&&s.parentNode)s.parentNode.removeChild(s);});
+    t.smoke=null;
+  }
+  if(t.g&&t.g.parentNode)t.g.parentNode.removeChild(t.g);
+}
+
+function dispatchEmergencyServiceTrain(){
+  if(!activeHazards.length){
+    toast('No active emergencies reported!','good');
+    return;
+  }
+
+  if(emergencyTrain){
+    var nextTarget=activeHazards.find(function(h){return h!==emergencyTrain.targetHazard;});
+    if(nextTarget){
+      emergencyTrain.queuedTarget=nextTarget;
+      addLog('<span class="a">EMERGENCY CHAINED:</span> Train will proceed to Platform '+nextTarget.track+' next!');
+      toast('Next target queued: Platform '+nextTarget.track,'warn');
+    }else{
+      toast('Emergency train is already handling the active site!','warn');
+    }
+    return;
+  }
+
+  var targetHazard=activeHazards[0];
+  var trkObj=TRACKS.find(function(t){return t.id===targetHazard.track;});
+  if(!trkObj) return;
+
+  var p=PATHS[trkObj.id]['S'].pIn;
+  var g=el('g',{'class':'train'},gTr);
+  var cars=[
+    el('rect',{x:-22,y:-7.5,width:44,height:15,rx:3,fill:'#f2a93b',stroke:'#ffffff','stroke-width':1.4},g),
+    el('rect',{x:-22,y:-7.5,width:44,height:15,rx:3,fill:'#e5484d',stroke:'#ffffff','stroke-width':1.4},g)
+  ];
+  var lbl=el('text',{'font-family':'IBM Plex Mono','font-size':10.5,'font-weight':700,fill:'#f2a93b','text-anchor':'middle',stroke:'#000','stroke-width':3.5,'paint-order':'stroke'},g);
+  lbl.textContent='EMERGENCY-911';
+
+  emergencyTrain={
+    id:'EMERGENCY-911',
+    path:p,
+    currentTrackId:trkObj.id,
+    d:2,
+    v:0,
+    cars:cars,
+    lbl:lbl,
+    g:g,
+    targetHazard:targetHazard,
+    queuedTarget:null,
+    state:'traveling_to_hazard',
+    repairTimer:3.5
+  };
+
+  addLog('<span class="r">EMERGENCY TRAIN DISPATCHED</span> via Line 500 to Platform '+targetHazard.track);
+  toast('Emergency Service Train rolling to Platform '+targetHazard.track,'good');
+}
+
+function stepEmergencyTrain(dt){
+  if(!emergencyTrain) return;
+  var em=emergencyTrain;
+
+  if(em.state==='traveling_to_hazard'){
+    em.v=Math.min(65, em.v+dt*24);
+    em.d+=em.v*dt;
+    if(em.d>=em.path.len-8){
+      em.d=em.path.len-8;
+      em.v=0;
+      em.state='patching_track';
+      addLog('<span class="a">CREW ON SITE</span> at Platform '+em.targetHazard.track+' · Repairing...');
+    }
+  }else if(em.state==='patching_track'){
+    em.repairTimer-=dt;
+    var pt=pathAt(em.path, em.d);
+    floatTxt(pt.x+(Math.random()*16-8), pt.y+(Math.random()*10-5), '⚡ REPAIRING', '#3ecf6e');
+
+    if(em.repairTimer<=0){
+      var hzIdx=activeHazards.indexOf(em.targetHazard);
+      if(hzIdx>=0) activeHazards.splice(hzIdx,1);
+      updateHazardDisplay();
+      addLog('<span class="g">INCIDENT RESOLVED</span> at Platform '+em.targetHazard.track);
+      toast('Platform '+em.targetHazard.track+' repaired & restored!','good');
+      score+=200;
+
+      var nextHazard=em.queuedTarget || (activeHazards.length?activeHazards[0]:null);
+      if(nextHazard && nextHazard.track!==em.targetHazard.track){
+        em.queuedTarget=null;
+        em.targetHazard=nextHazard;
+        em.currentTrackId=nextHazard.track;
+        em.path=PATHS[nextHazard.track]['S'].pIn;
+        em.d=2;
+        em.v=0;
+        em.repairTimer=3.5;
+        em.state='traveling_to_hazard';
+        addLog('<span class="r">EMERGENCY REDIRECTED</span> directly to Platform '+nextHazard.track+'!');
+        toast('Emergency train transferring to Platform '+nextHazard.track+'!','warn');
+      }else{
+        em.state='returning_to_depot';
+        em.path=PATHS[em.currentTrackId]['S'].pOut;
+        em.d=0;
+      }
+    }
+  }else if(em.state==='returning_to_depot'){
+    em.v=Math.min(50, em.v+dt*18);
+    em.d+=em.v*dt;
+    if(em.d>=em.path.len+30){
+      if(em.g.parentNode) em.g.parentNode.removeChild(em.g);
+      emergencyTrain=null;
+      addLog('<span class="m">Emergency train returned to depot. Ready on Line 500.</span>');
+      return;
+    }
+  }
+
+  var f=pathAt(em.path, em.d);
+  for(var c=0;c<em.cars.length;c++){
+    var cpt=pathAt(em.path, Math.max(1, em.d-c*48));
+    em.cars[c].setAttribute('transform','translate('+cpt.x.toFixed(2)+','+cpt.y.toFixed(2)+') rotate('+(cpt.ang*57.2958).toFixed(1)+')');
+  }
+  em.lbl.setAttribute('x',f.x);
+  em.lbl.setAttribute('y',f.y-14);
+}
+
+function sendSelectedTrainToDepot(){
+  var t=findTr(selId);
+  if(!t){toast('Select a train to route to depot!','warn');return;}
+  if(t.state!=='approach'){toast('Only approaching trains can be routed to Depot!','warn');return;}
+  
+  t.track='DEPOT';
+  t.path=PATHS['DEPOT'][t.main].pIn;
+  t.pathId='in:'+t.main+':DEPOT';
+  t.state='entering';
+  addLog(t.id+' re-routed to <span class="b">MAINTENANCE DEPOT</span> for overhaul');
+  toast(t.id+' routed to Depot for servicing','good');
+  renderPanel();renderCards();
+}
+
+function stepRoadTraffic(dt){
+  nextVehicleT-=dt;
+  if(nextVehicleT<=0){
+    nextVehicleT=1.1+Math.random()*1.6;
+    var southbound=Math.random()>0.5;
+    var laneX=southbound?(ROAD_X-12):(ROAD_X+12);
+    var vTypes=[{w:10,h:18,col:'#e9edf2',spd:72},{w:11,h:22,col:'#38bdf8',spd:58},{w:12,h:28,col:'#f2a93b',spd:46}];
+    var chosen=vTypes[Math.floor(Math.random()*vTypes.length)];
+    roadVehicles.push({
+      x:laneX,
+      y:southbound?-20:(VH+20),
+      dir:southbound?1:-1,
+      w:chosen.w,h:chosen.h,col:chosen.col,
+      spd:chosen.spd,
+      stopped:false
+    });
+  }
+
+  for(var i=roadVehicles.length-1;i>=0;i--){
+    var v=roadVehicles[i];
+    var stopForBarrier=false;
+
+    if(barriersClosed){
+      if(v.dir===1 && v.y>=(84-v.h/2-10) && v.y<=86){stopForBarrier=true;}
+      if(v.dir===-1 && v.y<=(158+v.h/2+10) && v.y>=156){stopForBarrier=true;}
+      if(v.dir===1 && v.y>=(352-v.h/2-10) && v.y<=354){stopForBarrier=true;}
+      if(v.dir===-1 && v.y<=(426+v.h/2+10) && v.y>=424){stopForBarrier=true;}
+    }
+
+    for(var j=0;j<roadVehicles.length;j++){
+      var o=roadVehicles[j];
+      if(o!==v && o.x===v.x){
+        if(v.dir===1 && o.y>v.y && (o.y-v.y)<(v.h/2+o.h/2+8)){stopForBarrier=true;}
+        if(v.dir===-1 && o.y<v.y && (v.y-o.y)<(v.h/2+o.h/2+8)){stopForBarrier=true;}
+      }
+    }
+
+    if(stopForBarrier){
+      v.stopped=true;
+    }else{
+      v.stopped=false;
+      v.y+=v.dir*v.spd*dt;
+    }
+
+    if(v.y<-40 || v.y>VH+40){
+      roadVehicles.splice(i,1);
+    }
+  }
+
+  while(gVehicles.firstChild)gVehicles.removeChild(gVehicles.firstChild);
+  for(var k=0;k<roadVehicles.length;k++){
+    var rv=roadVehicles[k];
+    el('rect',{x:rv.x-rv.w/2,y:rv.y-rv.h/2,width:rv.w,height:rv.h,rx:2,fill:rv.col,stroke:'#0c0d10','stroke-width':0.8},gVehicles);
+  }
+}
+
+function isTrainOnRoadCrossing(){
+  for(var i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.state==='wreck') continue;
+    var pts=bodyPts(t);
+    for(var j=0;j<pts.length;j++){
+      if(pts[j].x>=ROAD_X-32 && pts[j].x<=ROAD_X+32){
+        if((pts[j].y>=86 && pts[j].y<=156) || (pts[j].y>=348 && pts[j].y<=426)){
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function setBarriers(closed){
+  if(!closed && isTrainOnRoadCrossing()){
+    toast('INTERLOCK ENGAGED: Train is actively crossing highway!','bad');
+    return;
+  }
+
+  barriersClosed=closed;
+  var btn=$('#btnGateToggle');
+  var txt=$('#gateStatusText');
+
+  if(closed){
+    if(btn){btn.className='rc-btn closed';btn.textContent='OPEN BARRIERS [B]';}
+    if(txt){txt.textContent='GATES: CLOSED (TRAINS SAFE)';txt.style.color='var(--red)';}
+
+    if(gateUpperNorth){gateUpperNorth.setAttribute('x1',ROAD_X-28);gateUpperNorth.setAttribute('y1',88);gateUpperNorth.setAttribute('x2',ROAD_X+28);gateUpperNorth.setAttribute('y2',88);}
+    if(gateLowerNorth){gateLowerNorth.setAttribute('x1',ROAD_X-28);gateLowerNorth.setAttribute('y1',154);gateLowerNorth.setAttribute('x2',ROAD_X+28);gateLowerNorth.setAttribute('y2',154);}
+    if(gateWigWagNorth)gateWigWagNorth.setAttribute('opacity',1);
+
+    if(gateUpperSouth){gateUpperSouth.setAttribute('x1',ROAD_X-28);gateUpperSouth.setAttribute('y1',356);gateUpperSouth.setAttribute('x2',ROAD_X+28);gateUpperSouth.setAttribute('y2',356);}
+    if(gateLowerSouth){gateLowerSouth.setAttribute('x1',ROAD_X-28);gateLowerSouth.setAttribute('y1',422);gateLowerSouth.setAttribute('x2',ROAD_X+28);gateLowerSouth.setAttribute('y2',422);}
+    if(gateWigWagSouth)gateWigWagSouth.setAttribute('opacity',1);
+
+    addLog('<span class="r">ALL BARRIERS LOWERED</span> — Crossing safe for rail movements');
+  }else{
+    if(btn){btn.className='rc-btn open';btn.textContent='CLOSE BARRIERS [B]';}
+    if(txt){txt.textContent='GATES: OPEN (ROAD FLOWING)';txt.style.color='var(--grn)';}
+
+    if(gateUpperNorth){gateUpperNorth.setAttribute('x1',ROAD_X-28);gateUpperNorth.setAttribute('y1',88);gateUpperNorth.setAttribute('x2',ROAD_X-28);gateUpperNorth.setAttribute('y2',60);}
+    if(gateLowerNorth){gateLowerNorth.setAttribute('x1',ROAD_X+28);gateLowerNorth.setAttribute('y1',154);gateLowerNorth.setAttribute('x2',ROAD_X+28);gateLowerNorth.setAttribute('y2',182);}
+    if(gateWigWagNorth)gateWigWagNorth.setAttribute('opacity',0);
+
+    if(gateUpperSouth){gateUpperSouth.setAttribute('x1',ROAD_X-28);gateUpperSouth.setAttribute('y1',356);gateUpperSouth.setAttribute('x2',ROAD_X-28);gateUpperSouth.setAttribute('y2',328);}
+    if(gateLowerSouth){gateLowerSouth.setAttribute('x1',ROAD_X+28);gateLowerSouth.setAttribute('y1',422);gateLowerSouth.setAttribute('x2',ROAD_X+28);gateLowerSouth.setAttribute('y2',450);}
+    if(gateWigWagSouth)gateWigWagSouth.setAttribute('opacity',0);
+
+    addLog('<span class="g">ALL BARRIERS RAISED</span> — Highway flowing');
+  }
+}
+
+function triggerRandomScenario(){
+  if(activeHazards.length>=2) return;
+  var r=Math.random();
+  var targetTrack=Math.floor(Math.random()*6)+1;
+
+  if(r<0.5){
+    activeHazards.push({
+      type:'work',
+      track:targetTrack,
+      title:'TRACK '+targetTrack+' BALLAST FAULT',
+      duration:40+Math.random()*20
+    });
+    addLog('<span class="a">DEFECT DETECTED</span> — Platform '+targetTrack+' ballast fault. Press [E] to dispatch repair!');
+    toast('Track '+targetTrack+' fault · Press [E] to repair!','warn');
+  }else{
+    activeHazards.push({
+      type:'fire',
+      track:targetTrack,
+      title:'PLATFORM '+targetTrack+' ELECTRICAL FIRE',
+      duration:35+Math.random()*15
+    });
+    addLog('<span class="r">FIRE EMERGENCY</span> — Platform '+targetTrack+' transformer fire! Press [E] to extinguish!');
+    toast('ELECTRICAL FIRE on Platform '+targetTrack+'! Press [E]!','bad');
+    flashT=0.5;
+  }
+  updateHazardDisplay();
+}
+
+function updateHazardDisplay(){
+  while(gHazards.firstChild)gHazards.removeChild(gHazards.firstChild);
+  var noticeText=[];
+  for(var i=0;i<activeHazards.length;i++){
+    var hz=activeHazards[i];
+    var tk=TRACKS.find(function(x){return x.id===hz.track;});
+    if(tk){
+      if(hz.type==='work'){
+        el('rect',{x:176,y:tk.y-12,width:408,height:26,fill:'url(#stripes)',stroke:'#f2a93b','stroke-width':1.4},gHazards);
+        var tx=el('text',{x:380,y:tk.y+5,'text-anchor':'middle','font-family':'Barlow Condensed, sans-serif','font-weight':'700','font-size':13,fill:'#f2a93b','letter-spacing':'1.2'},gHazards);
+        tx.textContent='TRACK FAULT — PRESS [E] TO DISPATCH REPAIR';
+      }else if(hz.type==='fire'){
+        el('rect',{x:176,y:tk.y-14,width:408,height:30,fill:'rgba(229,72,77,0.3)',stroke:'#e5484d','stroke-width':1.6},gHazards);
+        var ftx=el('text',{x:380,y:tk.y+6,'text-anchor':'middle','font-family':'Barlow Condensed, sans-serif','font-size':14,fill:'#ff999b','letter-spacing':'1.5','font-weight':'800'},gHazards);
+        ftx.textContent='ELECTRICAL FIRE — PRESS [E] TO DISPATCH';
+      }
+    }
+    noticeText.push(hz.title);
+  }
+  var elNot=$('#incidentNotice');
+  if(elNot){
+    elNot.textContent=noticeText.length?noticeText.join(' | '):'ALL TRACKS NORMAL';
+    elNot.style.color=noticeText.length?'var(--red)':'var(--amber)';
+  }
+}
+
+function isTrackHazardBlocked(trk){
+  return activeHazards.some(function(h){return h.track===parseInt(trk,10);});
+}
+
+function bodyPts(t){
+  var out=[],d,step=12;
+  for(d=Math.max(1,t.d-t.len);d<=t.d;d+=step)out.push(pathAt(t.path,d));
+  out.push(pathAt(t.path,t.d));
+  return out;
+}
+
+function avoidV(t){
+  var f=pathAt(t.path,t.d);
+  var cs=Math.cos(f.ang),sn=Math.sin(f.ang);
+  var best=999,i,j,o,pts;
+
+  if(!barriersClosed){
+    if(t.state==='approach'||t.state==='entering'){
+      if(f.x > ROAD_X+30){
+        var stopDist=(f.x-(ROAD_X+32));
+        var vB=Math.sqrt(2*BRKMAX*Math.max(0,stopDist));
+        if(vB<best) best=vB;
+      }
+    }
+    if(t.state==='departing'){
+      if(f.x < ROAD_X-30){
+        var stopDistOut=((ROAD_X-35)-f.x);
+        var vBOut=Math.sqrt(2*BRKMAX*Math.max(0,stopDistOut));
+        if(vBOut<best) best=vBOut;
+      }
+    }
+  }
+
+  for(i=0;i<trains.length;i++){
+    o=trains[i];if(o===t)continue;
+    pts=bodyPts(o);
+    for(j=0;j<pts.length;j++){
+      var dx=pts[j].x-f.x,dy=pts[j].y-f.y;
+      var d2=dx*dx+dy*dy;if(d2>14400)continue;
+      var along=dx*cs+dy*sn;if(along<=2)continue;
+      var lat=-dx*sn+dy*cs;
+      if(Math.abs(lat)>18)continue;
+      if(along<best)best=along;
+    }
+  }
+  if(best===999)return 999;
+  return Math.sqrt(2*BRKMAX*Math.max(0,best-32));
+}
+
+function checkCollisions(){
+  var i,j,a,b,pa,pb,m,n;
+  for(i=0;i<trains.length;i++){
+    a=trains[i];if(a.state==='wreck')continue;
+    for(j=i+1;j<trains.length;j++){
+      b=trains[j];if(b.state==='wreck')continue;
+      if(a.state==='approach'&&b.state==='approach'&&a.v===0&&b.v===0)continue;
+      pa=bodyPts(a);pb=bodyPts(b);var hit=null;
+      for(m=0;m<pa.length&&!hit;m++)for(n=0;n<pb.length&&!hit;n++){
+        var dx=pa[m].x-pb[n].x,dy=pa[m].y-pb[n].y;
+        if(dx*dx+dy*dy<110)hit={x:(pa[m].x+pb[n].x)/2,y:(pa[m].y+pb[n].y)/2};
+      }
+      if(hit){doCollision(a,b,hit);return;}
+    }
+  }
+
+  for(var tIdx=0;tIdx<trains.length;tIdx++){
+    var tr=trains[tIdx];
+    if(tr.state==='wreck') continue;
+    var trPts=bodyPts(tr);
+    for(var vIdx=roadVehicles.length-1;vIdx>=0;vIdx--){
+      var veh=roadVehicles[vIdx];
+      for(var pIdx=0;pIdx<trPts.length;pIdx++){
+        var p=trPts[pIdx];
+        if(Math.abs(p.x-veh.x)<16 && Math.abs(p.y-veh.y)<16){
+          doCollision(tr,null,{x:veh.x,y:veh.y});
+          roadVehicles.splice(vIdx,1);
+          toast('VEHICLE HIT TRAIN ON CROSSING!','bad');
+          return;
+        }
+      }
+    }
+  }
+}
+
+function doCollision(a,b,pt){
+  if(a){
+    if(a.glow&&a.glow.parentNode)a.glow.parentNode.removeChild(a.glow);
+    a.glow=null;
+    a.state='wreck';a.v=0;a.wreckT=0;
+    a.cars.forEach(function(c){c.setAttribute('fill','#3a3f45');c.classList.remove('car-ready');});
+    issuePassengerRefund(a, 'DERAILMENT ACCIDENT');
+  }
+  if(b && b!==a){
+    if(b.glow&&b.glow.parentNode)b.glow.parentNode.removeChild(b.glow);
+    b.glow=null;
+    b.state='wreck';b.v=0;b.wreckT=0;
+    b.cars.forEach(function(c){c.setAttribute('fill','#3a3f45');c.classList.remove('car-ready');});
+    issuePassengerRefund(b, 'DERAILMENT ACCIDENT');
+  }
+
+  booms.push({x:pt.x,y:pt.y,t:0});
+  flashT=0.7;shakeT=0.55;
+  $('#schemWrap').classList.remove('shake');void $('#schemWrap').offsetWidth;
+  $('#schemWrap').classList.add('shake');
+  score=Math.max(0,score-300);combo=1;safety--;
+  
+  addLog('<span class="r">COLLISION IMPACT AT X:'+Math.round(pt.x)+'</span> · Wreck repair crane mobilized');
+  updateHUD();
+
+  pendingResc.push({at:simT+1.0,a:a,b:b,pt:pt});
+  if(safety<=0 || revenue<=0){setTimeout(gameOver,1200);}
+}
+
+function issuePassengerRefund(train, reason){
+  if(!train) return;
+  var trkObj=TRACKS.find(function(tk){return tk.id===train.track || tk.id===train.fixedTrack;});
+  var affectedPax=train.boardedPax || (trkObj?trkObj.pax:80);
+  var refundAmount=affectedPax*110;
+  revenue-=refundAmount;
+  
+  var fxX=400;
+  try{ fxX=frontX(train)||400; }catch(e){}
+  floatTxt(fxX, 180, '-kr '+refundAmount.toLocaleString()+' (REFUNDS)', '#e5484d');
+  addLog('<span class="r">PASSENGER REFUND:</span> kr '+refundAmount.toLocaleString()+' ('+reason+')');
+  toast('Service Failure! Paid kr '+refundAmount.toLocaleString()+' in refunds','bad');
+  updateHUD();
+}
+
+function makeRescue(a,b,pt){
+  var mm=(a&&a.main)?a.main:((b&&b.main)?b.main:'E');
+  var My=MAINS[mm].inY;
+  var p=mkPath([[LEAD,My],[pt.x,pt.y]],[[0,35]]);
+  var g=el('g',{},gTr);
+  var cars=[
+    el('rect',{x:-16,y:-7,width:32,height:14,rx:2.5,fill:'#f2a93b',stroke:'#0f1113','stroke-width':1.2},g),
+    el('rect',{x:-16,y:-7,width:32,height:14,rx:2.5,fill:'#f2a93b',stroke:'#0f1113','stroke-width':1.2},g)
+  ];
+  var lbl=el('text',{'font-family':'IBM Plex Mono','font-size':10,'font-weight':700,fill:'#f2a93b','text-anchor':'middle',stroke:'#101214','stroke-width':3.5,'paint-order':'stroke'},g);
+  lbl.textContent='RESCUE';
+  var beacon=el('circle',{r:2.8,fill:'#ff3d1f'},g);
+  
+  var wreckList=[];
+  if(a) wreckList.push(a);
+  if(b && b!==a) wreckList.push(b);
+
+  rescues.push({
+    path:p,d:2,v:0,phase:'go',g:g,cars:cars,lbl:lbl,beacon:beacon,
+    wrecks:wreckList,timer:0
+  });
+  addLog('<span class="b">BREAKDOWN CRANE 911</span> rolling to clear accident site');
+}
+
+function stepRescue(r,dt){
+  var f;
+  if(r.phase==='go'){
+    r.v=36;r.d+=r.v*dt;
+    if(r.d>=r.path.len-10){r.d=r.path.len-10;r.phase='couple';r.timer=2.0;}
+  }else if(r.phase==='couple'){
+    r.timer-=dt;
+    if(Math.random()<0.4){
+      f=pathAt(r.path,r.d);
+      floatTxt(f.x+(Math.random()*12-6),f.y+(Math.random()*8-4),'·','#ffd76b');
+    }
+    if(r.timer<=0){r.phase='haul';}
+  }else if(r.phase==='haul'){
+    r.v=24;r.d-=r.v*dt;
+    if(r.d<=4){
+      for(var k=0;k<r.wrecks.length;k++){
+        var w=r.wrecks[k];
+        if(w){
+          w.sv.done=true;
+          cleanTrain(w);
+          var idx=trains.indexOf(w);if(idx>=0)trains.splice(idx,1);
+        }
+      }
+      if(r.g&&r.g.parentNode)r.g.parentNode.removeChild(r.g);
+      var ri=rescues.indexOf(r);if(ri>=0)rescues.splice(ri,1);
+      score+=150;
+      addLog('<span class="g">Line cleared</span> — tracks reopened');
+      toast('Wreck cleared — tracks reopened','good');
+      updateHUD();
+      return;
+    }
+  }
+  f=pathAt(r.path,r.d);
+  for(var i2=0;i2<r.cars.length;i2++){
+    var cd=Math.max(1,r.d-16-i2*36);
+    var pt=pathAt(r.path,cd);
+    r.cars[i2].setAttribute('transform','translate('+pt.x.toFixed(2)+','+pt.y.toFixed(2)+') rotate('+(pt.ang*57.2958).toFixed(1)+')');
+  }
+  r.lbl.setAttribute('x',f.x);
+  r.lbl.setAttribute('y',f.y-14);
+  r.beacon.setAttribute('cx',f.x);
+  r.beacon.setAttribute('cy',f.y-8);
+  r.beacon.setAttribute('opacity',(Math.floor(simT*5)%2)?1:0.15);
+}
+
+function findTr(id){
+  for(var i=0;i<trains.length;i++)if(trains[i].id===id)return trains[i];
+  return null;
+}
+function trackOccupied(P){
+  for(var i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.track!==null&&String(t.track)===String(P)){
+      if(t.state==='entering'||t.state==='dwell'||t.state==='ready'||t.state==='wreck')return true;
+      if(t.state==='departing'&&t.d<180)return true;
+    }
+  }
+  return false;
+}
+function exitLineBlocked(side){
+  for(var i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.state==='departing'&&t.departSide===side&&t.d<PATHS[t.track][side].pOut.len*0.65){
+      return true;
+    }
+  }
+  return false;
+}
+
+function admit(t,P){
+  if(!t||t.state!=='approach'){toast('Select a train waiting at the signal','bad');return;}
+  if(isTrackHazardBlocked(P)){toast('Platform '+P+' is closed! Press [E] to repair!','bad');return;}
+  if(trackOccupied(P)){toast('Platform '+P+' is occupied','bad');return;}
+
+  if(!barriersClosed){
+    toast('NOTE: Close highway barriers so train can cross safely!','warn');
+  }
+
+  t.track=P;
+  t.path=PATHS[P][t.main].pIn;
+  t.pathId='in:'+t.main+':'+P;
+  t.state='entering';
+  t.glow=el('path',{d:polyD(t.path.pts),fill:'none',stroke:t.color,'stroke-width':4,opacity:0.3},gHi);
+  score+=25;
+  addLog(t.id+' <span class="g">admitted</span> → Platform '+P);
+  if(hasConflict(t.pathId))toast('Warning: switch move in progress!','bad');
+  updateHUD();renderPanel();renderCards();
+}
+
+function doDispatch(t,side){
+  if(!t)return;
+  if(t.state!=='ready'){toast('Train is not ready — passengers still boarding','bad');return;}
+  if(!barriersClosed){
+    toast('INTERLOCK REJECTION: Close highway barriers before dispatching!','bad');
+    return;
+  }
+  if(exitLineBlocked(side)){toast('Exit block occupied — wait for line clear','bad');return;}
+
+  var correct=(side===t.exit);
+  if(t.glow&&t.glow.parentNode)t.glow.parentNode.removeChild(t.glow);
+  t.cars.forEach(function(c){c.classList.remove('car-ready');c.setAttribute('fill',t.color);});
+  t.path=PATHS[t.track][side].pOut;
+  t.pathId='out:'+t.track+':'+side;
+  t.d=0;t.v=0;t.state='departing';t.departSide=side;
+  t.glow=el('path',{d:polyD(t.path.pts),fill:'none',stroke:t.color,'stroke-width':4,opacity:0.3},gHi);
+  var f=pathAt(t.path,0);
+
+  if(correct){
+    var mult=combo;
+    score+=100*mult;
+    delivered++;deliveredTotal++;
+    floatTxt(f.x,f.y-14,'+'+(100*mult),'#3ecf6e');
+    addLog(t.id+' <span class="g">dispatched</span> → '+t.sv.dest+' ('+EXNAME[side]+')');
+    combo=Math.min(combo+1,8);
+    if(combo>bestCombo)bestCombo=combo;
+    checkQuota();
+  }else{
+    score=Math.max(0,score-100);combo=1;
+    issuePassengerRefund(t, 'MISROUTED TO WRONG DESTINATION');
+    floatTxt(f.x,f.y-14,'-100 WRONG EXIT','#e5484d');
+    addLog(t.id+' <span class="r">WRONG ROUTE</span>: sent '+EXNAME[side]+', needed '+EXNAME[t.exit]);
+    toast('Wrong route! Destination was '+EXNAME[t.exit],'bad');
+  }
+  updateHUD();renderPanel();renderCards();
+}
+
+function checkQuota(){
+  if(delivered>=quota){
+    var bonus=350*level;
+    score+=bonus;
+    revenue+=5000*level;
+    $('#banT1').textContent='LEVEL '+level+' COMPLETE';
+    $('#banT2').textContent='BONUS +kr '+(5000*level)+' · ADVANCING TO LEVEL '+(level+1);
+    $('#banner').style.display='flex';
+    addLog('<span class="g">STAGE COMPLETE</span> · Subsidy bonus +kr '+(5000*level));
+    level++;delivered=0;
+    levelParams();
+    levelPauseT=2.5;
+    setTimeout(function(){$('#banner').style.display='none';},2400);
+    updateHUD();
+  }
+}
+
+function stepTrain(t,dt){
+  if(t.state==='approach'||t.state==='entering'||t.state==='departing'){
+    var lim=vLim(t.path,t.d);
+    var vA=avoidV(t);
+    var vT=Math.min(lim,vA,t.sv.vmax);
+
+    if(t.state==='approach'){
+      var vB=Math.sqrt(2*BRK*Math.max(0,DSTOP-t.d));
+      if(vB<vT)vT=vB;
+    }
+    if(t.state==='entering'){
+      var vB2=Math.sqrt(2*BRK*Math.max(0,t.path.len-t.d));
+      if(vB2<vT)vT=vB2;
+    }
+    if(vT>t.v){t.v+=ACC*dt;if(t.v>vT)t.v=vT;}
+    else{t.v-=BRKMAX*dt;if(t.v<vT)t.v=vT;}
+    if(t.v<0.03)t.v=0;
+    t.d+=t.v*dt;
+
+    if(t.state==='entering'&&t.d>=t.path.len-0.5&&t.v<2.2){
+      t.state='dwell';t.boarding=0;
+      if(t.glow&&t.glow.parentNode)t.glow.parentNode.removeChild(t.glow);
+      
+      var trkObj=TRACKS.find(function(tk){return tk.id===t.track;});
+      if(trkObj && !trkObj.special){
+        var paxCollected=trkObj.pax;
+        trkObj.pax=Math.floor(10+Math.random()*15);
+        if(paxTextEls[trkObj.id]){
+          paxTextEls[trkObj.id].textContent=trkObj.pax+' pax';
+        }
+        t.boardedPax=paxCollected;
+        var collectedRev=paxCollected * t.sv.fare;
+        revenue+=collectedRev;
+        floatTxt(frontX(t), pathAt(t.path,t.d).y-14, '+kr '+collectedRev+' ('+paxCollected+' PAX)', '#3ecf6e');
+        addLog(t.id+' boarded '+paxCollected+' passengers at Platform '+t.track+' · <span class="g">+kr '+collectedRev+'</span>');
+      }else if(t.track==='DEPOT'){
+        addLog(t.id+' arrived at <span class="b">MAINTENANCE DEPOT</span>. Servicing mechanics active.');
+      }
+      renderPanel();renderCards();
+    }
+    if(t.state==='departing'){
+      var rearD=t.d-(t.len+10);
+      if(rearD>0&&pathAt(t.path,rearD).x>VW+15){
+        t.sv.done=true;
+        cleanTrain(t);
+        var ix=trains.indexOf(t);if(ix>=0)trains.splice(ix,1);
+      }
+    }
+  }else if(t.state==='dwell'){
+    t.boarding+=dt/dwellTime;
+    if(t.boarding>=1){
+      t.boarding=1;
+      t.state='ready';
+      t.cars.forEach(function(c){c.classList.add('car-ready');});
+      addLog(t.id+' <span class="a">READY FOR DEPARTURE</span> on Track '+t.track+' → '+t.sv.dest+' ('+EXNAME[t.exit]+')');
+      renderPanel();renderCards();
+    }
+  }else if(t.state==='wreck'){
+    t.wreckT+=dt;
+  }
+
+  if(t.state==='approach'||t.state==='dwell'||t.state==='ready'){
+    t.pat-=dt;
+    if(t.pat<=0){
+      score=Math.max(0,score-100);combo=1;
+      issuePassengerRefund(t, 'DEPARTURE TIMEOUT / UNFULFILLED SERVICE');
+      cleanTrain(t);
+      var ixc=trains.indexOf(t);if(ixc>=0)trains.splice(ixc,1);
+      updateHUD();renderCards();renderPanel();
+    }
+  }
+}
+
+function step(dt){
+  simT+=dt;
+  if(levelPauseT>0){levelPauseT-=dt;return;}
+
+  stepRoadTraffic(dt);
+  replenishPassengers();
+  stepEmergencyTrain(dt);
+
+  nextScenarioCheckT-=dt;
+  if(nextScenarioCheckT<=0){
+    nextScenarioCheckT=35+Math.random()*25;
+    triggerRandomScenario();
+  }
+
+  for(var h=activeHazards.length-1;h>=0;h--){
+    activeHazards[h].duration-=dt;
+    if(activeHazards[h].duration<=0){
+      var ended=activeHazards.splice(h,1)[0];
+      addLog('<span class="g">INCIDENT CLEARED</span> — '+ended.title+' resolved.');
+      toast(ended.title+' resolved','good');
+      updateHazardDisplay();
+      renderPanel();
+    }
+  }
+
+  spawnT-=dt;
+  if(spawnT<=0){
+    spawnTrain(makeFixedService());
+    spawnT=spawnInt*(0.8+Math.random()*0.4);
+  }
+
+  for(var i=pendingResc.length-1;i>=0;i--){
+    if(pendingResc[i].at<=simT){
+      makeRescue(pendingResc[i].a,pendingResc[i].b,pendingResc[i].pt);
+      pendingResc.splice(i,1);
+    }
+  }
+
+  for(var tr=0;tr<trains.length;tr++)stepTrain(trains[tr],dt);
+  for(var r=0;r<rescues.length;r++)stepRescue(rescues[r],dt);
+  checkCollisions();
+
+  if(flashT>0)flashT-=dt;
+  if(shakeT>0)shakeT-=dt;
+  for(var f=fxTexts.length-1;f>=0;f--){
+    fxTexts[f].life-=dt;fxTexts[f].y-=14*dt;
+    if(fxTexts[f].life<=0)fxTexts.splice(f,1);
+  }
+  for(var b=booms.length-1;b>=0;b--){
+    booms[b].t+=dt;
+    if(booms[b].t>1.2)booms.splice(b,1);
+  }
+}
+
+function renderFrame(){
+  var i,j;
+  for(i=0;i<trains.length;i++){
+    var t=trains[i];
+    var f=pathAt(t.path,t.d);
+    for(j=0;j<t.cars.length;j++){
+      var cd=t.d-22-j*48;if(cd<1)cd=1;
+      var pt=pathAt(t.path,cd);
+      t.cars[j].setAttribute('transform','translate('+pt.x.toFixed(2)+','+pt.y.toFixed(2)+') rotate('+(pt.ang*57.2958).toFixed(1)+')');
+    }
+    t.label.setAttribute('x',f.x);t.label.setAttribute('y',f.y-14);
+    t.hitbox.setAttribute('cx',f.x);t.hitbox.setAttribute('cy',f.y);
+
+    var showBar=(t.state==='approach'||t.state==='dwell'||t.state==='ready'||t.state==='entering');
+    t.barBg.setAttribute('opacity',showBar?1:0);
+    t.bar.setAttribute('opacity',showBar?1:0);
+    if(showBar){
+      var frac=clamp(t.pat/t.pm,0,1);
+      t.bar.setAttribute('width',(44*frac).toFixed(1));
+      t.bar.setAttribute('fill',frac>0.4?'#3ecf6e':(frac>0.2?'#f2a93b':'#e5484d'));
+      if(t.state==='dwell'){
+        t.bar.setAttribute('width',(44*t.boarding).toFixed(1));
+        t.bar.setAttribute('fill','#3ecf6e');
+      }else if(t.state==='ready'){
+        t.bar.setAttribute('width','44');
+        t.bar.setAttribute('fill','#f2a93b');
+      }
+    }
+    var act=(t.id===selId)||(t.id===hovId);
+    t.ring.setAttribute('opacity',act?1:0);
+    if(act){
+      t.ring.setAttribute('cx',f.x);t.ring.setAttribute('cy',f.y);
+      t.ring.setAttribute('stroke',t.state==='ready'?'#f2a93b':(t.id===selId?'#ffffff':'#8a9097'));
+    }
+    if(t.state==='wreck'){
+      t.smokeT+=0.02;
+      var ph=(t.smokeT%1);
+      if(!t.smoke){
+        t.smoke=[el('circle',{r:4,fill:'#6a7076',opacity:0.5},gTr),el('circle',{r:3,fill:'#6a7076',opacity:0.4},gTr)];
+      }
+      t.smoke[0].setAttribute('cx',f.x+4);t.smoke[0].setAttribute('cy',f.y-6-ph*14);
+      t.smoke[0].setAttribute('opacity',0.5*(1-ph));
+      t.smoke[1].setAttribute('cx',f.x-5);t.smoke[1].setAttribute('cy',f.y-6-((ph+0.5)%1)*14);
+      t.smoke[1].setAttribute('opacity',0.4*(1-((ph+0.5)%1)));
+    }
+  }
+
+  setEntry('E',trains.some(function(t){return t.state==='entering'&&t.main==='E';}));
+  setEntry('W',trains.some(function(t){return t.state==='entering'&&t.main==='W';}));
+  setEntry('S',emergencyTrain!==null);
+
+  for(i=0;i<TRACKS.length;i++){
+    var tk=TRACKS[i];
+    if(tk.special) continue;
+    var readyOnTrk=trains.some(function(t){return String(t.track)===String(tk.id)&&t.state==='ready';});
+    var depOnTrk=trains.some(function(t){return String(t.track)===String(tk.id)&&t.state==='departing';});
+    setExit(tk.id, depOnTrk?'#3ecf6e':(readyOnTrk?'#f2a93b':'#e5484d'));
+  }
+
+  while(gFx.firstChild)gFx.removeChild(gFx.firstChild);
+  for(i=0;i<fxTexts.length;i++){
+    var ft=fxTexts[i];
+    var tx=el('text',{x:ft.x,y:ft.y,'text-anchor':'middle','font-family':'IBM Plex Mono, monospace',
+      'font-size':11.5,'font-weight':700,fill:ft.col,opacity:Math.min(1,ft.life)},gFx);
+    tx.textContent=ft.txt;
+  }
+  for(i=0;i<booms.length;i++){
+    var bm=booms[i],k=bm.t/1.2;
+    el('circle',{cx:bm.x,cy:bm.y,r:8+k*48,fill:'none',stroke:'#e5484d','stroke-width':3.5*(1-k),opacity:1-k},gFx);
+    el('circle',{cx:bm.x,cy:bm.y,r:5+k*20,fill:'#ffb35c',opacity:(1-k)*0.7},gFx);
+  }
+  if(flashT>0)el('rect',{x:0,y:0,width:VW,height:VH,fill:'#fff',opacity:(flashT*0.5).toFixed(2)},gFx);
+  gRoot.setAttribute('transform',shakeT>0?('translate('+((Math.random()*8-4)).toFixed(1)+','+((Math.random()*8-4)).toFixed(1)+')'):'');
+}
+
+function updateHUD(){
+  if($('#hLevel')) $('#hLevel').textContent=level;
+  if($('#hRevV')) $('#hRevV').textContent=revenue.toLocaleString();
+  if($('#hScoreV')) $('#hScoreV').textContent=score;
+  if($('#hComboV')) $('#hComboV').textContent='×'+combo;
+  if($('#hCombo')) $('#hCombo').classList.toggle('hot',combo>1);
+  if($('#hQuotaTxt')) $('#hQuotaTxt').textContent=delivered+' / '+quota;
+  if($('#hQuota')) $('#hQuota').style.width=Math.min(100,delivered/quota*100)+'%';
+  for(var i=0;i<3;i++){
+    var pip=$('#pip'+i);
+    if(pip) pip.className='pip'+(i<safety?'':' lost');
+  }
+  if($('#hClock')) $('#hClock').textContent=fmtT(simT);
+  if($('#queueCount')) $('#queueCount').textContent=trains.length+' ACTIVE TRAINS';
+}
+
+function stateLabel(t){
+  if(t.state==='approach')return'APPROACH · SCHED P'+t.fixedTrack;
+  if(t.state==='entering')return'ENTERING · TRK '+t.track;
+  if(t.state==='dwell')return'BOARDING';
+  if(t.state==='ready')return'READY (YELLOW)';
+  if(t.state==='wreck')return'DERAILED';
+  return t.state.toUpperCase();
+}
+
+function renderCards(){
+  var box=$('#qstrip');
+  if(!box) return;
+  var list=[],i;
+  for(i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.state==='approach'||t.state==='entering'||t.state==='dwell'||t.state==='ready')list.push(t);
+  }
+  list.sort(function(a,b){
+    var ord={ready:0,dwell:1,approach:2,entering:3};
+    return (ord[a.state]||9)-(ord[b.state]||9)||a.pat-b.pat;
+  });
+  if(!list.length){
+    box.innerHTML='<div class="qempty">All tracks clear. New scheduled services approaching...</div>';
+    return;
+  }
+  var html='';
+  for(i=0;i<list.length;i++){
+    var t2=list[i];
+    var frac=clamp(t2.pat/t2.pm,0,1);
+    var barCls=frac>0.4?'':(frac>0.2?'warn':'crit');
+    var isRdy=(t2.state==='ready');
+    var stCls=isRdy?'rdy':(t2.state==='dwell'?'brd':'');
+    var stTxt2=t2.state==='dwell'?('BOARDING '+Math.floor(t2.boarding*100)+'%'):stateLabel(t2);
+
+    var delaySec=Math.max(0,Math.floor(simT-t2.schedDepT));
+    var timeTxt='DEP DUE: '+fmtT(t2.schedDepT)+(delaySec>0?(' · <span style="color:var(--amber)">LATE +'+Math.floor(delaySec/60)+'m</span>'):'');
+
+    var trkObj=TRACKS.find(function(tk){return tk.id===t2.fixedTrack;});
+    var paxAvailable=trkObj?trkObj.pax:0;
+
+    html+='<button class="qcard'+(t2.id===selId?' sel':'')+(isRdy?' ready-card':'')+'" data-id="'+t2.id+'">'
+      +'<span class="qc-top"><b>'+t2.id+'</b><span class="qc-st '+stCls+'">'+stTxt2+'</span></span>'
+      +'<span class="qc-mid"><span class="qc-dest">'+t2.sv.dest+'</span>'
+      +'<span class="qc-arrow" style="color:'+t2.color+'">'+(t2.exit==='E'?'→ ØST':'VEST →')+'</span></span>'
+      +'<div class="qc-fixed">From '+t2.sv.orig+' · Assigned: <b>Platform '+t2.fixedTrack+'</b></div>'
+      +'<div class="qc-pax">Platform Waiting: <b>'+paxAvailable+' Passengers</b> (Fare: kr '+t2.sv.fare+'/ea)</div>'
+      +'<div class="qc-time">'+timeTxt+' · Due Buffer: '+Math.floor(t2.pat)+'s</div>'
+      +'<span class="qc-bar"><i class="'+barCls+'" style="width:'+(frac*100).toFixed(0)+'%"></i></span>'
+      +'</button>';
+  }
+  box.innerHTML=html;
+}
+
+function renderPanel(){
+  var t=selId?findTr(selId):null;
+  var grid=$('#agrid');
+  if(!grid) return;
+  var i,html='';
+  for(i=1;i<=6;i++){
+    var occ=trackOccupied(i);
+    var hazard=isTrackHazardBlocked(i);
+    var isFixedTarget=t&&t.state==='approach'&&(t.fixedTrack===i);
+    var risk=t&&t.state==='approach'&&hasConflict('in:'+t.main+':'+i);
+    var dis=(occ||hazard)?'disabled':'';
+    var hazardCls=hazard?' blocked-hazard':'';
+
+    var trkObj=TRACKS.find(function(tk){return tk.id===i;});
+    var pCount=trkObj?trkObj.pax:0;
+
+    html+='<button class="ab'+(occ?' occ':'')+(isFixedTarget?' fixed-target':'')+(risk?' risk':'')+hazardCls+'" '+dis+' data-p="'+i+'">P'+i+'<br><span style="font-size:9.5px;font-weight:600;color:var(--grn)">'+pCount+' pax</span></button>';
+  }
+  grid.innerHTML=html;
+
+  var dbE=$('#dbE'),dbW=$('#dbW');
+  if(!t){
+    $('#selInfo').innerHTML='<div class="no" style="color:#565c63">—</div><div class="ds">no train selected</div>'
+      +'<div class="hint">Click any train directly on track or select from queue.</div>';
+    if(dbE) {dbE.disabled=true;dbE.classList.remove('highlight-ready');}
+    if(dbW) {dbW.disabled=true;dbW.classList.remove('highlight-ready');}
+    $('#bprog').style.display='none';$('#bplbl').style.display='none';
+    return;
+  }
+  $('#selInfo').innerHTML='<span class="no" style="color:'+(t.state==='ready'?'#f2a93b':t.color)+'">'+t.id+'</span>'
+    +' <span class="ds">('+t.sv.orig+' → '+t.sv.dest+')</span>'
+    +' <span class="qc-arrow" style="color:'+t.color+';font-size:11px">'+(t.exit==='E'?'→ ØST':'VEST →')+'</span>'
+    +'<div class="hint">'+hintFor(t)+'</div>';
+
+  var ready=(t.state==='ready');
+  var eBlocked=exitLineBlocked('E');
+  var wBlocked=exitLineBlocked('W');
+
+  if(dbE){
+    dbE.disabled=(!ready||eBlocked);
+    dbE.textContent=eBlocked?'ØST OCCUPIED':'→ ØST';
+    if(ready&&t.exit==='E') dbE.classList.add('highlight-ready'); else dbE.classList.remove('highlight-ready');
+    if(ready&&hasConflict('out:'+t.track+':E'))dbE.classList.add('risk');else dbE.classList.remove('risk');
+  }
+  if(dbW){
+    dbW.disabled=(!ready||wBlocked);
+    dbW.textContent=wBlocked?'VEST OCCUPIED':'VEST →';
+    if(ready&&t.exit==='W') dbW.classList.add('highlight-ready'); else dbW.classList.remove('highlight-ready');
+    if(ready&&hasConflict('out:'+t.track+':W'))dbW.classList.add('risk');else dbW.classList.remove('risk');
+  }
+
+  if(t.state==='dwell'){
+    $('#bprog').style.display='block';$('#bplbl').style.display='block';
+    $('#bprogI').style.width=(t.boarding*100).toFixed(0)+'%';
+    $('#bplbl').textContent='BOARDING PASSENGERS '+Math.floor(t.boarding*100)+'% — FARES COLLECTED';
+  }else{
+    $('#bprog').style.display='none';$('#bplbl').style.display='none';
+  }
+}
+
+function hintFor(t){
+  if(t.state==='approach')return'Origin: '+t.sv.orig+' · Destination: '+t.sv.dest+'. Target: Platform '+t.fixedTrack+'.';
+  if(t.state==='entering')return'Entering Platform '+t.track+'. Keep level crossing closed!';
+  if(t.state==='dwell')return'Boarding passengers. Line release unlocks at 100%.';
+  if(t.state==='ready')return'<b style="color:var(--amber)">BOARDING COMPLETE!</b> Clear train onto '+EXNAME[t.exit]+'.';
+  return'';
+}
+
+function autoSelect(){
+  if(selId){
+    var t=findTr(selId);
+    if(t&&(t.state==='approach'||t.state==='dwell'||t.state==='ready'||t.state==='entering'))return;
+  }
+  var i,best=null;
+  for(i=0;i<trains.length;i++){
+    if(trains[i].state==='ready'){best=trains[i];break;}
+  }
+  if(!best)for(i=0;i<trains.length;i++)if(trains[i].state==='approach'&&(!best||trains[i].pat<best.pat))best=trains[i];
+  if(!best)for(i=0;i<trains.length;i++)if(trains[i].state==='dwell'){best=trains[i];break;}
+  selId=best?best.id:null;
+}
+
+function pick(e){
+  var pt=svg.createSVGPoint();
+  pt.x=e.clientX;
+  pt.y=e.clientY;
+  var ctm=svg.getScreenCTM();
+  if(!ctm) return null;
+  var local=pt.matrixTransform(ctm.inverse());
+  var px=local.x, py=local.y;
+
+  var best=null,bd=45;
+  for(var i=0;i<trains.length;i++){
+    var t=trains[i];
+    if(t.state==='wreck') continue;
+    for(var d=t.d; d>=Math.max(1, d-t.len); d-=20){
+      var ptPos=pathAt(t.path, d);
+      var dist=Math.sqrt((ptPos.x-px)*(ptPos.x-px)+(ptPos.y-py)*(ptPos.y-py));
+      if(dist<bd){
+        bd=dist;
+        best=t;
+      }
+    }
+  }
+  return best;
+}
+
+function wireUI(){
+  $('#qstrip').addEventListener('click',function(e){
+    var c=e.target?e.target.closest('.qcard'):null;
+    if(c){selId=c.getAttribute('data-id');renderCards();renderPanel();}
+  });
+  $('#agrid').addEventListener('click',function(e){
+    var b=e.target?e.target.closest('.ab'):null;
+    if(!b||b.disabled)return;
+    var t=selId?findTr(selId):null;
+    admit(t,b.getAttribute('data-p'));
+  });
+  $('#dbE').addEventListener('click',function(){doDispatch(selId?findTr(selId):null,'E');});
+  $('#dbW').addEventListener('click',function(){doDispatch(selId?findTr(selId):null,'W');});
+  $('#btnGateToggle').addEventListener('click',function(){setBarriers(!barriersClosed);});
+  $('#btnDispatchEmergency').addEventListener('click',dispatchEmergencyServiceTrain);
+  $('#btnRouteDepot').addEventListener('click',sendSelectedTrainToDepot);
+  $('#bPause').addEventListener('click',function(){togglePause();});
+
+  var rbs=document.querySelectorAll('.hbtns .hb[data-rate]');
+  for(var i=0;i<rbs.length;i++){
+    (function(b){
+      b.addEventListener('click',function(){
+        rate=parseInt(b.getAttribute('data-rate'),10);
+        for(var j=0;j<rbs.length;j++)rbs[j].classList.remove('on');
+        b.classList.add('on');
+      });
+    })(rbs[i]);
+  }
+
+  window.addEventListener('keydown',function(e){
+    if(e.key==='b'||e.key==='B'){
+      e.preventDefault();
+      setBarriers(!barriersClosed);
+      return;
+    }
+    if(!running) return;
+    if(e.code==='Space'){e.preventDefault();togglePause();return;}
+    if(e.key==='e'||e.key==='E'){e.preventDefault();dispatchEmergencyServiceTrain();return;}
+    if(e.key==='d'||e.key==='D'){e.preventDefault();sendSelectedTrainToDepot();return;}
+    if(paused) return;
+
+    if(e.key>='1'&&e.key<='6'){
+      e.preventDefault();
+      var t=selId?findTr(selId):null;
+      admit(t,parseInt(e.key,10));
+    }else if(e.key==='ArrowRight'){
+      e.preventDefault();
+      doDispatch(selId?findTr(selId):null,'E');
+    }else if(e.key==='ArrowLeft'){
+      e.preventDefault();
+      doDispatch(selId?findTr(selId):null,'W');
+    }
+  }, {passive:false});
+
+  svg.addEventListener('pointermove',function(e){
+    var t=pick(e);hovId=t?t.id:null;
+    svg.style.cursor=t?'pointer':'crosshair';
+    var tip=$('#tip');
+    if(t){
+      var wr=$('#schemWrap').getBoundingClientRect();
+      tip.style.display='block';
+      tip.style.left=(e.clientX-wr.left)+'px';tip.style.top=(e.clientY-wr.top)+'px';
+      tip.innerHTML='<b>'+t.id+'</b> ('+t.sv.orig+' → '+t.sv.dest+')<br>'
+        +'Sched Platform: '+t.fixedTrack+' · Exit: '+(t.exit==='E'?'ØST':'VEST')+'<br>'
+        +'Status: '+stateLabel(t)+' · Passenger Buffer: '+Math.max(0,Math.floor(t.pat))+'s';
+    }else tip.style.display='none';
+  });
+  svg.addEventListener('pointerleave',function(){hovId=null;$('#tip').style.display='none';});
+  svg.addEventListener('click',function(e){
+    var trG=e.target?e.target.closest('.train'):null;
+    var t=null;
+    if(trG && trG.getAttribute('data-id')){
+      t=findTr(trG.getAttribute('data-id'));
+    }
+    if(!t) t=pick(e);
+    if(t){
+      selId=t.id;
+      renderCards();
+      renderPanel();
+    }
+  });
+}
+
+function togglePause(){
+  paused=!paused;
+  $('#bPause').textContent=paused?'RESUME':'PAUSE';
+  $('#bPause').classList.toggle('on',paused);
+}
+
+function gameOver(){
+  running=false;
+  if($('#goRevenue')) $('#goRevenue').textContent=revenue.toLocaleString();
+  if($('#goScore')) $('#goScore').textContent=score;
+  if($('#goLevel')) $('#goLevel').textContent=level;
+  if($('#goDeliv')) $('#goDeliv').textContent=deliveredTotal;
+  if($('#goCombo')) $('#goCombo').textContent='×'+bestCombo;
+  if($('#ovOver')) $('#ovOver').style.display='flex';
+}
+
+function initGame(){
+  var i;
+  for(i=trains.length-1;i>=0;i--)cleanTrain(trains[i]);
+  for(i=rescues.length-1;i>=0;i--)
+    if(rescues[i].g&&rescues[i].g.parentNode)rescues[i].g.parentNode.removeChild(rescues[i].g);
+
+  if(emergencyTrain&&emergencyTrain.g.parentNode) emergencyTrain.g.parentNode.removeChild(emergencyTrain.g);
+  emergencyTrain=null;
+
+  trains=[];rescues=[];pendingResc=[];fxTexts=[];booms=[];
+  activeHazards=[];roadVehicles=[];
+  simT=16*3600;level=1;score=0;revenue=25000;combo=1;bestCombo=1;safety=3;
+  delivered=0;deliveredTotal=0;spawnT=2;selId=null;levelPauseT=0;
+  catalogIndex=0;serviceCounter=1;
+  levelParams();
+  logEl=$('#log');logEl.innerHTML='';
+  addLog('<span class="g">SHIFT OPEN</span> — 1080p high visibility interface active.');
+  setBarriers(false);
+  updateHazardDisplay();
+  updateHUD();renderCards();renderPanel();
+}
+
+function boot(){
+  buildStatic();
+  wireUI();
+  initGame();
+  
+  var bStart=$('#bStart');
+  if(bStart){
+    bStart.addEventListener('click',function(){
+      $('#ovStart').style.display='none';
+      running=true;
+    });
+  }
+  var bRestart=$('#bRestart');
+  if(bRestart){
+    bRestart.addEventListener('click',function(){
+      $('#ovOver').style.display='none';
+      initGame();
+      running=true;
+    });
+  }
+
+  var last=performance.now(),acc=0;
+  function frame(now){
+    var dt=(now-last)/1000;if(dt>0.05)dt=0.05;
+    last=now;
+    if(running&&!paused){
+      acc+=dt*rate;
+      var guard=0;
+      while(acc>=SIMSTEP&&guard<120){step(SIMSTEP);acc-=SIMSTEP;guard++;}
+    }
+    renderFrame();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  setInterval(function(){
+    if(!running)return;
+    autoSelect();
+    renderCards();renderPanel();updateHUD();
+  },300);
+}
+
+try{boot();}catch(err){
+  if(window.console&&console.error)console.error(err);
+  var eb=document.getElementById('errbar');
+  if(eb){eb.style.display='block';eb.textContent='SCRIPT ERROR — '+err.message;}
+}
+</script>
+</body>
+</html>
