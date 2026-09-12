@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Optimized Station Controller | Port & Penn Terminal</title>
+    <style>
+        :root {
+            --track-dim: #222;
+            --track-active: #00ff41;
+            --platform: #333;
+            --water: #1a3a5a;
+        }
+
+        body { 
+            background: #050505; 
+            color: #fff; 
+            font-family: 'Courier New', monospace; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        header {
+            background: #111;
+            padding: 10px 20px;
+            border-bottom: 2px solid #444;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #111 0%, #050505 100%);
+        }
+
+        canvas { display: block; will-change: transform; }
+
+        .control-panel {
+            background: #151515;
+            height: 180px;
+            border-top: 1px solid #333;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 15px;
+            gap: 20px;
+        }
+
+        .module { border: 1px solid #222; padding: 10px; position: relative; }
+        .module::before { content: 'MODULE [OPTIMIZED]'; position: absolute; top: -8px; left: 10px; background: #151515; padding: 0 5px; font-size: 10px; color: #555; }
+
+        button {
+            background: #222;
+            border: 1px solid #444;
+            color: #00ff41;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background 0.1s, color 0.1s;
+        }
+
+        button:hover { background: #00ff41; color: #000; }
+        button.active { background: #004400; border-color: #00ff41; }
+
+        #event-log { font-size: 10px; color: #00ff41; height: 100px; overflow-y: auto; opacity: 0.85; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>NY-DISTRICT CTC: HIGH-PERFORMANCE DISPATCH & PORT OPERATIONS</div>
+        <div>ACTIVE BLOCK: PORT & PENN LINE (GPU ACCELERATED)</div>
+        <div id="clock">00:00:00</div>
+    </header>
+
+    <div id="canvas-container">
+        <canvas id="mainCanvas"></canvas>
+    </div>
+
+    <div class="control-panel">
+        <div class="module">
+            <div style="color: #888; font-size: 10px; margin-bottom: 5px;">STATION THROAT - WEST (CURVED)</div>
+            <button onclick="setRoute(0)" id="btn0">TK 10</button>
+            <button onclick="setRoute(1)" id="btn1">TK 11</button>
+            <button onclick="setRoute(2)" id="btn2">TK 12</button>
+            <button onclick="setRoute(3)" id="btn3">TK 13</button>
+            <button onclick="setRoute(4)" id="btn4">TK 14</button>
+            <div style="margin-top: 8px;">
+                <button onclick="dispatchTrain()">DISPATCH TRAIN</button>
+            </div>
+        </div>
+        
+        <div class="module">
+            <div style="color: #888; font-size: 10px; margin-bottom: 5px;">HARBOR/DOCK INTERFACE</div>
+            <button onclick="toggleWater()">FLOOD/DRAIN CANAL</button>
+            <button onclick="toggleCranes()">ACTIVE CRANES</button>
+        </div>
+
+        <div class="module">
+            <div id="event-log">
+                > INITIALIZING TOPOLOGY V2...<br>
+                > ZERO-IDLE RENDER PIPELINE ACTIVE.
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d', { alpha: false }); // Boosts performance by disabling alpha channel on main buffer
+    const log = document.getElementById('event-log');
+    const clockEl = document.getElementById('clock');
+    
+    let activeTK = 2;
+    let waterActive = false;
+    let cranesActive = false;
+    let trainProgress = 0;
+    let trainMoving = false;
+    let needsRedraw = true; // Dirty flag optimization
+
+    const trackY = [-120, -60, 0, 60, 120];
+
+    function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        needsRedraw = true;
+    }
+
+    function addLog(msg) {
+        log.insertAdjacentHTML('beforeend', `<br>> ${msg}`);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    // High performance Bezier point evaluator
+    function getBezierPoint(p0, p1, p2, p3, t) {
+        const u = 1 - t;
+        const tt = t * t;
+        const uu = u * u;
+        const uuu = uu * u;
+        const ttt = tt * t;
+
+        let x = uuu * p0.x;
+        let y = uuu * p0.y;
+        x += 3 * uu * t * p1.x;
+        y += 3 * uu * t * p1.y;
+        x += 3 * u * tt * p2.x;
+        y += 3 * u * tt * p2.y;
+        x += ttt * p3.x;
+        y += ttt * p3.y;
+
+        return { x, y };
+    }
+
+    function getTrackPath(w, midY, yOff) {
+        return {
+            p0: { x: 0, y: midY },
+            p1: { x: w * 0.3, y: midY },
+            p2: { x: w * 0.4, y: midY + yOff },
+            p3: { x: w * 0.6, y: midY + yOff },
+            endX: w
+        };
+    }
+
+    function draw() {
+        const w = canvas.width;
+        const h = canvas.height;
+        const midY = h * 0.5;
+
+        // Background clearing
+        ctx.fillStyle = "#050505";
+        ctx.fillRect(0, 0, w, h);
+
+        // 1. Waterway Canal
+        ctx.fillStyle = waterActive ? "#1a3a5a" : "#0a1a2a";
+        ctx.fillRect(w * 0.75, 0, w * 0.15, h);
+
+        if (cranesActive) {
+            ctx.fillStyle = "#ffaa00";
+            ctx.fillRect(w * 0.78, midY - 80, 10, 160);
+        }
+
+        // 2. Platforms
+        ctx.fillStyle = "#1a1a1a";
+        ctx.strokeStyle = "#333";
+        for (let i = 0; i < trackY.length - 1; i++) {
+            const platY = midY + ((trackY[i] + trackY[i+1]) * 0.5);
+            ctx.fillRect(w * 0.6, platY - 10, w * 0.3, 20);
+            ctx.strokeRect(w * 0.6, platY - 10, w * 0.3, 20);
+        }
+
+        // 3. Fixed Tracks & Signals
+        ctx.lineWidth = 2;
+        for (let i = 0; i < trackY.length; i++) {
+            const yOff = trackY[i];
+            const isActive = (activeTK === i);
+            const path = getTrackPath(w, midY, yOff);
+
+            // Background track line
+            ctx.strokeStyle = "#222";
+            ctx.beginPath();
+            ctx.moveTo(path.p0.x, path.p0.y);
+            ctx.bezierCurveTo(path.p1.x, path.p1.y, path.p2.x, path.p2.y, path.p3.x, path.p3.y);
+            ctx.lineTo(path.endX, midY + yOff);
+            ctx.stroke();
+
+            // Active track highlight
+            if (isActive) {
+                ctx.strokeStyle = "#00ff41";
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = "#00ff41";
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = "#00ff41";
+            } else {
+                ctx.fillStyle = "#ff0000";
+            }
+
+            // Signal Light
+            ctx.beginPath();
+            ctx.arc(w * 0.55, midY + yOff - 15, 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 4. Moving Train Rendering
+        if (trainMoving) {
+            const yOff = trackY[activeTK];
+            const path = getTrackPath(w, midY, yOff);
+            let trainPos;
+
+            if (trainProgress <= 0.7) {
+                const t = trainProgress / 0.7;
+                trainPos = getBezierPoint(path.p0, path.p1, path.p2, path.p3, t);
+            } else {
+                const t = (trainProgress - 0.7) / 0.3;
+                trainPos = {
+                    x: path.p3.x + t * (path.endX - path.p3.x),
+                    y: midY + yOff
+                };
+            }
+
+            ctx.fillStyle = "#ff0055";
+            ctx.fillRect(trainPos.x - 20, trainPos.y - 6, 40, 12);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "8px monospace";
+            ctx.fillText(`TK-${10 + activeTK}`, trainPos.x - 14, trainPos.y + 3);
+        }
+    }
+
+    function setRoute(id) {
+        activeTK = id;
+        document.querySelectorAll('.control-panel button').forEach(b => {
+            if (b.id.startsWith('btn')) b.classList.remove('active');
+        });
+        document.getElementById('btn' + id).classList.add('active');
+        addLog(`INTERLOCKING: TK ${10 + id} ROUTE SECURED`);
+        needsRedraw = true;
+    }
+
+    function toggleWater() {
+        waterActive = !waterActive;
+        addLog(waterActive ? "CANAL: HIGH TIDE LEVEL" : "CANAL: LOW TIDE LEVEL");
+        needsRedraw = true;
+    }
+
+    function toggleCranes() {
+        cranesActive = !cranesActive;
+        addLog(cranesActive ? "CRANES: ACTIVATED & LOADING" : "CRANES: SECURED");
+        needsRedraw = true;
+    }
+
+    function dispatchTrain() {
+        if (trainMoving) {
+            addLog("DISPATCH REFUSED: Block currently occupied.");
+            return;
+        }
+        trainProgress = 0;
+        trainMoving = true;
+        addLog(`DISPATCH: Train cleared for entry along TK ${10 + activeTK} throat curve`);
+    }
+
+    // High-performance render loop using dirty flagging
+    function loop() {
+        if (trainMoving) {
+            trainProgress += 0.005;
+            if (trainProgress > 1.0) {
+                trainMoving = false;
+                addLog(`TRAIN ARRIVED: Safely cleared terminal block.`);
+            }
+            needsRedraw = true;
+        }
+
+        if (needsRedraw) {
+            draw();
+            needsRedraw = false;
+        }
+
+        requestAnimationFrame(loop);
+    }
+
+    // Live Clock Ticker
+    setInterval(() => {
+        clockEl.innerText = new Date().toLocaleTimeString();
+    }, 1000);
+
+    window.addEventListener('resize', resize);
+    resize();
+    document.getElementById('btn2').classList.add('active');
+    requestAnimationFrame(loop);
+</script>
+</body>
+</html>
