@@ -303,6 +303,158 @@ function pad2(n){n=Math.floor(n);return n<10?('0'+n):(''+n);}
 function fmtT(t){t=Math.floor(t)%86400;return pad2(t/3600)+':'+pad2((t%3600)/60);}
 function clamp(v,a,b){return v<a?a:(v>b?b:v);}
 
+/* COMPREHENSIVE AUDIO & SYNTHESIS ENGINE FOR EVERY SERVICE & ACTION */
+var audioCtx = null;
+function getAudioContext(){
+  if(!audioCtx){
+    var AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+  }
+  if(audioCtx.state === 'suspended'){
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playTone(freq, type, duration, gainVal){
+  try {
+    var ctx = getAudioContext();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(gainVal || 0.1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch(e){}
+}
+
+function playInboundArrivalSound(){
+  try {
+    var ctx = getAudioContext();
+    var now = ctx.currentTime;
+    [220, 330, 440].forEach(function(f, i){
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, now + i*0.08);
+      gain.gain.setValueAtTime(0.06, now + i*0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.08 + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i*0.08);
+      osc.stop(now + i*0.08 + 0.25);
+    });
+  } catch(e){}
+}
+
+function playAdmitSound(){
+  playTone(523.25, 'sine', 0.2, 0.08);
+  setTimeout(function(){ playTone(659.25, 'sine', 0.2, 0.08); }, 80);
+}
+
+function playReadyChime(){
+  try {
+    var ctx = getAudioContext();
+    var now = ctx.currentTime;
+    [587.33, 880, 1174.66].forEach(function(f, i){
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, now + i*0.1);
+      gain.gain.setValueAtTime(0.08, now + i*0.1);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.1 + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i*0.1);
+      osc.stop(now + i*0.1 + 0.3);
+    });
+  } catch(e){}
+}
+
+function playDispatchWhistle(){
+  try {
+    var ctx = getAudioContext();
+    var now = ctx.currentTime;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(1174.66, now);
+    osc.frequency.exponentialRampToValueAtTime(1567.98, now + 0.2);
+    osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.4);
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.45);
+  } catch(e){}
+}
+
+function playGateSound(){
+  playTone(300, 'square', 0.15, 0.05);
+  setTimeout(function(){ playTone(220, 'square', 0.2, 0.05); }, 120);
+}
+
+function playEmergencySound(){
+  try {
+    var ctx = getAudioContext();
+    var now = ctx.currentTime;
+    for(var i=0; i<3; i++){
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, now + i*0.2);
+      osc.frequency.exponentialRampToValueAtTime(440, now + i*0.2 + 0.15);
+      gain.gain.setValueAtTime(0.1, now + i*0.2);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.2 + 0.18);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + i*0.2);
+      osc.stop(now + i*0.2 + 0.18);
+    }
+  } catch(e){}
+}
+
+function playDepotSound(){
+  playTone(196, 'triangle', 0.3, 0.1);
+  setTimeout(function(){ playTone(146.83, 'triangle', 0.4, 0.1); }, 150);
+}
+
+function playCollisionSound(){
+  try {
+    var ctx = getAudioContext();
+    var now = ctx.currentTime;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.5);
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.6);
+  } catch(e){}
+}
+
+function speakVoice(text){
+  if('speechSynthesis' in window){
+    try {
+      window.speechSynthesis.cancel();
+      var msg = new SpeechSynthesisUtterance(text);
+      msg.rate = 1.05;
+      msg.pitch = 0.95;
+      msg.volume = 0.75;
+      window.speechSynthesis.speak(msg);
+    } catch(e){}
+  }
+}
+
 var VW=1200,VH=512,LEAD=1240,OUTEND=1420,THROAT=640,SIGX=884;
 var DSTOP=LEAD-(SIGX+18);
 var ROAD_X=980;
@@ -732,6 +884,10 @@ function spawnTrain(sv){
   t.hitbox=el('circle',{r:32,fill:'transparent'},g);
   t.g=g;t.sv=sv;sv.train=t;
   trains.push(t);
+  
+  playInboundArrivalSound();
+  speakVoice('New service ' + sv.id + ' from ' + sv.orig + ' approaching on ' + EXNAME[sv.entry]);
+  
   addLog(t.id+' from <b>'+sv.orig+'</b> inbound on '+MAINS[mm].name+' · <i>Target P'+sv.fixedTrack+'</i>');
   return true;
 }
@@ -790,6 +946,9 @@ function dispatchEmergencyServiceTrain(){
     state:'traveling_to_hazard',
     repairTimer:3.5
   };
+
+  playEmergencySound();
+  speakVoice('Emergency train dispatched to platform ' + targetHazard.track);
 
   addLog('<span class="r">EMERGENCY TRAIN DISPATCHED</span> via Line 500 to Platform '+targetHazard.track);
   toast('Emergency Service Train rolling to Platform '+targetHazard.track,'good');
@@ -868,6 +1027,10 @@ function sendSelectedTrainToDepot(){
   t.path=PATHS['DEPOT'][t.main].pIn;
   t.pathId='in:'+t.main+':DEPOT';
   t.state='entering';
+  
+  playDepotSound();
+  speakVoice('Train ' + t.id + ' routed to maintenance depot');
+
   addLog(t.id+' re-routed to <span class="b">MAINTENANCE DEPOT</span> for overhaul');
   toast(t.id+' routed to Depot for servicing','good');
   renderPanel();renderCards();
@@ -954,6 +1117,8 @@ function setBarriers(closed){
   barriersClosed=closed;
   var btn=$('#btnGateToggle');
   var txt=$('#gateStatusText');
+
+  playGateSound();
 
   if(closed){
     if(btn){btn.className='rc-btn closed';btn.textContent='OPEN BARRIERS [B]';}
@@ -1138,6 +1303,9 @@ function doCollision(a,b,pt){
     issuePassengerRefund(b, 'DERAILMENT ACCIDENT');
   }
 
+  playCollisionSound();
+  speakVoice('Collision reported on the network. Emergency services mobilized.');
+
   booms.push({x:pt.x,y:pt.y,t:0});
   flashT=0.7;shakeT=0.55;
   $('#schemWrap').classList.remove('shake');void $('#schemWrap').offsetWidth;
@@ -1274,6 +1442,10 @@ function admit(t,P){
   t.state='entering';
   t.glow=el('path',{d:polyD(t.path.pts),fill:'none',stroke:t.color,'stroke-width':4,opacity:0.3},gHi);
   score+=25;
+  
+  playAdmitSound();
+  speakVoice('Train ' + t.id + ' admitted to platform ' + P);
+
   addLog(t.id+' <span class="g">admitted</span> → Platform '+P);
   if(hasConflict(t.pathId))toast('Warning: switch move in progress!','bad');
   updateHUD();renderPanel();renderCards();
@@ -1296,6 +1468,9 @@ function doDispatch(t,side){
   t.d=0;t.v=0;t.state='departing';t.departSide=side;
   t.glow=el('path',{d:polyD(t.path.pts),fill:'none',stroke:t.color,'stroke-width':4,opacity:0.3},gHi);
   var f=pathAt(t.path,0);
+
+  playDispatchWhistle();
+  speakVoice('Train ' + t.id + ' dispatched to ' + t.sv.dest + ' via ' + EXNAME[side]);
 
   if(correct){
     var mult=combo;
@@ -1324,6 +1499,10 @@ function checkQuota(){
     $('#banT1').textContent='LEVEL '+level+' COMPLETE';
     $('#banT2').textContent='BONUS +kr '+(5000*level)+' · ADVANCING TO LEVEL '+(level+1);
     $('#banner').style.display='flex';
+    
+    playReadyChime();
+    speakVoice('Level ' + level + ' completed successfully. Excellent dispatching.');
+
     addLog('<span class="g">STAGE COMPLETE</span> · Subsidy bonus +kr '+(5000*level));
     level++;delivered=0;
     levelParams();
@@ -1385,6 +1564,10 @@ function stepTrain(t,dt){
     t.boarding+=dt/dwellTime;
     if(t.boarding>=1){
       t.boarding=1;
+      if(t.state!=='ready'){
+        playReadyChime();
+        speakVoice('Platform ' + t.track + ' train ' + t.id + ' ready for departure');
+      }
       t.state='ready';
       t.cars.forEach(function(c){c.classList.add('car-ready');});
       addLog(t.id+' <span class="a">READY FOR DEPARTURE</span> on Track '+t.track+' → '+t.sv.dest+' ('+EXNAME[t.exit]+')');
@@ -1842,6 +2025,7 @@ function boot(){
     bStart.addEventListener('click',function(){
       $('#ovStart').style.display='none';
       running=true;
+      getAudioContext();
     });
   }
   var bRestart=$('#bRestart');
