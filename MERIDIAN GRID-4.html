@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>MERIDIAN GRID-4 — Watchlist Intelligence Terminal</title>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'GT-NC6T5LRJ');
+</script> 
+
+ <link rel="icon" href="https://mohammad3230.github.io/PROJECT/favicon.png" type="image/png" sizes="32x32" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070907; --panel:#0D100C; --panel2:#0A0D0A; --line:#1E241C; --line2:#2A3326;
+  --txt:#C2CDBB; --dim:#77836F; --faint:#4A5443;
+  --grn:#8FE388; --grn2:#3E6B3C; --amb:#F0B441; --red:#F25C4D;
+  --mono:'IBM Plex Mono',monospace; --disp:'Chakra Petch',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+body{background:var(--bg);color:var(--txt);font-family:var(--mono);font-size:12px;user-select:none;-webkit-font-smoothing:antialiased}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column}
+#topbar{height:46px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.tb-left,.tb-right{display:flex;align-items:center;gap:14px}
+.sig-mark{width:12px;height:12px;border:1px solid var(--grn);position:relative;flex:none}
+.sig-mark::after{content:'';position:absolute;inset:3px;background:var(--grn)}
+.facility{font-family:var(--disp);font-weight:600;letter-spacing:.2em;font-size:12.5px;color:#DEE8D8;white-space:nowrap}
+.grid-id{color:var(--dim);font-size:10px;letter-spacing:.14em;white-space:nowrap}
+.tb-mid{display:flex;align-items:center;gap:12px;font-family:var(--disp);font-size:16px;letter-spacing:.14em;color:#E4ECDC}
+.lv{font-size:9px;color:var(--red);letter-spacing:.22em;display:flex;align-items:center;gap:5px}
+#secBadge{font-size:8.5px;letter-spacing:.16em;padding:2px 7px;border:1px solid #2C4A2A;color:var(--grn)}
+#secBadge.warn{color:var(--amb);border-color:#57481E;animation:blink 1s steps(2,start) infinite}
+.lbl{font-size:9.5px;color:var(--dim);letter-spacing:.18em}
+.val{font-size:12px;color:var(--txt)}
+#score{color:var(--grn);font-weight:600;font-size:14px;letter-spacing:.08em}
+#rankBadge{font-family:var(--disp);font-size:9px;letter-spacing:.18em;color:var(--amb);border:1px solid #57481E;padding:2px 8px}
+.tbtn{background:none;border:1px solid var(--line2);color:var(--dim);font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;padding:4px 9px;cursor:pointer}
+.tbtn:hover{color:var(--grn);border-color:var(--grn2)}
+#layout{flex:1;display:grid;grid-template-columns:300px minmax(0,1fr) 308px;grid-template-rows:minmax(0,1fr) 148px;min-height:0;position:relative;overflow:hidden}
+#leftCol{grid-row:1;grid-column:1;border-right:1px solid var(--line);background:var(--panel2);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#centerCol{grid-row:1;grid-column:2;display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg);overflow:hidden}
+#rightCol{grid-row:1;grid-column:3;border-left:1px solid var(--line);background:var(--panel2);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#mapWrap{grid-row:2;grid-column:1/4;border-top:1px solid var(--line);position:relative;background:#070A07;overflow:hidden}
+#tacCv{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
+.panel{border-bottom:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.p-h{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;font-family:var(--disp);font-size:9.5px;letter-spacing:.24em;color:var(--dim);border-bottom:1px solid var(--line);flex:none;background:repeating-linear-gradient(135deg,transparent 0 7px,rgba(255,255,255,.016) 7px 8px)}
+.p-h em{font-style:normal;color:var(--faint);display:flex;gap:8px;align-items:center}
+.mini{background:none;border:1px solid var(--line2);color:var(--dim);font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;padding:2px 7px;cursor:pointer}
+.mini:hover{color:var(--grn);border-color:var(--grn2)}
+#statusStrip{border-bottom:1px solid var(--line);flex:none}
+.ss-wrap{display:flex;align-items:center;gap:9px;padding:6px 12px;flex-wrap:nowrap;overflow:hidden}
+.ss-item{display:flex;align-items:baseline;gap:4px;white-space:nowrap}
+.ss-item .k{font-size:8px;color:var(--dim);letter-spacing:.14em}
+.ss-item .v{font-family:var(--disp);font-size:12.5px;color:var(--txt)}
+#shiftT{color:var(--grn)}
+#shiftT.low{color:var(--red)}
+.strikes{display:flex;gap:4px;align-self:center}
+.strikes i{width:10px;height:10px;border:1px solid var(--line2)}
+.strikes i.on{background:var(--red);border-color:var(--red)}
+.udots{display:flex;gap:4px;align-self:center}
+.udots i{width:9px;height:9px;border:1px solid #2A3326;background:#4A5443}
+#secStrip{padding:6px 12px;display:flex;flex-direction:column;gap:3px;font-size:9px;letter-spacing:.12em;color:var(--dim);border-bottom:1px solid var(--line);flex:none}
+#secStrip .srow{display:flex;gap:8px;align-items:center;white-space:nowrap;overflow:hidden}
+#secStrip .sk{color:var(--faint);width:64px;flex:none;letter-spacing:.16em;font-size:8px}
+#secStrip .ok{color:var(--grn)}
+#secStrip .bad{color:var(--red)}
+#secStrip .warn{color:var(--amb)}
+#boloBody{flex:1;overflow-y:auto;padding:9px 10px;min-height:0}
+#boloBody::-webkit-scrollbar{width:6px}
+#boloBody::-webkit-scrollbar-thumb{background:#222B1E}
+.bolo-note{font-size:9px;color:var(--faint);letter-spacing:.1em;margin-bottom:8px;line-height:1.6}
+.bolo{border:1px solid #2E2A18;border-left:3px solid var(--amb);background:#0C0E09;padding:7px 10px 8px;margin-bottom:8px;cursor:pointer}
+.bolo:hover{background:#10130C}
+.bolo.bsel{outline:1px solid var(--amb)}
+.bolo.engaged{border-left-color:var(--red)}
+.bolo.hi{border-left-color:var(--red)}
+.b-plate{font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.14em;color:var(--amb);display:flex;justify-content:space-between;align-items:baseline}
+.b-plate .bid{font-size:10px;color:var(--faint);letter-spacing:.1em}
+.b-plate.unknown{color:#8A8371}
+.b-ai{font-size:9px;color:#9FC7E8;letter-spacing:.1em;margin-top:3px}
+.b-desc{font-size:10.5px;color:var(--txt);margin-top:2px;letter-spacing:.08em}
+.b-st{font-size:9px;color:var(--dim);margin-top:5px;letter-spacing:.12em}
+.b-st.ping{color:var(--grn)}
+.b-st.unit{color:#F5A9A0}
+.b-st.canv{color:#B7A2E8}
+.b-bar{height:3px;background:#1A1F16;margin-top:6px}
+.b-bar i{display:block;height:100%;background:var(--amb)}
+.b-cand-h{font-size:8.5px;color:var(--faint);letter-spacing:.18em;margin:8px 0 4px}
+.cand{display:flex;align-items:center;gap:6px;font-size:10px;padding:3px 5px;margin-bottom:3px;cursor:pointer;border:1px solid transparent;color:var(--txt)}
+.cand:hover{background:#131A10}
+.cand.sel{border-color:var(--grn2);background:#131B12}
+.cand.ruled{opacity:.45}
+.cand .cp{font-weight:600;color:var(--grn);letter-spacing:.06em}
+.cand .cf{margin-left:auto;font-size:9px;color:#9FC7E8;letter-spacing:.06em}
+.cand .cb{font-size:8px;letter-spacing:.12em;padding:1px 5px;border:1px solid}
+.cb.regu{color:var(--dim);border-color:#2A3226}
+.cb.stol{color:var(--red);border-color:#5A2A24;animation:blink 1.1s steps(2,start) infinite}
+.cb.expi{color:var(--amb);border-color:#57481E}
+.cb.alib{color:var(--red);border-color:#5A2A24;text-decoration:line-through}
+.cb.cons{color:var(--grn);border-color:#2C4A2A}
+.cb.rel{color:var(--grn);border-color:#2C4A2A;background:#101A0E}
+.cb.spd{color:#E8907F;border-color:#5A3A2A}
+.cb.tgt{color:#EFF5E8;border-color:#3E6B3C;background:#1A2416}
+.clear-msg{color:var(--faint);font-size:10.5px;letter-spacing:.14em;padding:3px 0}
+#scanPanel{flex:1}
+#filterBar{display:flex;gap:10px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--line);font-size:10px;flex:none}
+.fb-l{color:var(--dim);letter-spacing:.2em;font-size:8.5px}
+#fbQ{color:var(--grn);letter-spacing:.14em;font-weight:600;overflow:hidden;white-space:nowrap;max-width:280px}
+#fbQ .cur{animation:blink 1s steps(2,start) infinite}
+#fbInfo{margin-left:auto;color:var(--dim);letter-spacing:.14em;font-size:9px}
+#scanHead{display:grid;grid-template-columns:64px 62px 92px 76px 70px 44px 34px;gap:6px;padding:4px 12px;font-size:8.5px;color:var(--faint);letter-spacing:.18em;border-bottom:1px solid var(--line);flex:none}
+#scanBody{flex:1;overflow-y:auto;min-height:0}
+#scanBody::-webkit-scrollbar{width:6px}
+#scanBody::-webkit-scrollbar-thumb{background:#222B1E}
+.sr{display:grid;grid-template-columns:64px 62px 92px 76px 70px 44px 34px;gap:6px;padding:4px 12px;font-size:11px;cursor:pointer;align-items:center}
+.sr .st{color:var(--faint);font-size:10px}
+.sr .sc{color:var(--dim);font-size:10px;display:flex;gap:4px;align-items:center}
+.uv{font-size:7.5px;letter-spacing:.1em;color:var(--amb);border:1px solid #57481E;padding:0 3px}
+.rl{font-size:7.5px;letter-spacing:.1em;color:var(--grn);border:1px solid #2C4A2A;padding:0 3px}
+.sr .sp{color:var(--grn);font-weight:600;letter-spacing:.06em}
+.sr.reld .sp{color:#5F8F5C}
+.sr .sty{color:#9AA792;font-size:10px}
+.sr .sco{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--dim)}
+.sr .cdot{width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,.14);flex:none}
+.sr .ss{color:#9AA792;text-align:right;font-size:10px}
+.sr .ss.fast{color:var(--red);font-weight:600}
+.sr .sd{color:var(--dim);text-align:right;font-size:10px}
+.sr.sel{background:#131B12;outline:1px solid var(--grn2)}
+.sr:hover{background:#101409}
+.sr.new .sp{animation:flashIn .8s steps(2,start) 3}
+@keyframes flashIn{50%{color:#EFF5E8}}
+#dossierPanel{height:262px;flex:none;border-top:1px solid var(--line)}
+#dossierBody{flex:1;overflow-y:auto;padding:10px 14px;font-size:11px;min-height:0}
+#dossierBody::-webkit-scrollbar{width:6px}
+#dossierBody::-webkit-scrollbar-thumb{background:#222B1E}
+.d-empty{color:var(--faint);letter-spacing:.14em;padding:14px 0;line-height:2;font-size:10px}
+.d-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.d-plate{font-family:var(--disp);font-weight:700;font-size:24px;letter-spacing:.12em;color:#EFF5E8}
+.d-plate.rel{color:var(--grn)}
+.d-live{font-size:8.5px;letter-spacing:.18em;padding:2px 6px;border:1px solid}
+.d-live.on{color:var(--grn);border-color:#2C4A2A}
+.d-live.off{color:var(--faint);border-color:#2A3226}
+.d-live.sec{color:var(--amb);border-color:#57481E}
+.d-cols{display:flex;gap:22px}
+.d-col{flex:1}
+.d-grid{display:grid;grid-template-columns:64px 1fr;gap:4px 8px}
+.d-k{color:var(--dim);font-size:8.5px;letter-spacing:.16em;padding-top:2px}
+.d-v{color:var(--txt)}
+.d-v b{color:#E8F0E0;font-weight:600}
+.d-warn{color:var(--amb);letter-spacing:.1em;font-size:10px;animation:blink 1.2s steps(2,start) infinite}
+.d-trace span{color:#9AA792;margin-right:8px;white-space:nowrap}
+.reg-unknown{color:var(--dim)}.reg-clean{color:var(--grn)}.reg-exp{color:var(--amb)}.reg-stolen{color:var(--red);animation:blink 1.1s steps(2,start) infinite}
+.d-journey{margin-top:4px}
+.dj{display:grid;grid-template-columns:60px 34px 30px 44px 34px;gap:6px;font-size:10px;color:#9AA792;padding:1.5px 0}
+.dj .jt{color:var(--dim)}
+.d-matches{margin-top:9px;border-top:1px dashed #212819;padding-top:7px}
+.d-m{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);padding:3px 0;letter-spacing:.06em}
+.d-verdict{font-family:var(--disp);letter-spacing:.2em;font-size:10px;flex:none;margin-left:8px}
+.d-verdict.hit{color:var(--grn);animation:blink 1.2s steps(2,start) infinite}
+.d-verdict.nope{color:var(--faint)}
+.d-verdict.eng{color:var(--amb)}
+.d-verdict.alib{color:var(--red)}
+.d-hint{margin-top:8px;color:var(--faint);font-size:9px;letter-spacing:.1em;line-height:1.7}
+.d-hint b{color:#8FA086;font-weight:600}
+#unitsBody{padding:8px 10px;flex:none}
+.urow{display:flex;align-items:center;gap:7px;padding:4px 6px;margin-bottom:4px;border:1px solid #1A2118;cursor:pointer;font-size:10px}
+.urow:hover{background:#101409}
+.urow.sel{border-color:#3E6B3C;background:#121A10}
+.urow .un{font-family:var(--disp);font-weight:600;font-size:12px;letter-spacing:.1em;width:64px}
+.urow .us{letter-spacing:.12em;font-size:9px;width:60px}
+.urow .ut{margin-left:auto;color:var(--dim);font-size:9px;letter-spacing:.06em}
+#purBox{margin:0 10px 8px;border:1px solid #5A2622;background:#120D0C;padding:7px 10px;display:none;flex:none}
+#purBox.show{display:block}
+.pur-t{font-family:var(--disp);font-size:10.5px;letter-spacing:.16em;color:#F5C9C4;margin-bottom:4px}
+.pur-l{font-size:9.5px;color:var(--dim);letter-spacing:.1em;margin-top:3px}
+.tr-bar{display:inline-block;width:104px;height:5px;background:#1A1F16;vertical-align:middle;margin:0 6px}
+.tr-bar i{display:block;height:100%;background:var(--red)}
+.ow-ok{color:var(--grn)}.ow-no{color:var(--amb);animation:blink 1s steps(2,start) infinite}
+#notesPanel{height:198px;flex:none}
+#notesBody{flex:1;overflow-y:auto;padding:7px 10px;min-height:0}
+#notesBody::-webkit-scrollbar{width:6px}
+#notesBody::-webkit-scrollbar-thumb{background:#222B1E}
+.nt{border:1px solid #1E241C;border-left:3px solid var(--dim);background:#0C0F0A;padding:5px 8px;margin-bottom:5px;cursor:pointer}
+.nt:hover{background:#101409}
+.nt.sev-CRIT{border-left-color:var(--red)}
+.nt.sev-FLAG{border-left-color:var(--amb)}
+.nt.sev-INFO{border-left-color:#4A5443}
+.nt.done{opacity:.55}
+.nt.rel{border-left-color:var(--grn2);opacity:.8}
+.nt1{display:flex;align-items:center;gap:7px;font-size:11px}
+.nt1 .nid{color:var(--faint);font-size:9px}
+.nt1 .npl{font-family:var(--disp);font-weight:600;letter-spacing:.08em;color:#EFF5E8}
+.nt.rel .npl{color:var(--grn)}
+.nt1 .tag{margin-left:auto;font-size:8px;letter-spacing:.16em;padding:1px 5px;border:1px solid}
+.sev-CRIT .tag{color:var(--red);border-color:#5A2A24}
+.sev-FLAG .tag{color:var(--amb);border-color:#57481E}
+.sev-INFO .tag{color:var(--dim);border-color:#2A3226}
+.nt2{font-size:9.5px;color:var(--dim);margin-top:2px;letter-spacing:.06em}
+.nt3{font-size:9px;color:#8FA086;margin-top:2px;letter-spacing:.08em}
+.nt3.hot{color:var(--red)}
+.nt3.rel{color:var(--grn)}
+#logPanel{flex:1}
+#logBody{flex:1;overflow-y:auto;padding:5px 0;min-height:0}
+#logBody::-webkit-scrollbar{width:6px}
+#logBody::-webkit-scrollbar-thumb{background:#222B1E}
+.ev{padding:4px 10px;font-size:10px;letter-spacing:.06em;border-left:2px solid;margin:1px 0}
+.ev .lt{color:var(--faint);margin-right:7px}
+.ev .hh{color:#4E6A78;margin-left:6px}
+.ev.alert{color:var(--amb);border-color:#57481E}
+.ev.op{color:var(--grn);border-color:#2C4A2A}
+.ev.bad{color:var(--red);border-color:#5A2A24}
+.ev.sys{color:var(--dim);border-color:#2A3226}
+.ev.reg{color:#B7E8AF;border-color:#2C4A2A}
+.ev.wit{color:#C9B8F0;border-color:#4A3A6A}
+.ev.mail{color:#9FC7E8;border-color:#2A4A5A}
+.ev.audit{color:#8FB8C8;border-color:#26404A}
+.ev.medal{color:#F0D98A;border-color:#6A5A2A}
+#termMsg{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:20;font-family:var(--disp);font-size:13px;letter-spacing:.24em;padding:7px 18px;background:rgba(6,8,6,.9);border:1px solid var(--line2);opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap}
+#termMsg.show{opacity:1}
+#termMsg.warn{color:var(--amb);border-color:#5A4A20}
+#termMsg.bad{color:var(--red);border-color:#5A2622}
+#termMsg.good{color:var(--grn);border-color:#2E4A2C}
+#popLayer{position:absolute;inset:0 0 148px 0;z-index:20;pointer-events:none;overflow:hidden}
+.pop{position:absolute;transform:translateX(-50%);font-family:var(--disp);font-size:13px;letter-spacing:.18em;animation:rise 1.5s ease-out forwards;white-space:nowrap;text-shadow:0 1px 0 #000}
+.pop.good{color:var(--grn)}.pop.bad{color:var(--red)}.pop.info{color:var(--amb)}.pop.medal{color:#F0D98A}
+@keyframes rise{0%{opacity:0;margin-top:12px}12%{opacity:1}80%{opacity:1}100%{opacity:0;margin-top:-34px}}
+#keybar{height:34px;flex:none;border-top:1px solid var(--line);background:var(--panel2);display:flex;align-items:center;gap:11px;padding:0 13px;font-size:9.5px;color:var(--dim);letter-spacing:.05em;white-space:nowrap;overflow:hidden;flex:none}
+kbd{display:inline-block;border:1px solid var(--line2);border-bottom-width:2px;background:#11150E;color:#C9D4C0;padding:1px 6px;font-family:var(--mono);font-size:9.5px;border-radius:2px;margin-right:4px}
+.ov{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(4,5,4,.85);overflow:hidden}
+.ov.show{display:flex}
+.sheet{width:780px;max-width:95vw;max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);position:relative;box-shadow:0 30px 80px rgba(0,0,0,.65)}
+.cnr{position:absolute;width:14px;height:14px;z-index:2;pointer-events:none}
+.cnr.a{top:-1px;left:-1px;border-top:2px solid var(--grn2);border-left:2px solid var(--grn2)}
+.cnr.b{top:-1px;right:-1px;border-top:2px solid var(--grn2);border-right:2px solid var(--grn2)}
+.cnr.c{bottom:-1px;left:-1px;border-bottom:2px solid var(--grn2);border-left:2px solid var(--grn2)}
+.cnr.d{bottom:-1px;right:-1px;border-bottom:2px solid var(--grn2);border-right:2px solid var(--grn2)}
+.sh-h{padding:14px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.sh-h h1{font-family:var(--disp);font-size:15px;letter-spacing:.22em;color:#E2ECD8;font-weight:600}
+.sh-h span{font-size:9.5px;color:var(--dim);letter-spacing:.2em}
+.sh-b{padding:20px 28px 26px}
+.sh-b p{font-size:11.5px;line-height:1.8;color:#A9B5A0;margin-bottom:12px}
+.sh-b p b{color:#DEE8D0}
+.proc{border:1px solid var(--line2);background:#0B0E0A;padding:12px 16px;margin:4px 0 14px}
+.proc .pr{display:flex;gap:12px;font-size:11px;color:#A9B5A0;line-height:1.7;padding:3px 0}
+.proc .pr b{color:var(--amb);font-family:var(--disp);letter-spacing:.14em;flex:none;width:158px;font-size:10px;padding-top:2px}
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;margin:6px 0 14px}
+.cg{display:flex;align-items:center;font-size:10.5px;color:var(--dim)}
+.blink-go{text-align:center;font-family:var(--disp);letter-spacing:.3em;font-size:13px;color:var(--grn);animation:blink 1.1s steps(2,start) infinite;margin-top:12px;cursor:pointer}
+.note{font-size:10px;color:var(--faint);letter-spacing:.06em;line-height:1.7;border-left:2px solid var(--line2);padding-left:10px}
+.stats .row{display:flex;justify-content:space-between;padding:7px 2px;border-bottom:1px dashed #212819;font-size:11.5px;color:var(--dim)}
+.stats .row b{font-family:var(--disp);letter-spacing:.1em;color:#DEE8D0;font-weight:600}
+.rank{margin:16px 0 4px;padding:11px;border:1px solid var(--line2);text-align:center;font-family:var(--disp);letter-spacing:.26em;font-size:14px;color:var(--amb)}
+.rank.bad{color:var(--red)}
+.xpbar{height:6px;background:#1A1F16;margin:10px 0 4px}
+.xpbar i{display:block;height:100%;background:var(--amb)}
+.xpline{display:flex;justify-content:space-between;font-size:9.5px;color:var(--dim);letter-spacing:.14em}
+.achrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ach{font-size:9px;letter-spacing:.12em;padding:3px 8px;border:1px solid #2A3226;color:var(--dim)}
+.ach.on{color:#F0D98A;border-color:#6A5A2A;background:#14120A}
+.pausebox{text-align:center;font-family:var(--disp);letter-spacing:.3em;font-size:15px;color:var(--amb);padding:14px 0 4px}
+.subline{text-align:center;color:var(--dim);font-size:10px;letter-spacing:.18em;margin-top:12px}
+@keyframes blink{50%{opacity:0}}
+.rec{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1.3s steps(2,start) infinite;flex:none}
+#ovLogin .sheet,#ovAuth .sheet{width:440px;max-height:none;overflow:visible}
+#ovLogin,#ovAuth{z-index:50}
+.gate{text-align:center;padding-bottom:6px}
+.g-head{padding:18px 24px 8px;border-bottom:1px solid var(--line)}
+.g-logo{font-size:26px;color:var(--grn);letter-spacing:.3em;font-family:var(--disp);font-weight:700}
+.g-sub{font-size:9px;color:var(--dim);letter-spacing:.24em;margin-top:4px}
+.g-body{padding:18px 26px 16px}
+.g-token{font-family:var(--disp);font-weight:700;font-size:clamp(22px,4vw,34px);letter-spacing:.42em;color:var(--amb);background:#080B08;border:1px dashed #57481E;padding:10px 0 10px 12px;margin:8px 0 4px}
+.g-cap{font-size:8.5px;color:var(--faint);letter-spacing:.2em;line-height:1.7}
+#lgInput,#auInput{width:100%;margin:14px 0 2px;background:#080B08;border:1px solid var(--line2);outline:none;color:var(--grn);font-family:var(--mono);font-size:20px;letter-spacing:.5em;text-align:center;padding:9px 0 9px 8px;text-transform:uppercase;caret-color:var(--grn)}
+#lgInput:focus,#auInput:focus{border-color:var(--grn2)}
+#lgInput:disabled{opacity:.4}
+.g-status{min-height:18px;font-size:10px;letter-spacing:.14em;margin-top:8px}
+.g-status.bad{color:var(--red)}
+.g-status.good{color:var(--grn)}
+.g-lock{color:var(--red);font-family:var(--disp);letter-spacing:.24em;font-size:12px;animation:blink 1s steps(2,start) infinite}
+.g-meta{display:flex;justify-content:space-between;padding:10px 24px;border-top:1px solid var(--line);font-size:8.5px;color:var(--faint);letter-spacing:.16em}
+#ovMail{z-index:46}
+.mail{width:780px;padding:0;overflow:visible}
+.m-head{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:#0B0F0B}
+.m-logo{width:30px;height:30px;border:1px solid var(--grn2);display:flex;align-items:center;justify-content:center;color:var(--grn);font-size:15px}
+.m-title{font-family:var(--disp);font-weight:600;letter-spacing:.2em;font-size:13px;color:#E2ECD8}
+.m-sub{font-size:9px;color:var(--dim);letter-spacing:.12em;margin-top:2px}
+.m-shift{margin-left:auto;font-size:9px;color:var(--dim);letter-spacing:.16em;text-align:right}
+.m-seal{color:var(--amb)}
+.m-fields{padding:10px 18px 4px;border-bottom:1px solid var(--line)}
+.m-row{display:flex;align-items:center;gap:12px;padding:5px 0;border-bottom:1px dashed #161C14;position:relative}
+.m-row:last-child{border-bottom:none}
+.m-row label{font-size:8.5px;letter-spacing:.2em;color:var(--faint);width:58px;flex:none;font-family:var(--disp)}
+.m-static{font-size:11px;color:#9AA792;letter-spacing:.06em}
+#mailTo,#mailSub{flex:1;background:none;border:none;outline:none;color:#E8F0E0;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;caret-color:var(--grn);padding:2px 0}
+#mailTo{cursor:pointer;color:var(--grn)}
+#mailTo::placeholder,#mailSub::placeholder{color:#3E4638}
+#mailToList{position:absolute;top:100%;left:70px;right:0;z-index:5;background:#0B0F0B;border:1px solid var(--line2);box-shadow:0 14px 30px rgba(0,0,0,.6);display:none}
+#mailToList.show{display:block}
+.m-off{padding:7px 12px;cursor:pointer;border-bottom:1px solid #121810}
+.m-off:last-child{border-bottom:none}
+.m-off .o1{display:flex;justify-content:space-between;font-size:11px;color:#E8F0E0;letter-spacing:.06em}
+.m-off .o1 small{color:var(--faint);font-size:9px;letter-spacing:.1em}
+.m-off .o2{font-size:9px;color:var(--dim);letter-spacing:.14em;margin-top:2px}
+.m-off:hover,.m-off.on{background:#131B12}
+#mailBody{display:block;width:100%;height:262px;background:#080B08;border:none;outline:none;resize:none;color:#D8E2D2;font-family:var(--mono);font-size:11.5px;line-height:1.75;padding:14px 18px;caret-color:var(--grn)}
+#mailBody::placeholder{color:#39423A}
+#evPick{position:absolute;left:18px;right:18px;bottom:96px;z-index:6;background:#0B0F0B;border:1px solid var(--line2);box-shadow:0 14px 30px rgba(0,0,0,.65);display:none;max-height:190px;overflow-y:auto}
+#evPick.show{display:block}
+.ep-h{padding:6px 12px;font-size:8.5px;letter-spacing:.2em;color:var(--faint);border-bottom:1px solid var(--line);font-family:var(--disp)}
+.ep{padding:6px 12px;font-size:10.5px;cursor:pointer;display:flex;gap:10px;align-items:center;border-bottom:1px solid #10150E}
+.ep:last-child{border-bottom:none}
+.ep .epi{color:var(--faint);font-size:9px}
+.ep .epp{font-weight:600;color:var(--grn);letter-spacing:.06em}
+.ep .epd{color:var(--dim);font-size:9.5px;margin-left:auto;letter-spacing:.08em}
+.ep:hover,.ep.on{background:#131B12}
+.m-foot{display:flex;align-items:center;gap:14px;padding:8px 18px;border-top:1px solid var(--line);background:#0B0F0B}
+#mailCite{font-size:9px;letter-spacing:.14em;color:var(--dim)}
+#mailCite b{color:var(--amb)}
+.m-hint{font-size:8.5px;color:var(--faint);letter-spacing:.1em}
+.m-send{margin-left:auto;background:#12200F;border:1px solid var(--grn2);color:var(--grn);font-family:var(--disp);letter-spacing:.22em;font-size:10.5px;padding:7px 18px;cursor:pointer}
+.m-send:hover{background:#1A2E15}
+#mailStatus{padding:0 18px;font-size:10px;letter-spacing:.1em;min-height:26px;display:flex;align-items:center;border-top:1px solid var(--line)}
+#mailStatus.bad{color:var(--red)}
+#mailStatus.good{color:var(--grn)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="tb-left">
+      <span class="sig-mark"></span>
+      <span class="facility">MERIDIAN CITY TRAFFIC OPS</span>
+      <span class="grid-id">GRID 4 · WATCHLIST INTELLIGENCE TERMINAL · 9 ANPR GATES · MESH AI v4</span>
+    </div>
+    <div class="tb-mid"><span id="clock">23:47:08</span><span class="lv"><span class="rec"></span>LIVE</span></div>
+    <div class="tb-right">
+      <span id="secBadge">AUTH ✓</span>
+      <span id="rankBadge">CADET</span>
+      <span class="lbl">ANALYST</span><span class="val">R-77 / K.VOSS</span>
+      <span class="lbl">SCORE</span><span id="score" class="val">0000</span>
+      <button id="muteBtn" class="tbtn">SND ON</button>
+      <button id="helpBtn" class="tbtn">HELP</button>
+    </div>
+  </header>
+
+  <main id="layout">
+    <div id="termMsg"></div>
+    <div id="popLayer"></div>
+
+    <div id="leftCol">
+      <section class="panel" id="statusStrip">
+        <div class="ss-wrap">
+          <div class="ss-item"><span class="k">SHIFT</span><span class="v" id="shiftT">05:00</span></div>
+          <div class="ss-item"><span class="k">STRIKES</span><span class="strikes" id="strikes"><i></i><i></i><i></i></span></div>
+          <div class="ss-item"><span class="k">ARR</span><span class="v" id="stCap">0</span></div>
+          <div class="ss-item"><span class="k">CITE</span><span class="v" id="stCit">0</span></div>
+          <div class="ss-item"><span class="k">MAIL</span><span class="v" id="stMail">0</span></div>
+          <div class="ss-item"><span class="k">DRN</span><span class="v" id="stDrn">2</span></div>
+          <div class="ss-item"><span class="k">UNITS</span><span class="udots" id="uDots"><i></i><i></i><i></i></span></div>
+        </div>
+      </section>
+      <div id="secStrip">
+        <div class="srow"><span class="sk">SESSION</span><span id="secSess" class="ok">AUTHENTICATED</span></div>
+        <div class="srow"><span class="sk">MAIL SEAL</span><span id="secSeal">—</span></div>
+        <div class="srow"><span class="sk">GATES</span><span id="secGates" class="ok">9/9 VERIFIED</span></div>
+        <div class="srow"><span class="sk">RE-AUTH</span><span id="secAuth">—</span></div>
+        <div class="srow"><span class="sk">DRONE</span><span id="secDrone" class="ok">READY ×2</span></div>
+      </div>
+      <div class="p-h"><span>WANTED · BOLO BOARD</span><em id="boloCount">0</em></div>
+      <div id="boloBody"></div>
+    </div>
+
+    <div id="centerCol">
+      <section class="panel" id="scanPanel">
+        <div class="p-h"><span>SCAN DATABASE · ALL GATE READS</span><em id="logCount">0 PLATES</em></div>
+        <div id="filterBar"><span class="fb-l">QUERY</span><span id="fbQ"><span class="cur">▊</span></span><span id="fbInfo">TYPE TO SEARCH · ? = WILDCARD</span></div>
+        <div id="scanHead"><span>TIME</span><span>GATE</span><span>PLATE</span><span>TYPE</span><span>COLOUR</span><span>KM/H</span><span>DIR</span></div>
+        <div id="scanBody"></div>
+      </section>
+      <section class="panel" id="dossierPanel">
+        <div class="p-h"><span>PLATE DOSSIER · CASE FILE</span><em id="dReg">—</em></div>
+        <div id="dossierBody"><div class="d-empty">NO TARGET SELECTED<br>TYPE A FRAGMENT — PLATE / COLOUR / TYPE — OR CLICK A CANDIDATE<br>↑ ↓ TO BROWSE READS</div></div>
+      </section>
+    </div>
+
+    <div id="rightCol">
+      <section class="panel">
+        <div class="p-h"><span>PATROL UNITS</span><em id="unitCount">3</em></div>
+        <div id="unitsBody"></div>
+        <div id="purBox">
+          <div class="pur-t" id="purTitle">PURSUIT ACTIVE</div>
+          <div class="pur-l">SIGNAL TRACK <span class="tr-bar"><i id="purTrack"></i></span><span id="purPct"></span></div>
+          <div class="pur-l" id="purOw"></div>
+          <div class="pur-l" id="purGap"></div>
+        </div>
+      </section>
+      <section class="panel" id="notesPanel">
+        <div class="p-h"><span>CASE NOTES · SUSPICIOUS</span>
+          <em><button class="mini" id="composeBtn">COMPOSE ⇥</button><span id="evCount">0</span></em></div>
+        <div id="notesBody"><div class="clear-msg">NO EVIDENCE ON FILE — SUSPICIOUS VEHICLES FILE HERE AUTOMATICALLY</div></div>
+      </section>
+      <section class="panel" id="logPanel">
+        <div class="p-h"><span>OPERATIONS LOG · AUDIT CHAIN</span><em>GRID 4</em></div>
+        <div id="logBody"></div>
+      </section>
+    </div>
+
+    <div id="mapWrap"><canvas id="tacCv" width="1180" height="148"></canvas></div>
+  </main>
+
+  <footer id="keybar">
+    <span><kbd>A–Z 0–9 ?</kbd>SEARCH</span>
+    <span><kbd>↑↓</kbd>BROWSE · <kbd>⏎</kbd>LATEST</span>
+    <span><kbd>Q</kbd>REGISTRY</span>
+    <span><kbd>C</kbd>RELEASE</span>
+    <span><kbd>[</kbd>X-REF</span>
+    <span><kbd>]</kbd>WITNESS</span>
+    <span><kbd>-</kbd>CITE</span>
+    <span><kbd>'</kbd>SPEED</span>
+    <span><kbd>=</kbd>STOLEN</span>
+    <span><kbd>SPACE</kbd>FLAG·CONVOY</span>
+    <span><kbd>\</kbd>SPIKES</span>
+    <span><kbd>H</kbd>DRONE</span>
+    <span><kbd>K</kbd>INTEGRITY</span>
+    <span><kbd>, . / ;</kbd>UNITS</span>
+    <span><kbd>TAB</kbd>MAIL</span>
+    <span><kbd>Z</kbd>FREEZE</span>
+    <span><kbd>?</kbd>HELP</span>
+  </footer>
+</div>
+
+<!-- LOGIN GATE -->
+<div class="ov show" id="ovLogin">
+  <div class="sheet gate"><span class="cnr a"></span><span class="cnr b"></span><span class="cnr c"></span><span class="cnr d"></span>
+    <div class="g-head">
+      <div class="g-logo">MERIDIAN PD</div>
+      <div class="g-sub">SECURE TERMINAL ACCESS · GRID-4 WATCHLIST DESK</div>
+    </div>
+    <div class="g-body">
+      <div class="g-cap">OPERATOR · K. VOSS · BADGE R-77<br>TYPE THE SECURITY TOKEN, THEN PRESS ENTER</div>
+      <div class="g-token" id="lgToken">------</div>
+      <input id="lgInput" maxlength="6" autocomplete="off" spellcheck="false" aria-label="security token">
+      <div class="g-status" id="lgStatus">3 ATTEMPTS BEFORE LOCKOUT</div>
+    </div>
+    <div class="g-meta"><span>TERMINAL T-07 · ENCRYPTED</span><span id="lgClock">23:47:08</span></div>
+  </div>
+</div>
+
+<!-- RE-AUTH -->
+<div class="ov" id="ovAuth">
+  <div class="sheet gate"><span class="cnr a"></span><span class="cnr b"></span><span class="cnr c"></span><span class="cnr d"></span>
+    <div class="g-head">
+      <div class="g-logo" style="color:var(--amb)">SESSION VERIFY</div>
+      <div class="g-sub">PERIODIC RE-AUTHENTICATION REQUIRED · TERMINAL LOCKED</div>
+    </div>
+    <div class="g-body">
+      <div class="g-cap">TYPE THE CHALLENGE CODE — SHIFT IS PAUSED</div>
+      <div class="g-token" id="auCode">----</div>
+      <input id="auInput" maxlength="4" autocomplete="off" spellcheck="false" aria-label="challenge code">
+      <div class="g-status" id="auStatus"></div>
+    </div>
+    <div class="g-meta"><span>SECURITY POLICY 7.4 · GRID-4</span><span id="auClock">23:47:08</span></div>
+  </div>
+</div>
+
+<!-- MAIL -->
+<div class="ov" id="ovMail">
+  <div class="sheet mail"><span class="cnr a"></span><span class="cnr b"></span><span class="cnr c"></span><span class="cnr d"></span>
+    <div class="m-head">
+      <div class="m-logo">✉</div>
+      <div>
+        <div class="m-title">MERIDIAN PD — SECURE MAIL · COMPOSE</div>
+        <div class="m-sub">CLASSIFICATION: OFFICIAL · SESSION SEAL <span class="m-seal" id="mSeal">----</span> MUST APPEAR IN BODY</div>
+      </div>
+      <div class="m-shift">SHIFT 4-C<br><span id="mClock">23:47:08</span></div>
+    </div>
+    <div class="m-fields">
+      <div class="m-row"><label>FROM</label><div class="m-static">ANALYST K. VOSS &lt;r-77.grid4@meridian.gov&gt;</div></div>
+      <div class="m-row"><label>TO</label>
+        <input id="mailTo" readonly placeholder="SELECT OFFICIAL — CLICK OR PRESS ↓">
+        <div id="mailToList"></div>
+      </div>
+      <div class="m-row"><label>SUBJECT</label><input id="mailSub" maxlength="90" placeholder="SHIFT 4-C — GRID 4 WATCHLIST REPORT"></div>
+    </div>
+    <textarea id="mailBody" spellcheck="false"
+      placeholder="DEAR SUPT. HALE,
+
+  RE: SHIFT 4-C WATCHLIST REPORT — GRID 4
+
+  DURING TONIGHT'S SHIFT THE FOLLOWING SUSPICIOUS VEHICLES
+  WERE IDENTIFIED ...
+  SESSION SEAL: ----
+
+  (TYPE YOUR REPORT — EVERY LETTER IS YOURS.
+   PRESS TAB TO INSERT AN EVIDENCE BLOCK FROM CASE NOTES)
+
+  REGARDS,
+  K. VOSS
+  ANALYST R-77 · GRID-4 WATCHLIST DESK"></textarea>
+    <div id="evPick"></div>
+    <div class="m-foot">
+      <span id="mailCite">EVIDENCE <b>0/0</b> CRITICAL CITED</span>
+      <span class="m-hint"><kbd>TAB</kbd>EVIDENCE · <kbd>⇧⏎</kbd>SEND · <kbd>ESC</kbd>CLOSE</span>
+      <button id="sendBtn" class="m-send">SEND ⇧⏎</button>
+    </div>
+    <div id="mailStatus"></div>
+  </div>
+</div>
+
+<!-- BRIEFING -->
+<div class="ov" id="ovBrief">
+  <div class="sheet"><span class="cnr a"></span><span class="cnr b"></span><span class="cnr c"></span><span class="cnr d"></span>
+    <div class="sh-h"><h1>GRID-4 INTELLIGENCE TERMINAL — WATCHLIST DESK</h1><span>BRIEFING 23:47 · MESH AI ONLINE</span></div>
+    <div class="sh-b">
+      <p><b>The full investigative chain, augmented by GRID MESH AI.</b> Nine ANPR gates read every
+      vehicle. Flag a suspect and <b>every available patrol unit rolls as a convoy</b> — closest unit
+      takes the pursuit, backup converges, any of them can make the box-in.</p>
+      <div class="proc">
+        <div class="pr"><b>0 · SECURITY</b><span>Authenticate, survive session re-verification, secure tampered gates with <b>[ K ]</b>, quote the session seal in mail. Hash-chained audit log.</span></div>
+        <div class="pr"><b>1 · BOLO + AI TRIAGE</b><span>Candidates are auto-listed and <b>AI-scored</b>. Cross-ref <b>[</b> rules innocents out with alibis; witness <b>]</b> narrows the plate.</span></div>
+        <div class="pr"><b>2 · VERDICT</b><span>Registry <b>Q</b>: CLEAN → <b>[ C ]</b> release (+10, file closes green). EXPIRED → <b>[ - ]</b>. SPEEDING → <b>[ ' ]</b>. STOLEN → <b>[ = ]</b> / <b>SPACE</b>. A suspect is never releasable — clone logic locks it.</span></div>
+        <div class="pr"><b>3 · CONVOY RESPONSE</b><span><b>[SPACE]</b> / <b>[=]</b> dispatches <b>all available units</b> to the suspect — one primary pursuer + backup. Arrest credit counts once. <b>[ / ]</b> re-tasks a single chosen unit instead.</span></div>
+        <div class="pr"><b>4 · PURSUIT</b><span>Keep the target selected to hold the signal — or deploy the <b>RECON DRONE [ H ]</b> to hold it for you. <b>[ \ ]</b> spike strips. Panel shows <b>EXIT ETA</b>.</span></div>
+        <div class="pr"><b>5 · INTERCEPTS</b><span>COMMS INTERCEPTS predict the target's next gate and sometimes leak a plate character.</span></div>
+        <div class="pr"><b>6 · REPORT ⇥</b><span>Suspicious vehicles auto-file to CASE NOTES. Formal mail — every letter yours, TAB inserts evidence, seal + greeting + closing + signature required. Resets after send.</span></div>
+      </div>
+      <div class="ctrl-grid">
+        <div class="cg"><kbd>A–Z 0–9 ?</kbd>FILTER DATABASE · ? = PATTERN</div>
+        <div class="cg"><kbd>↑</kbd><kbd>↓</kbd>BROWSE · <kbd>⏎</kbd>LATEST READ</div>
+        <div class="cg"><kbd>Q</kbd>REGISTRY · <kbd>C</kbd>RELEASE CLEAN</div>
+        <div class="cg"><kbd>[</kbd>X-REF · <kbd>]</kbd>WITNESS · <kbd>K</kbd>INTEGRITY</div>
+        <div class="cg"><kbd>-</kbd>CITE · <kbd>'</kbd>SPEED · <kbd>=</kbd>STOLEN</div>
+        <div class="cg"><kbd>SPACE</kbd>FLAG → ALL UNITS · <kbd>\</kbd>SPIKES · <kbd>H</kbd>DRONE</div>
+        <div class="cg"><kbd>,</kbd><kbd>.</kbd>UNIT · <kbd>/</kbd>RE-TASK ONE · <kbd>;</kbd>RECALL</div>
+        <div class="cg"><kbd>TAB</kbd>MAIL · <kbd>Z</kbd>FREEZE · <kbd>?</kbd>HELP</div>
+      </div>
+      <div class="note">5:00 SHIFT · BOLOS EXPIRE (−50) · REGISTRY IS THE ONLY VERDICT · RELEASED VEHICLES
+      TURN GREEN ACROSS ALL PANELS · CLICK ANYTHING: READS, CANDIDATES, NOTES, UNITS, MAP.</div>
+      <div class="blink-go" id="beginBtn">PRESS ENTER TO GO ON DUTY</div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ovPause">
+  <div class="sheet" style="width:420px"><span class="cnr a"></span><span class="cnr b"></span><span class="cnr c"></span><span class="cnr d"></span>
+    <div class="sh-b"><div class="pausebox">TERMINAL HOLD — SHIFT ON FREEZE</div>
+    <div class="subline">PRESS <b>Z</b> TO RESUME</div></div>
+  </div>
+</div>
+
+<div class="ov" id="ovReport">
+  <div class="sheet"><span class="cnr a"></span><span class="cnr b"></span><span class="cnr c"></span><span class="cnr d"></span>
+    <div class="sh-h"><h1 id="rTitle">SHIFT COMPLETE</h1><span>GRID 4 · WATCHLIST DESK</span></div>
+    <div class="sh-b">
+      <div class="stats">
+        <div class="row"><span>ARRESTS MADE</span><b id="rCap">0</b></div>
+        <div class="row"><span>PURSUITS WON / LOST</span><b id="rPur">0 / 0</b></div>
+        <div class="row"><span>FALSE FLAGS</span><b id="rFalse">0</b></div>
+        <div class="row"><span>CITATIONS / SPEED / RELEASES</span><b id="rCit">0 / 0 / 0</b></div>
+        <div class="row"><span>ALIBIS / WITNESSES</span><b id="rAli">0 / 0</b></div>
+        <div class="row"><span>GATES SECURED / RE-AUTHS / DRONE</span><b id="rSec">0 / 0 / 0</b></div>
+        <div class="row"><span>MAIL REPORTS FILED</span><b id="rMail">0</b></div>
+        <div class="row"><span>AUDIT CHAIN</span><b id="rAudit">VERIFIED</b></div>
+        <div class="row"><span>BOLOS EXPIRED</span><b id="rLost">0</b></div>
+        <div class="row"><span>BEST STREAK</span><b id="rStreak">×0</b></div>
+        <div class="row"><span>SHIFT SCORE</span><b id="rScore">0</b></div>
+      </div>
+      <div class="rank" id="rRank">—</div>
+      <div class="xpbar"><i id="xpFill" style="width:0%"></i></div>
+      <div class="xpline"><span id="xpRankL">CADET</span><span id="xpNextL"></span></div>
+      <div class="achrow" id="achRow"></div>
+      <div class="blink-go" id="againBtn">PRESS ENTER FOR NEXT SHIFT</div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ovHelp">
+  <div class="sheet"><span class="cnr a"></span><span class="cnr b"></span><span class="cnr c"></span><span class="cnr d"></span>
+    <div class="sh-h"><h1>ANALYST CONTROLS</h1><span>QUICK REFERENCE</span></div>
+    <div class="sh-b">
+      <div class="ctrl-grid">
+        <div class="cg"><kbd>A–Z 0–9 ?</kbd>FILTER DB · ? = WILDCARD</div>
+        <div class="cg"><kbd>↑</kbd><kbd>↓</kbd>BROWSE · <kbd>⏎</kbd>LATEST</div>
+        <div class="cg"><kbd>Q</kbd>REGISTRY · <kbd>C</kbd>RELEASE (CLEAN ONLY)</div>
+        <div class="cg"><kbd>[</kbd>X-REF · <kbd>]</kbd>WITNESS · <kbd>K</kbd>INTEGRITY</div>
+        <div class="cg"><kbd>H</kbd>DRONE — HOLD SIGNAL / BOOST UNIT</div>
+        <div class="cg"><kbd>SPACE</kbd>FLAG → ALL UNITS CONVOY</div>
+        <div class="cg"><kbd>-</kbd>CITE · <kbd>'</kbd>SPEED · <kbd>=</kbd>STOLEN · <kbd>\</kbd>SPIKES</div>
+        <div class="cg"><kbd>,</kbd><kbd>.</kbd>UNIT · <kbd>/</kbd>RE-TASK ONE · <kbd>;</kbd>RECALL · <kbd>TAB</kbd>MAIL</div>
+      </div>
+      <div class="note">SPACE / = SEND EVERY AVAILABLE UNIT AS A CONVOY. THE CLOSEST UNIT LEADS THE
+      PURSUIT; BACKUP CONVERGES; THE FIRST UNIT TO BOX THE TARGET IN MAKES THE ARREST — CREDIT IS
+      COUNTED ONCE. RE-TASK [/] SENDS ONLY THE SELECTED UNIT. UV READS BLOCK DISPOSITIONS UNTIL [K].</div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+   MERIDIAN GRID-4 — single-file build. No network. No eval.
+   ROOT-CAUSE FIX: scanBody/logBody/boloBody/dossierBody are now
+   declared HERE, at the top — the old bottom-of-file const left
+   them in the temporal dead zone when the delegated-input section
+   ran, which crashed the whole script at load and silently
+   disabled Enter, the briefing button and the game loop.
+   ============================================================ */
+/* fault trap — surfaces any runtime error in the ops log AND on screen */
+addEventListener('error',ev=>{
+  try{
+    const m=String(ev.message||'unknown error');
+    const lb=document.getElementById('logBody');
+    if(lb){ const d=document.createElement('div'); d.className='ev bad';
+      d.innerHTML='<span class="lt">FAULT</span>'+m;
+      lb.prepend(d); }
+    const tm=document.getElementById('termMsg');
+    if(tm){ tm.textContent='FAULT ▸ '+m; tm.className='show bad';
+      setTimeout(()=>{ tm.className=''; },4000); }
+  }catch(_){}
+});
+
+const TAU=Math.PI*2;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const rand=(a=1,b)=>b===undefined?Math.random()*a:a+Math.random()*(b-a);
+const irand=(a,b)=>Math.floor(rand(a,b+1));
+const pick=a=>a[Math.random()*a.length|0];
+const pad=(n,w=2)=>String(n).padStart(w,'0');
+const $=id=>document.getElementById(id);
+/* FIX: element refs hoisted to the top — safe for every section below */
+const scanBody=$('scanBody'), logBody=$('logBody'),
+      boloBody=$('boloBody'), dossierBody=$('dossierBody');
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+const LCHARS='ABCDEFGHJKLMNPRSTUVWXYZ23456789';
+function codeStr(n){let s='';for(let i=0;i<n;i++)s+=LCHARS[irand(0,LCHARS.length-1)];return s;}
+const htmlCache=new Map();
+function setHTML(el,html){ if(htmlCache.get(el)===html)return; htmlCache.set(el,html); el.innerHTML=html; }
+
+/* ================= audio ================= */
+const AU={ctx:null,out:null,on:true,
+  init(){ if(this.ctx){this.ctx.resume&&this.ctx.resume();return;}
+    const A=window.AudioContext||window.webkitAudioContext; if(!A)return;
+    this.ctx=new A(); this.out=this.ctx.createGain(); this.out.gain.value=.5; this.out.connect(this.ctx.destination); this.hum();},
+  setOn(v){this.on=v; if(this.out)this.out.gain.value=v?.5:0;},
+  beep(f,d,type='sine',v=.08,dl=0,f2){ if(!this.ctx||!this.on)return; const t=this.ctx.currentTime+dl;
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain(); o.type=type; o.frequency.setValueAtTime(f,t);
+    if(f2)o.frequency.linearRampToValueAtTime(f2,t+d);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g); g.connect(this.out); o.start(t); o.stop(t+d+.03);},
+  noise(d=.1,v=.1,f=1200,dl=0){ if(!this.ctx||!this.on)return; const t=this.ctx.currentTime+dl;
+    const n=this.ctx.sampleRate*d|0, b=this.ctx.createBuffer(1,n,this.ctx.sampleRate), ch=b.getChannelData(0);
+    for(let i=0;i<n;i++)ch[i]=Math.random()*2-1;
+    const s=this.ctx.createBufferSource(); s.buffer=b;
+    const fl=this.ctx.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=f; fl.Q.value=.8;
+    const g=this.ctx.createGain(); g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    s.connect(fl); fl.connect(g); g.connect(this.out); s.start(t);},
+  radioBlip(){this.noise(.09,.14,1500); this.beep(1100,.03,'square',.02);},
+  readTick(){this.beep(1500,.018,'square',.014);},
+  typeClick(){this.beep(1900,.012,'square',.02);},
+  capture(){[660,880,1175].forEach((f,i)=>this.beep(f,.09,'triangle',.09,i*.075)); this.noise(.3,.05,900,.1);},
+  falseR(){this.beep(150,.28,'square',.1); this.beep(98,.3,'square',.07,.03);},
+  denied(){this.beep(260,.12,'sine',.06,0,170);},
+  regClean(){this.beep(520,.06,'sine',.05); this.beep(700,.08,'sine',.05,.08);},
+  regExp(){this.beep(440,.09,'sine',.06); this.beep(330,.12,'sine',.06,.1);},
+  regStolen(){this.beep(622,.16,'square',.08); this.beep(466,.2,'square',.08,.18); this.beep(622,.16,'square',.07,.4);},
+  secured(){this.beep(784,.08,'sine',.06); this.beep(988,.1,'sine',.06,.09);},
+  bolo(){this.beep(520,.12,'sine',.06); this.beep(390,.16,'sine',.06,.13);},
+  expire(){this.beep(392,.14,'sine',.06); this.beep(262,.22,'sine',.06,.14);},
+  xrefOk(){this.beep(300,.1,'square',.06); this.beep(240,.16,'square',.06,.12);},
+  wit(){this.beep(880,.07,'triangle',.05); this.beep(1108,.09,'triangle',.05,.09);},
+  release(){this.beep(660,.05,'sine',.05); this.beep(440,.07,'sine',.04,.06);},
+  spikeSet(){this.noise(.12,.09,700); this.beep(200,.08,'square',.05,.05);},
+  spikeHit(){this.noise(.4,.16,500); this.beep(120,.3,'sawtooth',.08,.05);},
+  authOk(){this.beep(660,.06,'sine',.06); this.beep(990,.1,'sine',.06,.08);},
+  authBad(){this.beep(200,.16,'square',.07);},
+  tamper(){this.beep(180,.12,'square',.06); this.beep(150,.14,'square',.06,.1); this.beep(180,.12,'square',.05,.22);},
+  droneUp(){this.beep(320,.2,'sawtooth',.05); this.beep(480,.25,'sawtooth',.04,.18);},
+  medal(){[784,988,1175,1568].forEach((f,i)=>this.beep(f,.1,'triangle',.07,i*.08));},
+  mailSend(){[523,659,784].forEach((f,i)=>this.beep(f,.09,'triangle',.07,i*.09)); this.noise(.14,.05,2400,.28);},
+  mailErr(){this.beep(220,.14,'square',.06); this.beep(180,.18,'square',.05,.12);},
+  promo(){[523,659,784,1046,1318].forEach((f,i)=>this.beep(f,.12,'triangle',.08,i*.1));},
+  end(ok){ if(ok){[523,659,784,1046].forEach((f,i)=>this.beep(f,.14,'triangle',.08,i*.11));}
+    else{this.beep(90,.7,'sawtooth',.12); this.beep(64,.9,'sawtooth',.08,.1);}},
+  hum(){ const o=this.ctx.createOscillator(); o.frequency.value=55;
+    const g=this.ctx.createGain(); g.gain.value=.012; o.connect(g); g.connect(this.out); o.start();
+    const o2=this.ctx.createOscillator(); o2.frequency.value=110.3;
+    const g2=this.ctx.createGain(); g2.gain.value=.006; o2.connect(g2); g2.connect(this.out); o2.start();
+    const n=this.ctx.sampleRate*2|0, b=this.ctx.createBuffer(1,n,this.ctx.sampleRate), c=b.getChannelData(0);
+    for(let i=0;i<n;i++)c[i]=Math.random()*2-1;
+    const s=this.ctx.createBufferSource(); s.buffer=b; s.loop=true;
+    const fl=this.ctx.createBiquadFilter(); fl.type='lowpass'; fl.frequency.value=320;
+    const g3=this.ctx.createGain(); g3.gain.value=.006; s.connect(fl); fl.connect(g3); g3.connect(this.out); s.start();}
+};
+
+/* ================= catalogue (frozen) ================= */
+const VCOLORS=Object.freeze([{n:'WHITE'},{n:'SILVER'},{n:'BLACK'},{n:'RED'},{n:'BLUE'},{n:'GRAY'},{n:'YELLOW'},{n:'GREEN'}]);
+const COLHEX=Object.freeze({WHITE:'#DEDEDA',SILVER:'#B2B4B6',BLACK:'#3A3C40',RED:'#C05A50',BLUE:'#5A78B0',GRAY:'#8A8C8A',YELLOW:'#D6B230',GREEN:'#5A8460'});
+const VTYPES=Object.freeze({sedan:{key:'sedan',desc:'SEDAN',spd:14},hatch:{key:'hatch',desc:'HATCHBACK',spd:14},
+  suv:{key:'suv',desc:'SUV',spd:13},van:{key:'van',desc:'PANEL VAN',spd:12},
+  truck:{key:'truck',desc:'TRUCK',spd:10},bus:{key:'bus',desc:'BUS',spd:11}});
+const ABBR=Object.freeze({sedan:'SDN',hatch:'HTB',suv:'SUV',van:'VAN',truck:'TRK',bus:'BUS'});
+const MIX_STD=Object.freeze({sedan:6,hatch:3,suv:3,van:2,truck:1,bus:.4});
+const MIX_HARBOR=Object.freeze({sedan:4,hatch:2,suv:2,van:4,truck:4,bus:.3});
+const MIX_DEPOT=Object.freeze({sedan:2,hatch:1,suv:2,van:3,truck:5,bus:2});
+const MIX_FAST=Object.freeze({sedan:7,hatch:4,suv:4,van:1,truck:.6,bus:.2});
+function pickType(mix){ let tot=0; for(const k in mix)tot+=mix[k]; let r=Math.random()*tot;
+  for(const k in mix){ r-=mix[k]; if(r<=0)return VTYPES[k]; } return VTYPES.sedan; }
+
+/* ================= roads & gates ================= */
+const ROADS=[];
+function mkRoad(len,P,laneW,opts={}){
+  const rd={len,P,laneW,veh:[[],[]],spawnT:[rand(.5,2),rand(.5,2)],
+    ctrl:!!opts.ctrl,stopF:opts.stopF||0,stopB:opts.stopB||0,lim:opts.lim||50,
+    spdMul:opts.spdMul||1,mix:opts.mix||MIX_STD,target:opts.target||[4,4]};
+  ROADS.push(rd); return rd;
+}
+const r1=mkRoad(200,2,3.1,{ctrl:true,stopF:95.4,stopB:104.6,lim:45,target:[6,6]});
+const r2=mkRoad(130,2,3.0,{lim:40,target:[4,4]});
+const r3=mkRoad(140,2,3.2,{lim:45,target:[5,4],mix:MIX_HARBOR});
+const r4=mkRoad(180,2,3.4,{lim:60,spdMul:1.45,target:[5,5],mix:MIX_FAST});
+const r5=mkRoad(120,1,3.4,{lim:35,target:[3,3],mix:MIX_DEPOT});
+ROADS.forEach(r=>r.name='R'+(ROADS.indexOf(r)+1));
+const GATES=[];
+function mkGate(name,sector,rd,s){GATES.push({i:GATES.length,name,sector,rd,s,reads:0,lastRead:-9});}
+mkGate('NORTH GATE','NORTH',r1,40);
+mkGate('JUNCTION 7','CENTRAL',r1,96);
+mkGate('RIVERSIDE','RAMP',r1,160);
+mkGate('RIVER WEST','RIVER',r2,15);
+mkGate('RIVER UNDERPASS','RIVER',r2,60);
+mkGate('QUAY GATE','HARBOR',r3,25);
+mkGate('HARBOR QUAY','HARBOR',r3,70);
+mkGate('EAST TOLL','EAST',r4,95);
+mkGate('DEPOT SPUR','DEPOT',r5,55);
+function nextGateFor(v){
+  const gs=GATES.filter(g=>g.rd===v.rd).map(g=>g.s).sort((a,b)=>a-b);
+  if(v.back){ const c=gs.filter(s=>s<v.s-2).pop(); return c!=null?c:null; }
+  const c=gs.find(s=>s>v.s+2); return c!=null?c:null;
+}
+
+/* ================= career ================= */
+const RANKS=Object.freeze([[0,'CADET'],[600,'OFFICER'],[1500,'ANALYST'],[3000,'SENIOR ANALYST'],[5000,'WATCHLIST SPECIALIST'],[7500,'GRID COMMANDER']]);
+const ACHS=Object.freeze([
+  {id:'first',label:'FIRST CONTACT',desc:'FIRST ARREST'},
+  {id:'streak3',label:'HOT STREAK',desc:'STREAK ×3'},
+  {id:'clean',label:'CLEAN HANDS',desc:'CLEAN PURSUIT ARREST'},
+  {id:'alibi3',label:'ALIBI ACE',desc:'3 ALIBIS IN ONE SHIFT'},
+  {id:'mail1',label:'CORRESPONDENT',desc:'FIRST MAIL REPORT'},
+  {id:'spike',label:'SPIKE ACE',desc:'SPIKE-STRIP ARREST'},
+  {id:'ten',label:'TEN-COLLAR',desc:'10 ARRESTS TOTAL'},
+  {id:'perfect',label:'PERFECT SHIFT',desc:'NO STRIKES · NO LOSSES'},
+  {id:'sentinel',label:'SENTINEL',desc:'SECURE 3 TAMPERED GATES'},
+  {id:'unbreak',label:'UNBREAKABLE',desc:'ALL RE-AUTHS FIRST TRY'},
+  {id:'eyeline',label:'EYELINE',desc:'DRONE-ASSISTED ARREST'},
+  {id:'convoy',label:'CONVOY',desc:'3-UNIT BOX-IN ARREST'},
+]);
+let CAREER={xp:0,shifts:0,best:0,ach:{}};
+try{ const s=localStorage.getItem('mg4career'); if(s)CAREER=Object.assign(CAREER,JSON.parse(s)); }catch(e){}
+function saveCareer(){ try{ localStorage.setItem('mg4career',JSON.stringify(CAREER)); }catch(e){} }
+function rankFor(xp){ let n=RANKS[0][1],lo=0,hi=RANKS[1]?RANKS[1][0]:null;
+  for(let i=0;i<RANKS.length;i++){ if(xp>=RANKS[i][0]){ n=RANKS[i][1]; lo=RANKS[i][0];
+    hi=RANKS[i+1]?RANKS[i+1][0]:null; } }
+  return {name:n,lo,hi}; }
+function unlock(id){ if(CAREER.ach[id])return; CAREER.ach[id]=true; saveCareer();
+  const a=ACHS.find(x=>x.id===id);
+  if(a){ popup('★ '+a.label,'medal'); log(`COMMENDATION ▸ ${a.label} — ${a.desc}`,'medal'); AU.medal(); } }
+
+/* ================= security layer ================= */
+const SEC={authed:false,lockT:0,fails:0,token:'',
+  seal:'----',tamper:null,fixT:0,fixed:0,
+  auth:{active:false,code:'',tries:0,total:0,passed:0,firstTry:0},
+  nextAuth:1e9,nextTamper:1e9};
+let loginOpen=true, state='login';
+function newToken(){ SEC.token=codeStr(6); $('lgToken').textContent=SEC.token.split('').join(' '); }
+function loginTry(){
+  if(SEC.lockT>0)return;
+  const v=$('lgInput').value.trim().toUpperCase();
+  if(!v)return;
+  if(v===SEC.token){
+    SEC.authed=true; loginOpen=false;
+    state='brief';
+    $('ovLogin').classList.remove('show');
+    $('ovBrief').classList.add('show');
+    $('lgStatus').className='g-status good'; $('lgStatus').textContent='ACCESS GRANTED';
+    AU.authOk();
+  }else{
+    SEC.fails++; AU.authBad();
+    $('lgInput').value='';
+    if(SEC.fails>=3){
+      SEC.lockT=10;
+      $('lgStatus').className='g-status bad';
+      $('lgStatus').innerHTML='<span class="g-lock">TERMINAL LOCKED — INTRUSION FLAGGED</span>';
+      log('SECURITY ▸ 3 FAILED AUTH ATTEMPTS — TERMINAL LOCK 10s','bad');
+    }else{
+      newToken();
+      $('lgStatus').className='g-status bad';
+      $('lgStatus').textContent='REJECTED — ATTEMPT '+SEC.fails+'/3 · NEW TOKEN ISSUED';
+    }
+    $('lgInput').focus();
+  }
+}
+ $('lgInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); loginTry(); } });
+function triggerAuth(){
+  if(SEC.auth.active)return;
+  SEC.auth.active=true; SEC.auth.code=codeStr(4); SEC.auth.tries=0;
+  state='auth';
+  $('auCode').textContent=SEC.auth.code.split('').join(' ');
+  $('auInput').value=''; $('auStatus').className='g-status'; $('auStatus').textContent='';
+  $('ovAuth').classList.add('show');
+  setTimeout(()=>$('auInput').focus(),50);
+  log('SECURITY ▸ SESSION RE-VERIFICATION REQUIRED — TERMINAL LOCKED','bad');
+  AU.authBad();
+}
+function authTry(){
+  const v=$('auInput').value.trim().toUpperCase();
+  if(!v)return;
+  if(v===SEC.auth.code){
+    SEC.auth.active=false; SEC.auth.total++; SEC.auth.passed++;
+    if(SEC.auth.tries===0)SEC.auth.firstTry++;
+    $('ovAuth').classList.remove('show');
+    state='run';
+    SEC.nextAuth=simT+rand(150,260);
+    log(`SECURITY ▸ RE-AUTH PASSED${SEC.auth.tries===0?' (FIRST TRY)':''} — SESSION RESUMED`,'audit');
+    $('secBadge').textContent='AUTH ✓'; $('secBadge').className='';
+    AU.authOk();
+  }else{
+    SEC.auth.tries++; AU.authBad();
+    $('auInput').value='';
+    const nc=codeStr(4);
+    SEC.auth.code=nc;
+    $('auCode').textContent=nc.split('').join(' ');
+    if(SEC.auth.tries>=2){
+      score=Math.max(0,score-30); scoreDOM();
+      $('auStatus').className='g-status bad';
+      $('auStatus').textContent='FAILED — SCORE PENALTY −30 · NEW CODE ISSUED';
+      log('SECURITY ▸ FAILED RE-AUTH ×2 — SCORE −30','bad');
+    }else{
+      $('auStatus').className='g-status bad';
+      $('auStatus').textContent='REJECTED — RETRY ('+SEC.auth.tries+'/2)';
+    }
+    $('auInput').focus();
+  }
+}
+ $('auInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); authTry(); } });
+function gateTampered(gi){ return SEC.tamper&&SEC.tamper.g===gi&&SEC.fixT<=0; }
+function lastReadUnverified(rec){
+  return rec&&SEC.tamper&&rec.lastGate===SEC.tamper.g&&SEC.fixT<=0;
+}
+function gateGuard(rec){
+  if(lastReadUnverified(rec)){
+    flashMsg('LAST READ UNVERIFIED — GATE COMPROMISED · [K] INTEGRITY SCAN','warn');
+    AU.denied(); return true;
+  }
+  return false;
+}
+function doIntegrity(){
+  if(state!=='run')return;
+  if(!SEC.tamper){ flashMsg('ALL GATES VERIFIED — NO INTEGRITY ACTION NEEDED','good'); AU.denied(); return; }
+  if(SEC.fixT>0)return;
+  SEC.fixT=3;
+  audit(`INTEGRITY SCAN — GATE ${pad(SEC.tamper.g+1)} CREDENTIAL RE-EXCHANGE (3s)`);
+  AU.spikeSet();
+}
+function securityTick(dt){
+  if(SEC.lockT>0){
+    SEC.lockT-=dt;
+    if(SEC.lockT<=0){ SEC.fails=0; newToken();
+      $('lgStatus').className='g-status';
+      $('lgStatus').textContent='LOCK LIFTED — 3 NEW ATTEMPTS';
+      $('lgInput').disabled=false; $('lgInput').focus(); }
+    else $('lgInput').disabled=true;
+  }
+  if(state!=='run')return;
+  if(SEC.tamper){
+    SEC.fixT-=dt;
+    if(SEC.fixT<=0){
+      const g=SEC.tamper.g;
+      SEC.tamper=null; SEC.fixed++; score+=10; scoreDOM();
+      log(`INTEGRITY ▸ GATE ${pad(g+1)} SECURED — READS TRUSTED AGAIN (+10)`,'op');
+      audit(`GATE ${pad(g+1)} SECURED — CREDENTIALS ROTATED`);
+      flashMsg('GATE SECURED — READS VERIFIED +10','good'); AU.authOk();
+      if(SEC.fixed>=3)unlock('sentinel');
+      SEC.fixT=0;
+    }
+  }else if(simT>=SEC.nextTamper){
+    const g=irand(0,GATES.length-1);
+    SEC.tamper={g,until:simT+26};
+    SEC.nextTamper=simT+rand(75,140);
+    log(`SECURITY BREACH ▸ GATE ${pad(g+1)} ${GATES[g].name} TAMPERED — READS UNVERIFIED`,'bad');
+    flashMsg('GATE TAMPERED — READS UNVERIFIED','bad'); AU.tamper();
+  }
+  if(SEC.tamper&&simT>SEC.tamper.until&&SEC.fixT<=0){
+    audit(`GATE ${pad(SEC.tamper.g+1)} FAILOVER — READS RESUME`);
+    SEC.tamper=null;
+  }
+  if(!SEC.auth.active&&simT>=SEC.nextAuth)triggerAuth();
+}
+
+/* ================= vehicles ================= */
+const usedPlates=new Set();
+const PL='ABCDEFGHJKLMNPRSTVWX';
+function genPlate(){ let p; do{ p=PL[irand(0,PL.length-1)]+irand(0,9)+'·'+irand(1000,9999);}while(usedPlates.has(p)); usedPlates.add(p); return p; }
+function spawnVehicle(rd,d,opts={}){
+  const spec=opts.spec||pickType(rd.mix);
+  const col=opts.col||pick(VCOLORS);
+  const roll=Math.random();
+  const v={type:spec.key,spec,colName:col.n,plate:opts.plate||genPlate(),back:d===1,
+    lane:irand(0,rd.P-1), rd,dir:d,
+    s:opts.mid?rand(10,rd.len-10):(d===1?rd.len-3:3),
+    v:opts.mid?spec.spd*rd.spdMul*rand(.8,1.1):rand(2,5),
+    vmax:spec.spd*rd.spdMul*rand(.82,1.12), len:spec.key==='bus'?11:spec.key==='truck'?8.6:4.8,
+    bolo:!!opts.wanted, captured:false, arrested:false, off:0, hazT:0, capT:0, holdT:0, secFlag:false, panic:false,
+    reg:(opts.reg)||((roll<.09)?'EXPIRED':(roll<.13?'STOLEN':'CLEAN')),
+    rcd:{}, lastReadAny:-9, spiked:false};
+  rd.veh[d].push(v); return v;
+}
+function populate(){ for(const rd of ROADS) for(const d of[0,1])
+  for(let k=0;k<rd.target[d];k++) spawnVehicle(rd,d,{mid:true}); }
+function laneOff(rd,v){ return (v.back?1:-1)*((v.lane%rd.P)+.5)*rd.laneW; }
+let lightT=3, simT=0, clockT=23*3600+47*60+8;
+function lightState(){ const t=lightT%21; return t<8?'g':t<9.5?'a':'r'; }
+function stopFor(rd,d,v){
+  if(!rd.ctrl)return null;
+  const st=lightState();
+  let sd=d===0?rd.stopF-v.s:v.s-rd.stopB;
+  if(sd<-.3)return null;
+  if(st==='g')return null;
+  if(st==='a'&&sd<7)return null;
+  return sd;
+}
+let strips=[], spikesLeft=2;
+function spikeCheck(v){
+  if(v.spiked||v.captured)return false;
+  for(let i=0;i<strips.length;i++){ const st=strips[i];
+    if(st.rd!==v.rd||!st.armed)continue;
+    const passed=v.back?(v.s<=st.s):(v.s>=st.s);
+    if(Math.abs(v.s-st.s)<1.6||passed){
+      v.spiked=true; v.captured=true; v.arrested=false; v.hazT=0; v.capT=0;
+      v.offT=(v.back?1:-1)*(v.rd.P*v.rd.laneW+1.6);
+      v.v=0;
+      strips.splice(i,1);
+      const u=UNITS.find(x=>x.mission&&x.mission.v===v);
+      AU.spikeHit();
+      log(`SPIKE STRIP ▸ ${v.plate} TYRES DOWN — VEHICLE STOPPING`,'op');
+      flashMsg('SPIKE STRIP HIT — TARGET STOPPING','good');
+      if(u){ u.mission.spike=true; u.state='arrest'; u.arrestT=2.2; u.s=v.s;
+        log(`UNIT ${u.name} MOVING IN ON DISABLED ${v.plate}`,'op'); }
+      return true;
+    }
+  }
+  return false;
+}
+function updateVehicles(dt){
+  for(const rd of ROADS){
+    for(let d=0;d<2;d++){
+      const arr=rd.veh[d];
+      for(let i=arr.length-1;i>=0;i--){
+        const v=arr[i];
+        let want=v.captured?0:v.vmax, ahead=null, mg=1e9;
+        if(!v.captured&&!v.panic) for(const o of arr){
+          if(o===v||o.lane!==v.lane)continue;
+          const g=(o.s-v.s)*(v.back?-1:1)-v.len;
+          if(g>-.1&&g<mg){mg=g;ahead=o;}
+        }
+        if(ahead&&mg<14) want=Math.min(want,Math.max(0,(mg-3.5)*1.4));
+        if(!v.panic){
+          const sd=stopFor(rd,d,v);
+          if(sd!==null&&sd<16) want=Math.min(want,Math.max(0,(sd-.6)*1.1));
+        }else want=Math.min(9.4,v.vmax*1.55);
+        if(v.holdT>0){ v.holdT-=dt; want=0; v.hazT+=dt; }
+        v.v+=clamp(want-v.v,-9*dt,3.2*dt);
+        v.s+=v.v*dt*(v.back?-1:1);
+        if(!v.captured&&v.panic)spikeCheck(v);
+        if(v.captured){
+          v.hazT+=dt;
+          v.off+=clamp(v.offT-v.off,-1.6*dt,1.6*dt);
+          if(v.v<.05){ v.v=0; if(Math.abs(v.off-v.offT)<.4&&!v.secFlag){ v.secFlag=true;
+            log(`TARGET SECURED ▸ ${v.plate} — UNIT ON SCENE`,'op'); AU.secured(); } v.lane=-1; }
+          v.capT+=dt;
+          if(v.capT>26){ const r=recOf(v.plate); if(r)r.v=null; arr.splice(i,1);
+            log(`SCENE CLEAR ▸ ${v.plate} REMOVED`,'sys'); continue; }
+        }
+        if((v.back&&v.s<-4)||(!v.back&&v.s>rd.len+4)){
+          if(UNITS.some(u=>u.mission&&u.mission.v===v)){ evadeExit(arr,i,v); continue; }
+          const r=recOf(v.plate); if(r)r.v=null;
+          if(v.bolo){ v.s=v.back?rd.len-3:3; v.lane=irand(0,rd.P-1); v.off=laneOff(rd,v); v.v=3;
+            v.rcd={}; v.lastReadAny=-9; }
+          else arr.splice(i,1);
+        }
+      }
+      rd.spawnT[d]-=dt;
+      const live=arr.filter(x=>!x.captured).length;
+      if(rd.spawnT[d]<=0){ if(live<rd.target[d]) spawnVehicle(rd,d); rd.spawnT[d]=rand(.8,2.4); }
+    }
+  }
+}
+
+/* ================= records & scan db ================= */
+const plateMap=new Map();
+const readLog=[];
+let query='', selPlate=null, visSet=new Set(), readTimes=[];
+const recOf=p=>plateMap.get(p)||null;
+function scanEngine(){
+  for(const g of GATES){ const rd=g.rd;
+    for(let d=0;d<2;d++) for(const v of rd.veh[d]){
+      if(v.captured)continue;
+      if(simT-v.lastReadAny<1.1)continue;
+      if((v.rcd[g.i]||0)>simT)continue;
+      if(Math.abs(v.s-g.s)>55)continue;
+      emitRead(g,v);
+      v.rcd[g.i]=simT+rand(7,12); v.lastReadAny=simT;
+    }
+  }
+}
+function emitRead(g,v){
+  const dir=v.back?'WB':'EB';
+  const spd=Math.round(v.v*3.6);
+  const uv=gateTampered(g.i);
+  let rec=recOf(v.plate);
+  if(!rec){
+    rec={plate:v.plate,typeKey:v.type,typeName:v.spec.desc,colorName:v.colName,
+      firstT:clockT,lastT:clockT,reads:0,lastGate:g.i,lastDir:dir,lastSpeed:spd,
+      hist:[],v,reg:'UNKNOWN',regFinal:v.reg,regPend:0,cited:false,spdIssued:false,
+      spdCited:false,released:false,xpend:0,alibi:{}};
+    plateMap.set(v.plate,rec);
+  }
+  rec.lastT=clockT; rec.reads++; rec.lastGate=g.i; rec.lastDir=dir; rec.lastSpeed=spd;
+  rec.hist.unshift({g:g.i,t:clockT,dir,spd,uv}); if(rec.hist.length>18)rec.hist.pop();
+  rec.v=v;
+  if(!uv&&!v.captured&&spd>v.rd.lim+6&&!rec.spdIssued&&rec.reg!=='UNKNOWN'){
+    rec.spdIssued=true;
+    addEvidence(v.plate,'SPEEDING '+spd+' IN '+v.rd.lim,'FLAG','OPEN — VIOLATE [ \' ]',
+      `GATE ${pad(g.i+1)} · ${spd} KM/H IN ${v.rd.lim} ZONE · ${dir}`);
+    log(`SPEED READ ▸ ${v.plate} ${spd} KM/H IN ${v.rd.lim} ZONE · [ ' ] TO VIOLATE`,'alert');
+  }
+  readLog.unshift({t:clockT,rec,g:g.i,spd,dir,uv}); if(readLog.length>220)readLog.pop();
+  readTimes.push(clockT);
+  g.reads++; g.lastRead=simT;
+  addReadRow(readLog[0]);
+  $('logCount').textContent=plateMap.size+' PLATES';
+  AU.readTick();
+}
+function matchPlate(plate){
+  if(!query)return true;
+  const rec=recOf(plate); if(!rec)return false;
+  const p=plate.replace('·','').toUpperCase(), q=query.toUpperCase();
+  if(q.includes('?')){
+    for(let i=0;i<q.length;i++){ if(q[i]!=='?'&&q[i]!==p[i])return false; }
+    return true;
+  }
+  if(p.includes(q))return true;
+  return rec.typeName.toLowerCase().includes(query)||rec.colorName.toLowerCase().includes(query);
+}
+function addReadRow(read){
+  const r=read.rec;
+  const d=document.createElement('div'); d.className='sr new'+(r.released?' reld':''); d.dataset.plate=r.plate;
+  const fast=read.spd>GATES[read.g].rd.lim+6;
+  d.innerHTML=`<span class="st">${fmtClockT(read.t)}</span>`+
+    `<span class="sc">G${pad(read.g+1)}${read.uv?'<span class="uv">UV</span>':''}${r.released?'<span class="rl">REL</span>':''}</span>`+
+    `<span class="sp">${r.plate}</span><span class="sty">${ABBR[r.typeKey]}</span>`+
+    `<span class="sco"><span class="cdot" style="background:${COLHEX[r.colorName]}"></span>${r.colorName}</span>`+
+    `<span class="ss ${fast?'fast':''}">${read.spd}</span><span class="sd">${read.dir}</span>`;
+  scanBody.prepend(d);
+  while(scanBody.children.length>140)scanBody.lastChild.remove();
+  d.classList.toggle('hidden',!matchPlate(r.plate));
+  if(r.plate===selPlate)d.classList.add('sel');
+  applyFilter();
+}
+function applyFilter(){
+  visSet=new Set();
+  for(const r of readLog){ if(matchPlate(r.rec.plate))visSet.add(r.rec.plate); }
+  [...scanBody.children].forEach(el=>el.classList.toggle('hidden',!visSet.has(el.dataset.plate)));
+  const n=visSet.size;
+  $('fbInfo').textContent=query?`${n} MATCH${n===1?'':'ES'}`:'TYPE TO SEARCH · ? = WILDCARD';
+  if(selPlate&&!visSet.has(selPlate)){ selPlate=null; refreshSel(); }
+}
+function markSel(scroll){
+  [...scanBody.children].forEach(el=>{
+    const on=el.dataset.plate===selPlate;
+    el.classList.toggle('sel',on);
+    if(on&&scroll)el.scrollIntoView({block:'nearest'});
+  });
+}
+function refreshSel(scroll){ markSel(scroll); refreshDossier(); }
+function addEvent(text,type){
+  const d=document.createElement('div'); d.className='ev '+type;
+  d.innerHTML=`<span class="lt">${fmtClockT(clockT)}</span>${text}`;
+  logBody.prepend(d);
+  while(logBody.children.length>90)logBody.lastChild.remove();
+}
+const log=(text,type='sys')=>addEvent(text,type);
+let AUD={prev:'GENESIS',count:0};
+function audit(text){
+  const raw=AUD.prev+'|'+fmtClockT(clockT)+'|'+text;
+  let h=5381; for(let i=0;i<raw.length;i++)h=((h<<5)+h+raw.charCodeAt(i))|0;
+  const tag=(h>>>0).toString(16).toUpperCase().padStart(8,'0').slice(0,6);
+  AUD.prev=tag; AUD.count++;
+  addEvent(`AUDIT ▸ ${text}<span class="hh">#${tag}</span>`,'audit');
+}
+
+/* ================= registry ================= */
+let regQueries=0;
+function doRegistry(){
+  if(state!=='run')return;
+  const rec=selPlate&&recOf(selPlate);
+  if(!rec){ flashMsg('NO TARGET SELECTED','warn'); AU.denied(); return; }
+  if(gateGuard(rec))return;
+  if(rec.regPend>0||rec.xpend>0)return;
+  if(rec.reg!=='UNKNOWN'){ flashMsg('REGISTRY ALREADY ON FILE','warn'); AU.denied(); return; }
+  rec.regPend=1.7;
+  log(`REGISTRY QUERY ▸ ${rec.plate} …`,'sys');
+  refreshDossier();
+}
+function isSuspect(rec){ return boloList.some(b=>b.plate===rec.plate); }
+function pendTick(dt){
+  for(const rec of plateMap.values()){
+    if(rec.regPend>0){
+      rec.regPend-=dt;
+      if(rec.regPend<=0){
+        rec.regPend=0; rec.reg=rec.regFinal; regQueries++;
+        const sus=isSuspect(rec);
+        if(rec.reg==='STOLEN'){ log(`REGISTRY ▸ ${rec.plate} → STOLEN · [ = ] DISPATCH`,'bad'); AU.regStolen();
+          addEvidence(rec.plate,'STOLEN REGISTRY HIT','CRIT','DISPATCH REQUIRED','REGISTRY FLAG · CRIMINAL MATTER'); }
+        else if(rec.reg==='EXPIRED'){ log(`REGISTRY ▸ ${rec.plate} → EXPIRED · [ - ] CITE`,'alert'); AU.regExp();
+          addEvidence(rec.plate,'EXPIRED REGISTRATION','FLAG','OPEN — CITE [ - ]','REGISTRY FLAG · CIVIL MATTER'); }
+        else{
+          if(sus){
+            log(`REGISTRY ▸ ${rec.plate} → CLEAN BUT SUSPECT ON BOLO — CLONED PLATE LIKELY · [SPACE] DISPATCH`,'alert');
+            addEvidence(rec.plate,'CLEAN REGISTRY · BOLO SUSPECT','CRIT','HOLD — CLONE RISK',
+              'CLEAN REGISTRY ON A WANTED VEHICLE — PLATE LIKELY CLONED · DISPATCH, DO NOT RELEASE');
+          }else{
+            log(`REGISTRY ▸ ${rec.plate} → CLEAN · [ C ] RELEASE`,'reg'); AU.regClean();
+            addEvidence(rec.plate,'REGISTRY CLEAN','INFO','OPEN — RELEASE [ C ]','NO FLAGS · AWAITING DISPOSITION');
+          }
+        }
+        refreshDossier();
+      }
+    }
+    if(rec.xpend>0){
+      rec.xpend-=dt;
+      if(rec.xpend<=0){ rec.xpend=0; runAlibi(rec); }
+    }
+  }
+}
+
+/* ================= CASE NOTES ================= */
+let evidence=[], evSeq=0, reportsSent=0;
+function addEvidence(plate,reason,sev,status,detail){
+  const rec=recOf(plate);
+  let ev=evidence.find(x=>x.plate===plate&&!x.closed);
+  if(!ev){
+    ev={id:'E-'+pad(++evSeq,2),plate,t:clockT,ut:clockT,
+      typeName:rec?rec.typeName:'UNKNOWN',colorName:rec?rec.colorName:'UNKNOWN',
+      reg:rec&&rec.reg!=='UNKNOWN'?rec.reg:'UNKNOWN',
+      reason,sev,status,detail,closed:sev==='INFO'};
+    evidence.unshift(ev);
+  }else{
+    ev.reason=reason; ev.status=status; ev.detail=detail; ev.ut=clockT;
+    if(rec&&rec.reg!=='UNKNOWN')ev.reg=rec.reg;
+    if(sev!=='INFO')ev.sev=sev;
+  }
+  renderNotes();
+  return ev;
+}
+function renderNotes(){
+  $('evCount').textContent=evidence.filter(x=>!x.closed).length;
+  if(!evidence.length){ setHTML($('notesBody'),'<div class="clear-msg">NO EVIDENCE ON FILE — SUSPICIOUS VEHICLES FILE HERE AUTOMATICALLY</div>'); return; }
+  setHTML($('notesBody'),evidence.map(ev=>{
+    const isRel=ev.status.startsWith('RELEASED');
+    const hot=/EVADED|LOST|REQUIRED/.test(ev.status);
+    return `<div class="nt sev-${ev.sev} ${ev.closed?'done':''} ${isRel?'rel':''}" data-plate="${ev.plate}">
+      <div class="nt1"><span class="nid">${ev.id}</span><span class="npl">${ev.plate}</span>
+        <span class="tag">${ev.sev}</span></div>
+      <div class="nt2">${ev.colorName} ${ev.typeName} · ${ev.reason} · REG ${ev.reg}</div>
+      <div class="nt3 ${isRel?'rel':(hot?'hot':'')}">STATUS ▸ ${ev.status} · ${fmtClockT(ev.ut)}</div></div>`;
+  }).join(''));
+}
+
+/* ================= BOLO + AI ================= */
+let score=0, strikes=0, streak=0, bestStreak=0, captures=0, falseReports=0, lostBolos=0;
+let citations=0, spdTickets=0, releases=0, pursuitsWon=0, pursuitsLost=0, alibisFound=0, witUsed=0, droneUses=0;
+let shiftT=300, boloList=[], boloTimer=3, boloCooldown=0, boloSeq=0, bSel=null;
+let peakAnnounced=false, intT=40;
+const REGTXT=Object.freeze({CLEAN:'CLEAN — NO FLAGS',EXPIRED:'EXPIRED REGISTRATION',STOLEN:'STOLEN — REPORTED'});
+function maskOf(plate,reveal){
+  const idxs=shuffle([0,1,3,4,5,6]).slice(0,reveal);
+  return plate.split('').map((ch,i)=>i===2?'·':(idxs.includes(i)?ch:'?')).join('');
+}
+function maskMatch(plate,mask){
+  for(let i=0;i<7;i++){ const m=mask[i]; if(m==='?'||m==='·')continue; if(m!==plate[i])return false; }
+  return true;
+}
+function maskHasIntel(mask){ return mask.split('').some(c=>c!=='?'&&c!=='·'); }
+function candConf(b,c){
+  if(c.plate===b.plate)return 99;
+  if(c.alibi[b.id]&&c.alibi[b.id].startsWith('ALIBI'))return 0;
+  let s=32;
+  if(maskHasIntel(b.mask)&&maskMatch(c.plate,b.mask))s+=26;
+  if(c.reg==='STOLEN')s+=24; else if(c.reg==='UNKNOWN')s+=6; else if(c.reg==='EXPIRED')s-=8;
+  if(c.spdIssued)s-=6;
+  if(c.hist.length>=3)s+=4;
+  s+=((c.reads*7)%5);
+  return clamp(Math.round(s),1,97);
+}
+function spawnBolo(){
+  const g=pick(GATES), rd=g.rd, d=irand(0,1);
+  const el=300-shiftT;
+  const mode=(el>60&&Math.random()<.35)?'reg':'vis';
+  const spec=pick([VTYPES.sedan,VTYPES.sedan,VTYPES.hatch,VTYPES.suv,VTYPES.van,VTYPES.truck]);
+  const col=pick(VCOLORS.slice(0,6));
+  const s=clamp(g.s+(d===0?-rand(18,40):rand(18,40)),8,rd.len-8);
+  const v=spawnVehicle(rd,d,{spec,col,wanted:true});
+  v.s=s; v.v=spec.spd*rd.spdMul*rand(.7,.95);
+  if(mode==='reg')v.reg='STOLEN';
+  const reveal=shiftT>240?3:shiftT>120?pick([2,3]):2;
+  const b={id:++boloSeq,plate:v.plate,mask:mode==='vis'?maskOf(v.plate,reveal):'??·????',
+    colorName:col.n,typeName:spec.desc,typeKey:spec.key,mode,v,age:0,ttl:rand(75,100),
+    ping:false,pingT:14,gateIdx:g.i,engaged:false,canv:2,wpend:0,
+    priority:mode==='reg'?'HIGH':'STD'};
+  boloList.push(b);
+  if(mode==='vis'){ const k=irand(1,2);
+    for(let j=0;j<k;j++){ const oc=pick(GATES).rd;
+      spawnVehicle(oc,irand(0,1),{spec,col}); } }
+  log(`BOLO #${b.id}${b.priority==='HIGH'?' · HIGH PRIORITY':''} ISSUED ▸ ${col.n} ${spec.desc} · ${mode==='reg'?'STOLEN PLATES':'PATTERN '+b.mask}`,'alert');
+  AU.bolo(); refreshBoloDOM();
+  boloCooldown=peakAnnounced?rand(9,16):rand(15,24);
+}
+function candidatesFor(b){
+  const out=[];
+  const patterned=maskHasIntel(b.mask);
+  for(const rec of plateMap.values()){
+    if(rec.typeKey!==b.typeKey||rec.colorName!==b.colorName)continue;
+    if(patterned&&!maskMatch(rec.plate,b.mask))continue;
+    out.push(rec);
+  }
+  return out;
+}
+function findAlibi(b,cand){
+  const t=recOf(b.plate);
+  if(!t||t.hist.length<2)return null;
+  for(const h1 of cand.hist){ if(h1.uv)continue; const g1=GATES[h1.g];
+    for(const h2 of t.hist){ if(h2.uv)continue; if(h2.g===h1.g)continue;
+      const g2=GATES[h2.g];
+      if(g2.rd!==g1.rd&&Math.abs(h1.t-h2.t)<=10) return {h1,h2};
+    }
+  }
+  return null;
+}
+function doXref(){
+  if(state!=='run')return;
+  const rec=selPlate&&recOf(selPlate);
+  if(!rec){ flashMsg('NO TARGET SELECTED','warn'); AU.denied(); return; }
+  if(rec.xpend>0)return;
+  rec.xpend=2.4;
+  log(`CROSS-REF ▸ ${rec.plate} VS ACTIVE TRACES …`,'sys');
+  refreshDossier();
+}
+function runAlibi(rec){
+  let n=0;
+  for(const b of boloList){
+    if(rec.plate===b.plate){ rec.alibi[b.id]='TARGET'; continue; }
+    const al=findAlibi(b,rec);
+    if(al){
+      rec.alibi[b.id]=`ALIBI ▸ G${al.h1.g+1} ${fmtClockT(al.h1.t)} VS G${al.h2.g+1} ${fmtClockT(al.h2.t)}`;
+      log(`X-REF ▸ ${rec.plate} RULED OUT OF #${b.id} — TWO ROADS, 10s WINDOW`,'op');
+      addEvidence(rec.plate,'ALIBI CONFIRMED','INFO','RULED OUT',
+        `IMPOSSIBLE JOURNEY: G${al.h1.g+1} ${fmtClockT(al.h1.t)} VS G${al.h2.g+1} ${fmtClockT(al.h2.t)} · BOLO #${b.id}`);
+      n++; AU.xrefOk();
+    }else rec.alibi[b.id]=null;
+  }
+  if(n>0){ alibisFound+=n; if(alibisFound>=3)unlock('alibi3'); }
+  else log(`X-REF ▸ ${rec.plate} — NO CONFLICT FOUND (NOT PROOF)`,'sys');
+  refreshDossier();
+}
+function doWitness(){
+  if(state!=='run')return;
+  let b=null;
+  if(selPlate){ b=boloList.find(x=>x.plate!==selPlate&&(candidatesFor(x).some(c=>c.plate===selPlate))); }
+  if(!b)b=bSel&&boloList.includes(bSel)?bSel:boloList[0];
+  if(!b){ flashMsg('NO ACTIVE BOLO','warn'); AU.denied(); return; }
+  if(b.wpend>0)return;
+  if(b.canv<=0){ flashMsg(`BOLO #${b.id} — CANVASS QUOTA SPENT`,'warn'); AU.denied(); return; }
+  b.canv--; b.wpend=6; witUsed++;
+  log(`WITNESS CANVASS ▸ BOLO #${b.id} — DOOR KNOCK UNDERWAY (6s)`,'wit');
+  AU.wit(); refreshBoloDOM();
+}
+function witTick(dt){
+  for(const b of boloList){
+    if(b.wpend>0){
+      b.wpend-=dt;
+      if(b.wpend<=0){
+        const idxs=shuffle([0,1,3,4,5,6].filter(i=>b.mask[i]==='?'));
+        if(idxs.length){
+          const i=idxs[0];
+          const ch=b.plate[i];
+          b.mask=b.mask.substring(0,i)+ch+b.mask.substring(i+1);
+          log(`WITNESS ▸ BOLO #${b.id} — CHARACTER ${i<2?'#'+(i+1):'LAST '+(7-i)} IS “${ch}” · PATTERN ${b.mask}`,'wit');
+        }else log(`WITNESS ▸ BOLO #${b.id} — NO FURTHER DETAIL`,'wit');
+        AU.wit(); refreshBoloDOM();
+      }
+    }
+  }
+}
+function interceptTick(dt){
+  intT-=dt;
+  if(intT>0)return;
+  intT=rand(35,60);
+  if(!boloList.length)return;
+  const live=boloList.filter(x=>x.v&&!x.captured);
+  const b=live.length?pick(live):boloList[0];
+  const v=b.v; if(!v)return;
+  const ns=nextGateFor(v);
+  if(ns!=null){
+    const g=GATES.find(x=>x.rd===v.rd&&x.s===ns);
+    log(`COMMS INTERCEPT ▸ BOLO #${b.id} — CHATTER PLACES TARGET TOWARD ${g.name} · ${v.back?'WB':'EB'}`,'wit');
+  }else{
+    log(`COMMS INTERCEPT ▸ BOLO #${b.id} — TARGET DISCUSSING LEAVING THE GRID · EXIT WATCH ON`,'wit');
+  }
+  if(Math.random()<.3){
+    const idxs=[0,1,3,4,5,6].filter(i=>b.mask[i]==='?');
+    if(idxs.length){ const i=pick(idxs);
+      b.mask=b.mask.substring(0,i)+b.plate[i]+b.mask.substring(i+1);
+      log(`COMMS INTERCEPT ▸ LEAKED PLATE CHARACTER “${b.plate[i]}” · PATTERN ${b.mask}`,'wit'); }
+  }
+  AU.wit(); refreshBoloDOM();
+}
+function boloTick(dt){
+  boloTimer-=dt; boloCooldown-=dt;
+  const el=300-shiftT;
+  if(!peakAnnounced&&el>=210){ peakAnnounced=true;
+    log('PEAK HOURS ▸ GRID PRESSURE RISING — EXPECT MORE TARGETS','alert');
+    flashMsg('PEAK HOURS — PRESSURE RISING','warn'); }
+  const maxB=(el<75?1:el<180?2:3)+(peakAnnounced?1:0);
+  if(boloTimer<=0){ if(boloList.length<maxB)spawnBolo(); boloTimer=rand(6,12); }
+  if(boloList.length<maxB&&boloCooldown<=0){ spawnBolo(); }
+  let dirty=false;
+  for(let i=boloList.length-1;i>=0;i--){
+    const b=boloList[i];
+    if(!b.engaged)b.age+=dt;
+    const rec=recOf(b.plate);
+    if(!b.ping&&rec&&b.age>14){ b.ping=true; dirty=true;
+      log(`TRACE ▸ BOLO #${b.id} LAST READ GATE ${pad(rec.lastGate+1)} ${GATES[rec.lastGate].sector} · ${rec.lastDir}`,'alert');
+      b.pingT=12;
+    } else if(b.ping&&!b.engaged){ b.pingT-=dt;
+      if(b.pingT<=0){ b.pingT=12; if(rec){
+        log(`TRACE ▸ BOLO #${b.id} GATE ${pad(rec.lastGate+1)} · ${rec.lastDir}`,'alert'); } } }
+    if(b.age>=b.ttl&&!b.engaged){
+      boloList.splice(i,1);
+      if(b.v){ b.v.bolo=false; }
+      lostBolos++; streak=0; score=Math.max(0,score-50);
+      log(`BOLO #${b.id} EXPIRED — TARGET LOST TO TIME (−50)`,'bad');
+      flashMsg('BOLO EXPIRED — TARGET LOST −50','bad'); AU.expire();
+      addEvidence(b.plate,'WATCHLIST TARGET','CRIT','EXPIRED — LOST','BOLO TTL EXPIRED BEFORE INTERCEPT');
+      scoreDOM(); dirty=true;
+    }
+  }
+  if(dirty||Math.random()<dt*2)refreshBoloDOM();
+}
+function unitsOn(b){ return UNITS.filter(u=>u.mission&&u.mission.b===b); }
+function refreshBoloDOM(){
+  $('boloCount').textContent=boloList.length;
+  if(!boloList.length){ setHTML(boloBody,'<div class="clear-msg">NO ACTIVE BOLO — MONITORING</div>'); return; }
+  setHTML(boloBody,'<div class="bolo-note">AI TRIAGE ONLINE · CANDIDATES SCORED · SPACE = FULL CONVOY RESPONSE</div>'+
+    boloList.map(b=>{
+      const rec=recOf(b.plate);
+      const ue=unitsOn(b);
+      let st;
+      if(ue.length)st=`${ue.length} UNIT${ue.length>1?'S':''} ${ue.map(u=>u.name).join('/')} ▸ ${USTATE_TXT[ue[0].state]}`;
+      else if(b.wpend>0)st=`WITNESS CANVASS ▸ ${Math.ceil(b.wpend)}s`;
+      else if(b.ping&&rec)st=`TRACE ▸ GATE ${pad(rec.lastGate+1)} ${GATES[rec.lastGate].sector} · ${rec.lastDir}`;
+      else st='ESTABLISHING TRACE…';
+      const pct=clamp((1-b.age/b.ttl)*100,0,100);
+      const cands=candidatesFor(b).map(c=>({c,conf:candConf(b,c)}))
+        .sort((a,x)=>x.conf-a.conf);
+      const top=cands.length>1?cands[0]:null;
+      const rows=cands.slice(0,6).map(({c,conf})=>{
+        let cb;
+        const ruled=c.alibi[b.id]&&c.alibi[b.id]!=='TARGET'&&c.alibi[b.id].startsWith('ALIBI');
+        if(c.plate===b.plate)cb='<span class="cb tgt">●</span>';
+        else if(ruled)cb='<span class="cb alib">ALIBI</span>';
+        else if(c.released)cb='<span class="cb rel">REL</span>';
+        else if(c.reg==='STOLEN')cb='<span class="cb stol">STOLEN</span>';
+        else if(c.reg==='EXPIRED')cb='<span class="cb expi">EXPR</span>';
+        else if(c.spdIssued&&c.reg==='UNKNOWN')cb='<span class="cb spd">SPD</span>';
+        else if(c.reg==='UNKNOWN')cb='<span class="cb regu">REG?</span>';
+        else cb='<span class="cb cons">OK</span>';
+        return `<div class="cand ${selPlate===c.plate?'sel':''} ${ruled?'ruled':''}" data-plate="${c.plate}">
+          <span class="cp">${c.plate}</span>${cb}<span class="cf">${conf}%</span></div>`;
+      }).join('');
+      const more=cands.length>6?`<div class="b-st">+${cands.length-6} MORE — REFINE QUERY</div>`:'';
+      const aiLine=top&&top.conf>=50?`<div class="b-ai">AI TOP ▸ ${top.c.plate} · ${top.conf}%</div>`:'';
+      return `<div class="bolo ${b.engaged?'engaged':''} ${b.priority==='HIGH'?'hi':''} ${bSel===b?'bsel':''}" data-bid="${b.id}">
+      <div class="b-plate ${b.mode==='reg'&&!maskHasIntel(b.mask)?'unknown':''}"><span>${b.mask}</span><span class="bid">#${b.id}${b.priority==='HIGH'?' · HIGH':''}${b.canv?` · W×${b.canv}`:''}</span></div>
+      ${aiLine}
+      <div class="b-desc">${b.colorName} ${b.typeName}${b.mode==='reg'?' · <span style="color:var(--red)">STOLEN PLATES</span>':''} · ${cands.length} CAND${cands.length===1?'':'S'}</div>
+      <div class="b-st ${ue.length?'unit':(b.wpend>0?'canv':(b.ping?'ping':''))}">${st}</div>
+      <div class="b-bar"><i style="width:${pct}%"></i></div>
+      ${cands.length?'<div class="b-cand-h">CANDIDATES · AI CONFIDENCE</div>'+rows+more:''}</div>`;
+    }).join(''));
+}
+
+/* ================= dossier ================= */
+const AGO=t=>`${Math.max(0,Math.round(clockT-t))}s`;
+function boloChecklist(b,rec){
+  const t=rec.typeKey===b.typeKey?'✓':'✗';
+  const c=rec.colorName===b.colorName?'✓':'✗';
+  const patterned=maskHasIntel(b.mask);
+  const p=patterned?(maskMatch(rec.plate,b.mask)?'✓':'✗'):'?';
+  if(b.mode==='vis'||patterned){
+    return {items:`T${t} · C${c} · P${p}`, hit:t==='✓'&&c==='✓'&&p==='✓'};
+  }
+  const r=rec.reg==='UNKNOWN'?null:rec.reg==='STOLEN';
+  const rs=r===null?'<span class="un">REG?</span>':r?'<span class="ok">REG✓</span>':'<span class="no">REG✗</span>';
+  return {items:`T${t} · C${c} · ${rs}`, hit:t==='✓'&&c==='✓'&&r===true};
+}
+function refreshDossier(){
+  const rec=selPlate&&recOf(selPlate);
+  if(!rec){
+    $('dReg').textContent='—';
+    setHTML(dossierBody,'<div class="d-empty">NO TARGET SELECTED<br>TYPE A FRAGMENT — PLATE / COLOUR / TYPE — OR CLICK A CANDIDATE<br>↑ ↓ TO BROWSE READS · [ CROSS-REF · ] WITNESS</div>');
+    return;
+  }
+  const suspect=isSuspect(rec);
+  const live=rec.v?(rec.v.captured?'sec':'on'):'off';
+  const liveTxt=live==='sec'?'STOPPED':live==='on'?'ON GRID':'OFF GRID';
+  $('dReg').textContent=(rec.reg==='UNKNOWN'?'REG ?':rec.reg)+(rec.cited?' · CITED':'')+(rec.released?' · RELEASED':'')+(suspect?' · SUSPECT':'');
+  const trace=[...new Map(rec.hist.map(h=>[h.g,h.t])).entries()].slice(0,3)
+    .map(([g,t])=>`<span>G${g+1} ${AGO(t)}</span>`).join('');
+  let regHtml;
+  if(rec.regPend>0){ const k=Math.round((1.7-rec.regPend)/1.7*6);
+    regHtml=`<span class="reg-unknown">QUERYING ${'▮'.repeat(k)}${'▯'.repeat(6-k)}</span>`; }
+  else if(rec.xpend>0){ const k=Math.round((2.4-rec.xpend)/2.4*6);
+    regHtml=`<span class="reg-unknown">X-REF ${'▮'.repeat(k)}${'▯'.repeat(6-k)}</span>`; }
+  else if(rec.reg==='UNKNOWN')regHtml=`<span class="reg-unknown">UNKNOWN — PRESS [Q] TO CHECK</span>`;
+  else if(rec.released)regHtml=`<span class="reg-clean">CLEAN — RELEASED ✓</span>`;
+  else if(rec.reg==='CLEAN'&&suspect)regHtml=`<span class="reg-exp">CLEAN ⚠ CLONE SUSPECTED</span>`;
+  else regHtml=`<span class="reg-${rec.reg==='CLEAN'?'clean':rec.reg==='EXPIRED'?'exp':'stolen'}">${REGTXT[rec.reg]}</span>`;
+  const warnLine=suspect&&!rec.released?'<span class="d-v d-warn" style="grid-column:2">⚠ BOLO MATCH ON FILE — PLATE MAY BE CLONED · DISPATCH [SPACE], DO NOT RELEASE [C]</span>':'';
+  const journey=rec.hist.slice(0,6).map(h=>
+    `<div class="dj"><span class="jt">${fmtClockT(h.t)}</span><span>G${h.g+1}${h.uv?'*':''}</span><span>${h.dir}</span><span>${h.spd} KM/H</span><span>${GATES[h.g].sector}</span></div>`).join('');
+  let matches='';
+  if(boloList.length){
+    matches='<div class="d-matches">'+boloList.map(b=>{
+      const ck=boloChecklist(b,rec);
+      const ue=unitsOn(b);
+      const ali=rec.alibi[b.id];
+      let verdict;
+      if(rec.plate===b.plate)verdict='<span class="d-verdict hit">● SUSPECT</span>';
+      else if(ali&&ali!=='TARGET'&&ali.startsWith('ALIBI'))verdict='<span class="d-verdict alib">RULED OUT</span>';
+      else if(ali==='TARGET')verdict='<span class="d-verdict nope">SELF</span>';
+      else if(ue.length)verdict=`<span class="d-verdict eng">${ue.length} UNIT${ue.length>1?'S':''}</span>`;
+      else verdict=ck.hit?'<span class="d-verdict hit">MATCH — SPACE</span>':'<span class="d-verdict nope">—</span>';
+      return `<div class="d-m"><span>#${b.id} ${b.mask}</span>
+        <span>${ck.items}</span>${verdict}</div>`;
+    }).join('')+'</div>';
+  } else matches='<div class="d-matches"><div class="d-m"><span>NO ACTIVE BOLO</span><span class="d-verdict nope">—</span></div></div>';
+  const hints=[];
+  if(suspect&&!rec.released)hints.push('<b>SPACE</b> DISPATCH CONVOY — SUSPECT ON FILE');
+  if(rec.reg==='STOLEN')hints.push('<b>[ = ]</b> REPORT STOLEN → CONVOY');
+  if(rec.reg==='EXPIRED'&&!rec.cited)hints.push('<b>[ - ]</b> CITE +25');
+  if(rec.reg==='CLEAN'&&!rec.released&&!suspect)hints.push('<b>[ C ]</b> RELEASE +10');
+  if(rec.spdIssued&&!rec.spdCited)hints.push('<b>[ \' ]</b> SPEED VIOLATION +15');
+  if(rec.cited)hints.push('CITED ✓');
+  if(rec.released)hints.push('RELEASED ✓ — FILE GREEN');
+  if(lastReadUnverified(rec))hints.push('<span style="color:var(--amb)">LAST READ UNVERIFIED — [K] SCAN</span>');
+  hints.push('<b>Q</b> REGISTRY · <b>TAB</b> MAIL');
+  setHTML(dossierBody,`
+    <div class="d-head"><span class="d-plate ${rec.released?'rel':''}">${rec.plate}</span><span class="d-live ${live}">${liveTxt}</span></div>
+    <div class="d-cols">
+      <div class="d-col">
+        <div class="d-grid">
+          <span class="d-k">VEHICLE</span><span class="d-v"><b>${rec.colorName} ${rec.typeName}</b></span>
+          <span class="d-k">LAST READ</span><span class="d-v">GATE ${pad(rec.lastGate+1)}${gateTampered(rec.lastGate)?' <span class="uv">UV</span>':''} · ${GATES[rec.lastGate].name} · ${AGO(rec.lastT)}</span>
+          <span class="d-k">HEADING</span><span class="d-v">${rec.lastDir} · ${rec.lastSpeed} KM/H · LIMIT ${rec.v?rec.v.rd.lim:'—'}</span>
+          <span class="d-k">TRACE</span><span class="d-v d-trace">${trace||'—'}</span>
+          <span class="d-k">REGISTRY</span><span class="d-v">${regHtml}</span>
+          ${warnLine}
+        </div>
+        ${matches}
+        <div class="d-hint">${hints.join(' · ')}</div>
+      </div>
+      <div class="d-col d-journey">
+        <div class="d-k" style="margin-bottom:4px">JOURNEY LOG · LAST READS (* = UNVERIFIED)</div>
+        ${journey||'<div class="d-k">NO HISTORY</div>'}
+      </div>
+    </div>`);
+}
+
+/* ================= police units + drone ================= */
+const UNITS=[];
+const USTATE_COL=Object.freeze({base:'#4A5443',enroute:'#F0B441',pursuit:'#F25C4D',arrest:'#F25C4D',rtb:'#77836F',transit:'#77836F'});
+const USTATE_TXT=Object.freeze({base:'BASE',enroute:'RESPOND',pursuit:'PURSUIT',arrest:'ARREST',rtb:'RTB',transit:'TRANSIT'});
+const UCOL=Object.freeze({ABLE:'#7FC7E8',BRAVO:'#E8C07F',CHARLIE:'#C9A0E0'});
+function mkUnit(name,brd,bs){UNITS.push({name,color:UCOL[name],rd:brd,s:bs,dir:1,
+  state:'base',baseRd:brd,baseS:bs,mission:null,cool:0,transit:null,arrestT:0,flash:rand(9)});}
+mkUnit('ABLE',r1,-80);
+mkUnit('BRAVO',r3,60);
+mkUnit('CHARLIE',r5,50);
+const drone={bat:2,active:false,rd:null,s:0,dir:1,t:0};
+function doDrone(){
+  if(state!=='run')return;
+  if(drone.active){ drone.active=false;
+    log('DRONE ▸ RECALLED TO NEST — BATTERY PRESERVED','op'); AU.release(); return; }
+  if(drone.bat<=0){ flashMsg('DRONE BATTERIES DEPLETED','warn'); AU.denied(); return; }
+  const rec=selPlate&&recOf(selPlate);
+  const busy=UNITS.find(u=>u.mission&&u.mission.v);
+  const v=(rec&&rec.v)?rec.v:(busy?busy.mission.v:null);
+  if(!v){ flashMsg('NO LIVE TARGET SIGNAL — DRONE NEEDS A ROAD TO COVER','warn'); AU.denied(); return; }
+  drone.bat--; drone.active=true; drone.rd=v.rd; drone.s=v.s; drone.dir=v.back?-1:1; drone.t=14;
+  droneUses++;
+  log(`DRONE ▸ AIRBORNE OVER ${v.rd.name} — 14s OVERWATCH · SIGNAL LOCK ASSIST ACTIVE`,'op');
+  audit(`RECON DRONE DEPLOY — ROAD ${v.rd.name} · OPERATOR R-77`);
+  flashMsg('DRONE AIRBORNE — OVERWATCH LIVE','info'); AU.droneUp();
+  statusDOM();
+}
+function droneTick(dt){
+  if(!drone.active)return;
+  drone.t-=dt;
+  const tgt=UNITS.find(u=>u.mission&&u.state==='pursuit'&&u.mission.v.rd===drone.rd);
+  if(tgt){ drone.s=clamp(tgt.mission.v.s,0,drone.rd.len); drone.dir=tgt.mission.v.back?-1:1; }
+  else drone.s=clamp(drone.s+drone.dir*6*dt,0,drone.rd.len);
+  if(drone.t<=0){ drone.active=false;
+    log('DRONE ▸ BATTERY CYCLE COMPLETE — RTB','op'); }
+}
+function unitStepToward(u,targetS,speed,dt){
+  const d=targetS-u.s;
+  if(Math.abs(d)<.4){u.s=targetS;return true;}
+  u.dir=d>0?1:-1;
+  u.s+=u.dir*speed*dt;
+  if((u.dir>0&&u.s>targetS)||(u.dir<0&&u.s<targetS))u.s=targetS;
+  return u.s===targetS;
+}
+function transitTo(u,toRd){
+  u.state='transit';
+  u.transit={to:toRd,p:0,dur:.8+.3*Math.abs(ROADS.indexOf(toRd)-ROADS.indexOf(u.rd)),
+    y0:32+ROADS.indexOf(u.rd)*24,y1:32+ROADS.indexOf(toRd)*24};
+}
+/* CONVOY DISPATCH — every available unit rolls for the suspect */
+function dispatchUnits(v){
+  const avail=UNITS.filter(u=>u.state==='base'&&u.cool<=0);
+  if(!avail.length){flashMsg('NO UNITS AVAILABLE — ALL PATROLS BUSY','warn');AU.denied();return false;}
+  avail.sort((a,b)=>{
+    const da=(a.rd===v.rd)?Math.abs(a.s-v.s):Math.abs(a.s-(a.rd.len-5))+40;
+    const db=(b.rd===v.rd)?Math.abs(b.s-v.s):Math.abs(b.s-(b.rd.len-5))+40;
+    return da-db;
+  });
+  const b=boloList.find(x=>x.v===v);
+  avail.forEach((u,i)=>{
+    u.mission={v,b:null,track:1,clean:true,spike:false,droneAssist:false,primary:i===0};
+    u.state='enroute';
+  });
+  if(b){ b.engaged=true; avail.forEach(u=>{u.mission.b=b;}); }
+  log(`CONVOY DISPATCH ▸ ${avail.length} UNIT${avail.length>1?'S':''} (${avail.map(u=>u.name).join(', ')}) ROLLING FOR ${v.plate} — LEAD ${avail[0].name}`,'op');
+  audit(`CONVOY DISPATCH — ${avail.map(u=>u.name).join('/')} · TARGET ${v.plate}`);
+  AU.radioBlip();
+  return true;
+}
+function callOff(u,v){
+  u.state='rtb'; u.cool=4; v.panic=false;
+  const b=u.mission&&u.mission.b;
+  u.mission=null; pursuitsLost++;
+  score=Math.max(0,score-25); streak=0;
+  for(const x of UNITS){ if(x.mission&&x.mission.v===v){
+    x.mission=null; x.state='rtb'; x.cool=3; } }
+  if(b)b.engaged=false;
+  log(`PURSUIT CALLED OFF ▸ ${v.plate} — SIGNAL LOCK LOST (−25)`,'bad');
+  audit(`PURSUIT CALLED OFF — ${v.plate} · SIGNAL LOST`);
+  flashMsg('PURSUIT CALLED OFF — SIGNAL LOST −25','bad'); AU.expire();
+  addEvidence(v.plate,'WATCHLIST TARGET','CRIT','PURSUIT CALLED OFF','SIGNAL LOCK LOST — UNITS RTB');
+  scoreDOM(); refreshBoloDOM();
+}
+function arrestSuccess(u){
+  const m=u.mission;
+  if(!m){ u.state='rtb'; return; }
+  const v=m.v;
+  if(v.arrested){
+    u.mission=null; u.state='rtb'; u.cool=2;
+    log(`UNIT ${u.name} SECURING SCENE — ARREST BY LEAD UNIT`,'sys');
+    return;
+  }
+  v.arrested=true;
+  let pts=v.bolo?150:120;
+  if(m.b)pts+=Math.max(0,120-Math.round(m.b.age)*2);
+  else pts+=60;
+  if(m.clean)pts+=40;
+  if(m.spike)pts+=30;
+  if(m.droneAssist)pts+=15;
+  if(m.b&&m.b.priority==='HIGH')pts+=30;
+  pts+=streak*35;
+  const crew=UNITS.filter(x=>x.mission&&x.mission.v===v&&x!==u).length;
+  if(crew>=2)unlock('convoy');
+  const bi=boloList.findIndex(b=>b.v===v);
+  if(bi>=0)boloList.splice(bi,1);
+  if(v.bolo)v.bolo=false;
+  v.panic=false;
+  streak++; bestStreak=Math.max(bestStreak,streak);
+  captures++; pursuitsWon++; score+=pts;
+  popup(`ARREST ${v.plate}  +${pts}${m.spike?' · SPIKE +30':''}${m.droneAssist?' · DRONE +15':''}${m.clean?' · CLEAN +40':''}${streak>1?' · STREAK ×'+streak:''}`,'good');
+  log(`ARREST ▸ ${v.plate} — UNIT ${u.name}${crew?` +${crew} BACKUP`:''} · +${pts}${m.spike?' (SPIKE)':''}${m.droneAssist?' (DRONE)':''}${m.clean?' (CLEAN)':''}`,'op');
+  audit(`ARREST — ${v.plate} · UNIT ${u.name}${crew?` · +${crew} BACKUP`:''}${m.droneAssist?' · DRONE-ASSIST':''}`);
+  flashMsg('SUSPECT ARRESTED','good'); AU.capture();
+  addEvidence(v.plate,'CONFIRMED OFFENDER','CRIT','ARRESTED '+fmtClockT(clockT),
+    (m.b?'BOLO #'+m.b.id+(m.b.priority==='HIGH'?' · HIGH':''):'STOLEN PLATE')+' · UNIT '+u.name+
+    (crew?` · +${crew} BACKUP`:'')+
+    (m.spike?' · SPIKE STRIP':'')+(m.droneAssist?' · DRONE OVERWATCH':'')+(m.clean?' · CLEAN PURSUIT':''));
+  unlock('first'); if(streak>=3)unlock('streak3'); if(m.clean)unlock('clean'); if(m.spike)unlock('spike');
+  if(m.droneAssist)unlock('eyeline');
+  if(captures>=10)unlock('ten');
+  u.mission=null; u.state='rtb'; u.cool=3;
+  for(const x of UNITS){ if(x.mission&&x.mission.v===v){ x.mission=null; x.state='rtb'; x.cool=2; } }
+  scoreDOM(); refreshBoloDOM(); refreshDossier();
+}
+function updateUnits(dt){
+  for(let i=strips.length-1;i>=0;i--){ const st=strips[i];
+    st.armT-=dt;
+    if(st.armT<=0&&!st.armed){ st.armed=true;
+      log(`SPIKE STRIP ARMED ▸ ${st.rd.name} @ ${Math.round(st.s)}u`,'op'); } }
+  for(const u of UNITS){
+    u.flash+=dt;
+    if(u.cool>0)u.cool-=dt;
+    const m=u.mission;
+    if(u.state==='transit'){
+      u.transit.p+=dt/u.transit.dur;
+      if(u.transit.p>=1){u.rd=u.transit.to;u.s=u.rd.len-5;u.state='enroute';u.transit=null;}
+      continue;
+    }
+    if(u.state==='base')continue;
+    if(u.state==='enroute'){
+      if(!m){u.state='rtb';continue;}
+      const v=m.v;
+      if(u.rd!==v.rd){
+        if(unitStepToward(u,u.rd.len-5,26,dt))transitTo(u,v.rd);
+      }else{
+        unitStepToward(u,v.s,26,dt);
+        if(Math.abs(v.s-u.s)<26){
+          u.state='pursuit'; v.panic=true; m.track=1;
+          if(m.primary){
+            log(`PURSUIT ▸ UNIT ${u.name} ON ${v.plate} — KEEP TARGET SELECTED · [ \\ ] SPIKES · [ H ] DRONE`,'alert');
+            flashMsg('PURSUIT ACTIVE — HOLD SIGNAL OR LAUNCH DRONE','warn'); AU.bolo();
+          }else{
+            log(`BACKUP ▸ UNIT ${u.name} JOINING PURSUIT OF ${v.plate}`,'op');
+          }
+        }
+      }
+    }else if(u.state==='pursuit'){
+      const v=m.v;
+      if(!v){u.state='rtb';u.mission=null;continue;}
+      if(v.captured){
+        if(Math.abs(v.s-u.s)<8){ u.state='arrest'; u.arrestT=1.5; u.s=v.s; }
+        else { u.mission=null; u.state='rtb'; u.cool=2; }
+        continue;
+      }
+      const manual=selPlate===v.plate;
+      const assist=drone.active&&drone.rd===v.rd;
+      if(assist&&!m.droneAssist){ m.droneAssist=true;
+        log(`DRONE ▸ OVERWATCH RELAY LIVE — UNIT ${u.name} SIGNAL ASSISTED`,'op'); }
+      const ow=manual||assist;
+      m.clean=m.clean&&manual;
+      m.track=clamp(m.track+(ow?.30:-.26)*dt,0,1);
+      if(m.track<=0){
+        if(m.primary){ callOff(u,v); }
+        else { u.mission=null; u.state='rtb'; u.cool=2;
+          log(`BACKUP ▸ UNIT ${u.name} BROKE OFF — SIGNAL LOST`,'sys'); }
+        continue;
+      }
+      unitStepToward(u,v.s,assist?11.6:(manual?10.4:9.7),dt);
+      if(Math.abs(v.s-u.s)<4.2){
+        u.state='arrest'; u.arrestT=m.primary?4.0:2.5;
+        v.captured=true; v.arrested=false; v.hazT=0; v.capT=0;
+        v.offT=(v.back?1:-1)*(v.rd.P*v.rd.laneW+1.6);
+        log(`UNIT ${u.name} BOXING IN ${v.plate} — MAKING ARREST`,'op'); AU.secured();
+      }
+    }else if(u.state==='arrest'){
+      const v=m?m.v:null;
+      if(!v){ u.state='rtb'; u.mission=null; continue; }
+      u.s=v.s;
+      u.arrestT-=dt;
+      if(u.arrestT<=0)arrestSuccess(u);
+    }else if(u.state==='rtb'){
+      if(u.rd!==u.baseRd){
+        if(unitStepToward(u,u.rd.len-5,22,dt))transitTo(u,u.baseRd);
+      }else if(unitStepToward(u,u.baseS,22,dt)){u.state='base';u.cool=2;}
+    }
+  }
+}
+function evadeExit(arr,i,v){
+  const pursuing=UNITS.some(u=>u.mission&&u.mission.v===v&&u.state==='pursuit');
+  const pen=pursuing?75:50;
+  score=Math.max(0,score-pen); lostBolos++; pursuitsLost++; streak=0;
+  const bi=boloList.findIndex(b=>b.v===v);
+  if(bi>=0)boloList.splice(bi,1);
+  if(v.bolo)v.bolo=false;
+  v.panic=false;
+  for(const u of UNITS){ if(u.mission&&u.mission.v===v){ u.mission=null; u.state='rtb'; u.cool=5; } }
+  const rec=recOf(v.plate); if(rec)rec.v=null;
+  arr.splice(i,1);
+  log(`EVADED ▸ ${v.plate} LEFT THE GRID — ${pursuing?'CONVOY PURSUIT FAILED':'INTERCEPT TOO LATE'} (−${pen})`,'bad');
+  audit(`TARGET EVADED — ${v.plate} · PENALTY −${pen}`);
+  flashMsg(`TARGET EVADED — LEFT GRID −${pen}`,'bad'); AU.expire();
+  addEvidence(v.plate,'WATCHLIST TARGET','CRIT','EVADED — LOST','TARGET EXITED GRID · '+(pursuing?'CONVOY PURSUIT FAILED':'INTERCEPT TOO LATE'));
+  scoreDOM(); refreshBoloDOM();
+}
+function doSpike(){
+  if(state!=='run')return;
+  if(spikesLeft<=0){ flashMsg('NO SPIKE STRIPS REMAINING','warn'); AU.denied(); return; }
+  const u=UNITS.find(x=>x.state==='pursuit'&&x.mission);
+  if(!u){ flashMsg('NO ACTIVE PURSUIT — SPIKES NEED A FLEEING TARGET','warn'); AU.denied(); return; }
+  const v=u.mission.v;
+  if(strips.some(s=>s.rd===v.rd)){ flashMsg('STRIP ALREADY DEPLOYED ON THIS ROAD','warn'); AU.denied(); return; }
+  spikesLeft--;
+  const lead=v.back?-16:16;
+  const s=clamp(v.s+lead,4,v.rd.len-4);
+  strips.push({rd:v.rd,s,armT:2.5,armed:false});
+  AU.spikeSet();
+  log(`SPIKE STRIP DEPLOYED ▸ ${v.rd.name} @ ${Math.round(s)}u — ARMING 2.5s (${spikesLeft} LEFT)`,'op');
+  audit(`SPIKE STRIP DEPLOY — ROAD ${v.rd.name} · OPERATOR R-77`);
+  flashMsg('SPIKE STRIP DEPLOYED — ARMING','info');
+  statusDOM();
+}
+
+/* ================= actions ================= */
+function doFlag(){
+  if(state!=='run')return;
+  const rec=selPlate&&recOf(selPlate);
+  if(!rec){ flashMsg('NO TARGET SELECTED','warn'); AU.denied(); return; }
+  if(gateGuard(rec))return;
+  const v=rec.v;
+  if(!v){ flashMsg('NO ACTIVE SIGNAL — TARGET OFF GRID','warn'); AU.denied(); return; }
+  if(v.captured){ flashMsg('TARGET ALREADY STOPPED','warn'); AU.denied(); return; }
+  if(UNITS.some(u=>u.mission&&u.mission.v===v)){ flashMsg('UNITS ALREADY ON THIS TARGET','warn'); AU.denied(); return; }
+  const bi=boloList.findIndex(b=>b.v===v);
+  if(bi<0){ falseFlag(v,rec); return; }
+  const b=boloList[bi];
+  if(b.engaged){ flashMsg('UNIT ALREADY ON THIS TARGET','warn'); AU.denied(); return; }
+  if(!dispatchUnits(v))return;
+  addEvidence(v.plate,'BOLO #'+b.id+' MATCH','CRIT','CONVOY DISPATCHED',
+    'CHECKLIST MATCH · ALL AVAILABLE UNITS EN ROUTE');
+  popup(`MATCH #${b.id} — CONVOY DISPATCHED`,'good');
+  flashMsg('BOLO MATCH — ALL UNITS ROLLING','good'); AU.bolo();
+  refreshBoloDOM(); refreshDossier();
+}
+function doStolenReport(){
+  if(state!=='run')return;
+  const rec=selPlate&&recOf(selPlate);
+  if(!rec){ flashMsg('NO TARGET SELECTED','warn'); AU.denied(); return; }
+  if(gateGuard(rec))return;
+  if(rec.reg==='UNKNOWN'){ flashMsg('RUN REGISTRY FIRST [Q]','warn'); AU.denied(); return; }
+  const v=rec.v;
+  if(rec.reg!=='STOLEN'){
+    if(v&&!v.captured)falseFlag(v,rec);
+    else{ flashMsg('NOT STOLEN — REPORT REJECTED','warn'); AU.denied(); }
+    return;
+  }
+  if(!v){ flashMsg('TARGET OFF GRID — CANNOT DISPATCH','warn'); AU.denied(); return; }
+  if(v.captured){ flashMsg('TARGET ALREADY STOPPED','warn'); AU.denied(); return; }
+  if(UNITS.some(u=>u.mission&&u.mission.v===v)){ flashMsg('UNITS ALREADY ON THIS TARGET','warn'); AU.denied(); return; }
+  if(!dispatchUnits(v))return;
+  addEvidence(v.plate,'STOLEN VEHICLE REPORT','CRIT','CONVOY DISPATCHED',
+    'REGISTRY STOLEN · ALL AVAILABLE UNITS EN ROUTE');
+  popup('STOLEN REPORT — CONVOY DISPATCHED','good');
+  flashMsg('STOLEN VEHICLE — ALL UNITS ROLLING','good'); AU.bolo();
+  refreshDossier();
+}
+function doCite(){
+  if(state!=='run')return;
+  const rec=selPlate&&recOf(selPlate);
+  if(!rec){ flashMsg('NO TARGET SELECTED','warn'); AU.denied(); return; }
+  if(gateGuard(rec))return;
+  if(rec.reg==='UNKNOWN'){ flashMsg('RUN REGISTRY FIRST [Q]','warn'); AU.denied(); return; }
+  if(rec.reg==='STOLEN'){ flashMsg('STOLEN — ESCALATE WITH [ = ]','warn'); AU.denied(); return; }
+  if(rec.reg!=='EXPIRED'){ flashMsg('CLEAN PLATE — NOTHING TO CITE','warn'); AU.denied(); return; }
+  if(rec.cited){ flashMsg('ALREADY CITED','warn'); AU.denied(); return; }
+  rec.cited=true; citations++; score+=25;
+  log(`CITATION ▸ ${rec.plate} — EXPIRED REGISTRATION · AUTO MAIL-OUT (+25)`,'reg');
+  audit(`CIVIL CITATION — ${rec.plate}`);
+  popup(`CITATION ${rec.plate}  +25`,'info'); AU.regClean();
+  addEvidence(rec.plate,'EXPIRED REGISTRATION','FLAG','CITED','CIVIL CITATION ISSUED BY AUTO MAIL-OUT');
+  scoreDOM(); refreshDossier();
+}
+function doSpeed(){
+  if(state!=='run')return;
+  const rec=selPlate&&recOf(selPlate);
+  if(!rec){ flashMsg('NO TARGET SELECTED','warn'); AU.denied(); return; }
+  if(gateGuard(rec))return;
+  if(!rec.spdIssued){ flashMsg('NO SPEED VIOLATION ON FILE FOR THIS PLATE','warn'); AU.denied(); return; }
+  if(rec.spdCited){ flashMsg('SPEED VIOLATION ALREADY ISSUED','warn'); AU.denied(); return; }
+  const v=rec.v;
+  if(v&&(v.panic||v.captured)){ flashMsg('TARGET ENGAGED — CANNOT STOP FOR PAPERWORK','warn'); AU.denied(); return; }
+  rec.spdCited=true; spdTickets++; score+=15;
+  const ev=evidence.find(x=>x.plate===rec.plate&&!x.closed&&/SPEEDING/.test(x.reason));
+  if(ev){ ev.status='VIOLATION ISSUED'; ev.ut=clockT; ev.closed=true; }
+  log(`SPEED VIOLATION ▸ ${rec.plate} — ${rec.lastSpeed} KM/H · NOTICE ISSUED (+15)`,'reg');
+  popup(`SPEED VIOLATION ${rec.plate}  +15`,'info'); AU.regClean();
+  scoreDOM(); renderNotes(); refreshDossier();
+}
+function doRelease(){
+  if(state!=='run')return;
+  const rec=selPlate&&recOf(selPlate);
+  if(!rec){ flashMsg('NO TARGET SELECTED','warn'); AU.denied(); return; }
+  if(gateGuard(rec))return;
+  if(rec.released){ flashMsg('ALREADY RELEASED','warn'); AU.denied(); return; }
+  if(rec.reg==='UNKNOWN'){ flashMsg('RUN REGISTRY FIRST [Q] — C ONLY CLEANS VERIFIED CARS','warn'); AU.denied(); return; }
+  if(rec.reg==='STOLEN'){ flashMsg('STOLEN — CANNOT RELEASE. ESCALATE [ = ]','warn'); AU.denied(); return; }
+  if(isSuspect(rec)){
+    flashMsg('SUSPECT ON BOLO — CLEAN-RELEASE LOCKED. CLEAN REG = CLONED PLATE → DISPATCH [SPACE]','bad');
+    AU.falseR();
+    log(`SECURITY LOCK ▸ RELEASE BLOCKED — ${rec.plate} IS A BOLO SUSPECT (CLONE RISK)`,'bad');
+    return;
+  }
+  const v=rec.v;
+  if(UNITS.some(u=>u.mission&&u.mission.v===v)){ flashMsg('UNITS ENGAGED ON THIS VEHICLE','warn'); AU.denied(); return; }
+  rec.released=true; releases++;
+  let pts=5;
+  const openEv=evidence.filter(x=>x.plate===rec.plate&&!x.closed);
+  if(openEv.length){ pts=10; for(const ev of openEv){ ev.status='RELEASED — CLEARED'; ev.ut=clockT; ev.closed=true; } }
+  score+=pts;
+  log(`RELEASED ▸ ${rec.plate} — REGISTRY CLEAN · FILE CLEARED (+${pts})`,'reg');
+  audit(`CLEAN RELEASE — ${rec.plate}`);
+  popup(`RELEASED ${rec.plate}  +${pts}`,'good'); AU.release();
+  [...scanBody.children].forEach(el=>{
+    if(el.dataset.plate===rec.plate){
+      el.classList.add('reld');
+      const sc=el.querySelector('.sc');
+      if(sc&&!sc.querySelector('.rl'))sc.insertAdjacentHTML('beforeend','<span class="rl">REL</span>');
+    }
+  });
+  scoreDOM(); renderNotes(); refreshDossier(); refreshBoloDOM();
+}
+function falseFlag(v,rec){
+  strikes++; falseReports++; streak=0; score=Math.max(0,score-150);
+  v.holdT=3; v.hazT=0;
+  const ruled=boloList.some(b=>rec.alibi[b.id]&&rec.alibi[b.id].startsWith('ALIBI'));
+  popup(`FALSE FLAG · ${v.plate}  −150`,'bad');
+  log(`FALSE FLAG ▸ ${v.plate}${ruled?' — ALIBI WAS ON FILE!':' — CHECK & RELEASE'} · STRIKE ${strikes}/3`,'bad');
+  audit(`FALSE FLAG — ${v.plate} · STRIKE ${strikes}/3`);
+  flashMsg(`FALSE FLAG — STRIKE ${strikes}/3`,'bad'); AU.falseR();
+  addEvidence(v.plate,'FALSE FLAG','INFO','CLEARED','CHECK & RELEASE · STRIKE '+strikes+'/3');
+  scoreDOM(); strikeDOM();
+  if(strikes>=3)endShift(false);
+}
+let selUnit=0;
+function cycleUnit(d){ selUnit=(selUnit+d+UNITS.length)%UNITS.length; refreshUnits(); AU.typeClick(); }
+function manualDispatch(){
+  if(state!=='run')return;
+  const u=UNITS[selUnit];
+  if(u.state==='pursuit'||u.state==='arrest'||u.state==='transit'){
+    flashMsg(`UNIT ${u.name} BUSY — ${USTATE_TXT[u.state]}`,'warn'); AU.denied(); return; }
+  if(u.state==='base'&&u.cool>0){ flashMsg(`UNIT ${u.name} COOLING DOWN`,'warn'); AU.denied(); return; }
+  const rec=selPlate&&recOf(selPlate);
+  const v=rec&&rec.v;
+  if(!v||v.captured){ flashMsg('NO ACTIVE TARGET SIGNAL — SELECT A READ','warn'); AU.denied(); return; }
+  if(gateGuard(rec))return;
+  if(UNITS.some(x=>x.mission&&x.mission.v===v)){ flashMsg('TARGET ALREADY ENGAGED','warn'); AU.denied(); return; }
+  if(u.mission&&u.mission.b)u.mission.b.engaged=false;
+  u.mission={v,b:null,track:1,clean:true,spike:false,droneAssist:false,primary:true};
+  const b=boloList.find(x=>x.v===v);
+  if(b){ b.engaged=true; u.mission.b=b; }
+  u.state='enroute';
+  log(`SINGLE RE-TASK ▸ UNIT ${u.name} → ${v.plate}`,'op');
+  audit(`MANUAL RE-TASK — UNIT ${u.name} · TARGET ${v.plate}`);
+  refreshUnits(); refreshBoloDOM();
+}
+function recallUnit(){
+  const u=UNITS[selUnit];
+  if(u.mission){
+    const b=u.mission.b;
+    if(u.mission.v)u.mission.v.panic=UNITS.some(x=>x.mission&&x.mission.v===u.mission.v&&x!==u);
+    u.mission=null;
+    if(b)b.engaged=UNITS.some(x=>x.mission&&x.mission.b===b);
+    audit(`RECALL — UNIT ${u.name}`);
+  }
+  if(u.state!=='base'){ u.state='rtb'; log(`UNIT ${u.name} RECALLED TO BASE`,'op'); }
+  refreshUnits(); refreshBoloDOM();
+}
+function refreshUnits(){
+  setHTML($('unitsBody'),UNITS.map((u,i)=>{
+    const t=u.mission?(u.mission.primary?'▸ '+u.mission.v.plate:'↳ '+u.mission.v.plate):'—';
+    const trk=u.mission?Math.round(u.mission.track*100):0;
+    return `<div class="urow ${i===selUnit?'sel':''}" data-u="${i}">
+      <span class="un" style="color:${u.color}">${u.name}</span>
+      <span class="us" style="color:${USTATE_COL[u.state]}">${u.mission&&u.mission.primary?'★ ':''}${USTATE_TXT[u.state]}</span>
+      <span class="ut">${t}</span>
+      ${u.mission?`<div style="flex-basis:100%;height:3px;background:#1A1F16"><i style="display:block;height:100%;width:${trk}%;background:${USTATE_COL[u.state]}"></i></div>`:''}
+    </div>`;
+  }).join(''));
+}
+
+/* ================= SECURE MAIL ================= */
+const OFFICIALS=Object.freeze([
+  {addr:'supt.r.hale@meridian.gov', name:'SUPT. R. HALE', role:'OPERATIONS COMMAND', note:'SHIFT REPORTS · ESCALATIONS'},
+  {addr:'dci.m.orlov@meridian.gov', name:'DCI M. ORLOV', role:'CRIMINAL INVESTIGATIONS', note:'STOLEN-VEHICLE CASES'},
+  {addr:'intel.fusion@meridian.gov', name:'INTELLIGENCE FUSION CELL', role:'WATCHLIST LIAISON', note:'BOLO / GRID INTEL'},
+  {addr:'traffic.auth@meridian.gov', name:'TRAFFIC AUTHORITY', role:'CIVIL ENFORCEMENT', note:'REGISTRATION CITATIONS'},
+]);
+let mailOpen=false, toOpen=false, toIdx=0, pickOpen=false, pickIdx=0, mailWasRun=false;
+const mailTo=$('mailTo'), mailSub=$('mailSub'), mailBody=$('mailBody'),
+  mailToList=$('mailToList'), evPick=$('evPick'), mailStatus=$('mailStatus');
+function renderMailList(){
+  mailToList.innerHTML=OFFICIALS.map((o,i)=>
+    `<div class="m-off ${i===toIdx?'on':''}" data-i="${i}">
+      <div class="o1">${o.name}<small>${o.addr}</small></div>
+      <div class="o2">${o.role} · ${o.note}</div></div>`).join('');
+  [...mailToList.children].forEach(el=>{
+    el.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); selectOfficial(+el.dataset.i); });
+  });
+}
+function selectOfficial(i){
+  toIdx=i; const o=OFFICIALS[i];
+  mailTo.value=`${o.name} <${o.addr}>`;
+  mailTo.dataset.addr=o.addr;
+  toOpen=false; mailToList.classList.remove('show');
+  AU.typeClick(); updateMailMeta();
+}
+function evBlock(ev){
+  const L='------------------------------------------------------------';
+  return `${L}\nEVIDENCE ${ev.id} · PLATE ${ev.plate}\n  VEHICLE ......... ${ev.colorName} ${ev.typeName}\n  REGISTRY ........ ${ev.reg==='UNKNOWN'?'NOT VERIFIED':REGTXT[ev.reg]||ev.reg}\n  STATUS .......... ${ev.status} · ${fmtClockT(ev.ut)}\n  DETAIL .......... ${ev.detail}\n${L}`;
+}
+function renderEvPick(){
+  const list=evidence;
+  if(!list.length){ evPick.innerHTML='<div class="ep-h">CASE NOTES EMPTY — NOTHING TO INSERT</div>'; return; }
+  evPick.innerHTML='<div class="ep-h">INSERT EVIDENCE FROM CASE NOTES · ↑↓ + ⏎ · ESC CLOSE</div>'+
+    list.map((ev,i)=>{
+      const col=ev.sev==='CRIT'?'var(--red)':ev.sev==='FLAG'?'var(--amb)':'var(--dim)';
+      return `<div class="ep ${i===pickIdx?'on':''}" data-i="${i}">
+        <span class="epi">${ev.id}</span><span class="epp">${ev.plate}</span>
+        <span style="color:${col};font-size:8.5px;letter-spacing:.14em">${ev.sev}</span>
+        <span class="epd">${ev.colorName} ${ev.typeName} · ${ev.status}</span></div>`;
+    }).join('');
+  [...evPick.querySelectorAll('.ep')].forEach(el=>{
+    el.addEventListener('pointerdown',e=>{ e.preventDefault(); pickIdx=+el.dataset.i; insertPick(); });
+  });
+}
+function insertPick(){
+  const ev=evidence[pickIdx]; if(!ev)return;
+  const ta=mailBody;
+  const s=ta.selectionStart??ta.value.length, e=ta.selectionEnd??s;
+  const ins='\n\n'+evBlock(ev)+'\n';
+  ta.value=ta.value.slice(0,s)+ins+ta.value.slice(e);
+  ta.selectionStart=ta.selectionEnd=s+ins.length;
+  pickOpen=false; evPick.classList.remove('show');
+  ta.focus(); AU.typeClick(); updateMailMeta();
+}
+function normBody(s){ return s.toUpperCase().replace(/[·.]/g,'.').replace(/\s+/g,' '); }
+function plateCited(nb,ev){
+  return nb.includes(ev.plate.toUpperCase().replace('·','.'))||nb.includes(ev.id);
+}
+function mailCitedSet(){
+  const nb=normBody(mailBody.value);
+  const cited=new Set();
+  for(const ev of evidence) if(plateCited(nb,ev))cited.add(ev.id);
+  return cited;
+}
+function updateMailMeta(){
+  const cited=mailCitedSet();
+  const crit=evidence.filter(x=>!x.closed&&x.sev==='CRIT');
+  const nc=crit.filter(x=>cited.has(x.id)).length;
+  $('mailCite').innerHTML=`EVIDENCE <b>${nc}/${crit.length}</b> CRITICAL CITED · BODY ${mailBody.value.length} CH`;
+  if(mailOpen)$('mClock').textContent=fmtClockT(clockT);
+}
+function validateMail(){
+  const issues=[];
+  const o=OFFICIALS[OFFICIALS.findIndex(x=>x.addr===(mailTo.dataset.addr||''))];
+  if(!o)issues.push('NO RECIPIENT — SELECT AN OFFICIAL');
+  const sub=mailSub.value.trim();
+  if(sub.length<6)issues.push('SUBJECT TOO SHORT / MISSING');
+  const body=mailBody.value;
+  const nb=normBody(body);
+  if(body.trim().length<60)issues.push('BODY TOO BRIEF FOR AN OFFICIAL REPORT');
+  if(!/(DEAR|HELLO|GOOD (MORNING|EVENING|AFTERNOON)|SIR|MADAM)/.test(nb))issues.push('ADD A GREETING — “DEAR …”');
+  if(!/(REGARDS|SINCERELY|RESPECTFULLY|YOURS)/.test(nb))issues.push('ADD A CLOSING — “REGARDS …”');
+  if(!/VOSS/.test(nb))issues.push('SIGN WITH YOUR NAME — K. VOSS');
+  if(!nb.includes(SEC.seal))issues.push('SESSION SEAL '+SEC.seal+' MISSING — TYPE IT IN THE BODY');
+  const cited=mailCitedSet();
+  const crit=evidence.filter(x=>!x.closed&&x.sev==='CRIT');
+  const missing=crit.filter(x=>!cited.has(x.id));
+  for(const m of missing.slice(0,3))issues.push(`UNCITED CRITICAL EVIDENCE ${m.id} ${m.plate}`);
+  if(missing.length>3)issues.push(`+${missing.length-3} MORE UNCITED`);
+  const stolen=evidence.some(x=>x.sev==='CRIT'&&/STOLEN/.test(x.reason)&&!/RULED OUT/.test(x.status));
+  return {issues,o,stolen,cited,crit,missing};
+}
+function doSend(){
+  const v=validateMail();
+  if(v.issues.length){
+    mailStatus.className='bad';
+    mailStatus.textContent='✖ NOT SENT ▸ '+v.issues.slice(0,3).join(' · ')+(v.issues.length>3?' …':'');
+    AU.mailErr(); return;
+  }
+  let pts=reportsSent===0?150:75;
+  const nCrit=v.crit.filter(x=>v.cited.has(x.id)).length;
+  pts+=nCrit*25;
+  const flags=evidence.filter(x=>!x.closed&&x.sev==='FLAG'&&v.cited.has(x.id));
+  pts+=flags.length*15;
+  let route='ROUTED OK';
+  const addr=v.o.addr;
+  if(v.stolen&&/orlov|fusion/.test(addr)){ pts+=25; route='ROUTED TO CRIMINAL COMMAND +25'; }
+  else if(!v.stolen&&/traffic/.test(addr)){ pts+=25; route='CIVIL ROUTING +25'; }
+  else if(v.stolen&&/traffic/.test(addr)){ route='NOTE — CRIMINAL MATTER SENT TO CIVIL AUTHORITY'; }
+  reportsSent++; score+=pts;
+  for(const ev of evidence){
+    if(!ev.closed&&v.cited.has(ev.id)){ ev.status='REPORTED'; ev.ut=clockT; ev.closed=true; }
+  }
+  log(`MAIL ▸ OFFICIAL REPORT TO ${addr} · ${nCrit} CRITICAL CITED · +${pts}`,'mail');
+  audit(`TRANSMISSION — ${addr} · SEAL ${SEC.seal}`);
+  popup(`MAIL SENT ${v.o.name.split(' ')[0]}  +${pts}`,'good');
+  flashMsg('OFFICIAL REPORT TRANSMITTED','good'); AU.mailSend();
+  unlock('mail1');
+  scoreDOM(); renderNotes();
+  mailStatus.className='good';
+  mailStatus.textContent='✓ TRANSMITTED ▸ '+route+' (+'+pts+') — COMPOSER RESET FOR NEXT REPORT';
+  mailTo.value=''; delete mailTo.dataset.addr;
+  mailSub.value=''; mailBody.value='';
+  updateMailMeta();
+  setTimeout(()=>{ if(mailOpen)closeMail(); },900);
+}
+function openMail(){
+  if(state==='brief'||state==='over')return;
+  if(mailOpen)return;
+  mailOpen=true; $('ovMail').classList.add('show');
+  if(state==='run'){ togglePause(); mailWasRun=true; } else mailWasRun=false;
+  mailStatus.className=''; mailStatus.textContent='';
+  pickOpen=false; evPick.classList.remove('show');
+  toOpen=false; mailToList.classList.remove('show');
+  $('mSeal').textContent=SEC.seal;
+  renderMailList(); renderEvPick(); updateMailMeta();
+  setTimeout(()=>mailSub.focus(),40);
+}
+function closeMail(){
+  mailOpen=false; $('ovMail').classList.remove('show');
+  pickOpen=false; evPick.classList.remove('show');
+  toOpen=false; mailToList.classList.remove('show');
+  if(mailWasRun&&state==='pause')togglePause();
+}
+function mailKeys(e){
+  const k=e.key;
+  if(k==='Tab'){ e.preventDefault();
+    if(toOpen){ toOpen=false; mailToList.classList.remove('show'); }
+    pickOpen=!pickOpen;
+    if(pickOpen){ pickIdx=0; renderEvPick(); evPick.classList.add('show'); }
+    else evPick.classList.remove('show');
+    return;
+  }
+  if(k==='Escape'){ e.preventDefault();
+    if(pickOpen){ pickOpen=false; evPick.classList.remove('show'); return; }
+    if(toOpen){ toOpen=false; mailToList.classList.remove('show'); return; }
+    closeMail(); return;
+  }
+  if(k==='Enter'&&e.shiftKey){ e.preventDefault(); doSend(); return; }
+  if(toOpen){
+    if(k==='ArrowDown'||k==='ArrowUp'){ e.preventDefault();
+      toIdx=(toIdx+(k==='ArrowDown'?1:-1)+OFFICIALS.length)%OFFICIALS.length; renderMailList(); return; }
+    if(k==='Enter'){ e.preventDefault(); selectOfficial(toIdx); return; }
+    return;
+  }
+  if(pickOpen){
+    if(k==='ArrowDown'||k==='ArrowUp'){ e.preventDefault();
+      pickIdx=(pickIdx+(k==='ArrowDown'?1:-1)+Math.max(1,evidence.length))%Math.max(1,evidence.length);
+      renderEvPick(); return; }
+    if(k==='Enter'){ e.preventDefault(); insertPick(); return; }
+    return;
+  }
+  if(k==='ArrowDown'&&document.activeElement===mailTo){ e.preventDefault();
+    toOpen=true; toIdx=0; renderMailList(); mailToList.classList.add('show'); return; }
+}
+mailTo.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  toOpen=!toOpen;
+  if(toOpen){ renderMailList(); mailToList.classList.add('show'); }
+  else mailToList.classList.remove('show');
+});
+mailBody.addEventListener('input',updateMailMeta);
+mailSub.addEventListener('input',updateMailMeta);
+ $('sendBtn').addEventListener('pointerdown',e=>{ e.preventDefault(); doSend(); });
+ $('composeBtn').addEventListener('pointerdown',e=>{ e.preventDefault(); openMail(); });
+
+/* ================= shift flow ================= */
+function fmtClockT(t){ const s=t|0; return `${pad((s/3600|0)%24)}:${pad((s/60|0)%60)}:${pad(s%60)}`; }
+function fmtClock(){ return fmtClockT(clockT); }
+function fmtT(s){ return `${pad(Math.floor(s/60))}:${pad(Math.floor(s%60))}`; }
+function scoreDOM(){ $('score').textContent=String(score).padStart(4,'0'); }
+function strikeDOM(){ const s=$('strikes'); if(!s)return;
+  [...s.children].forEach((el,i)=>el.classList.toggle('on',i<strikes)); }
+function statusDOM(){
+  const st=$('shiftT'); if(!st)return;
+  st.textContent=fmtT(shiftT); st.classList.toggle('low',shiftT<30);
+  $('stCap').textContent=captures;
+  $('stCit').textContent=citations;
+  $('stMail').textContent=reportsSent;
+  $('stDrn').textContent=drone.bat;
+  [...$('uDots').children].forEach((el,i)=>{ el.style.background=USTATE_COL[UNITS[i].state]; });
+}
+function secDOM(){
+  const b=$('secBadge');
+  if(SEC.auth.active){ b.textContent='VERIFY!'; b.className='warn'; }
+  else if(SEC.tamper){ b.textContent='GATE UV'; b.className='warn'; }
+  else{ b.textContent='AUTH ✓'; b.className=''; }
+  $('secSeal').textContent=SEC.seal;
+  const gt=$('secGates');
+  if(SEC.tamper){
+    gt.className='warn';
+    gt.textContent=`G${pad(SEC.tamper.g+1)} COMPROMISED${SEC.fixT>0?` · SCAN ${Math.ceil(SEC.fixT)}s`:''}`;
+  }else{ gt.className='ok'; gt.textContent='9/9 VERIFIED'; }
+  const at=$('secAuth');
+  const shiftLive=(state==='run'||state==='pause'||state==='auth');
+  if(SEC.auth.active){ at.className='bad'; at.textContent='LOCKED — RESPOND NOW'; }
+  else if(!shiftLive){ at.className='ok'; at.textContent='STANDBY'; }
+  else{ const r=SEC.nextAuth-simT;
+    at.className=r<40?'warn':'ok';
+    at.textContent='NEXT IN '+fmtT(Math.max(0,r)); }
+  const dr=$('secDrone');
+  if(drone.active){ dr.className='warn'; dr.textContent=`AIRBORNE ${Math.ceil(drone.t)}s`; }
+  else{ dr.className='ok'; dr.textContent='READY ×'+drone.bat; }
+}
+function resetShift(){
+  score=0; strikes=0; streak=0; bestStreak=0; captures=0; falseReports=0; lostBolos=0; regQueries=0;
+  citations=0; spdTickets=0; releases=0; pursuitsWon=0; pursuitsLost=0; alibisFound=0; witUsed=0; selUnit=0;
+  evidence=[]; evSeq=0; reportsSent=0; spikesLeft=2; strips=[]; peakAnnounced=false; droneUses=0;
+  drone.bat=2; drone.active=false; drone.rd=null; intT=rand(30,45);
+  AUD={prev:'GENESIS',count:0};
+  shiftT=300; boloList=[]; boloTimer=3; boloCooldown=0; boloSeq=0; bSel=null;
+  SEC.seal=codeStr(4); SEC.tamper=null; SEC.fixT=0; SEC.fixed=0;
+  SEC.auth.active=false; SEC.auth.total=0; SEC.auth.passed=0; SEC.auth.firstTry=0;
+  SEC.nextAuth=simT+rand(110,180); SEC.nextTamper=simT+rand(40,80);
+  usedPlates.clear(); plateMap.clear(); readLog.length=0; readTimes.length=0;
+  query=''; selPlate=null; visSet=new Set();
+  for(const rd of ROADS){ rd.veh=[[],[]]; rd.spawnT=[.5,1.5]; }
+  GATES.forEach(g=>{g.reads=0;g.lastRead=-9;});
+  for(const u of UNITS){ u.state='base'; u.rd=u.baseRd; u.s=u.baseS; u.dir=1;
+    u.mission=null; u.cool=0; u.transit=null; }
+  populate();
+  strikeDOM(); scoreDOM(); statusDOM(); secDOM(); refreshBoloDOM(); refreshDossier(); refreshUnits(); applyFilter(); renderNotes();
+  scanBody.innerHTML=''; htmlCache.delete(scanBody);
+  logBody.innerHTML=''; $('logCount').textContent='0 PLATES'; updateQueryUI();
+  log('SHIFT START — 9 ANPR GATES ONLINE · 3 UNITS · 2 SPIKE STRIPS · DRONE ARMED','sys');
+  log(`SECURITY ▸ SESSION AUTHENTICATED · MAIL SEAL ${SEC.seal} · AUDIT CHAIN OPENED`,'audit');
+  log('AI MESH ▸ CANDIDATE TRIAGE + NEXT-GATE PREDICTION ONLINE · SPACE = CONVOY RESPONSE','sys');
+}
+function endShift(complete){
+  state='over';
+  AU.end(complete);
+  if(SEC.auth.active){ SEC.auth.active=false; $('ovAuth').classList.remove('show'); }
+  const perfect=complete&&strikes===0&&lostBolos===0&&pursuitsLost===0&&(captures>0||reportsSent>0);
+  if(perfect)unlock('perfect');
+  if(SEC.auth.total>=2&&SEC.auth.firstTry===SEC.auth.total)unlock('unbreak');
+  CAREER.xp+=score; CAREER.shifts++;
+  if(score>CAREER.best)CAREER.best=score;
+  const preRank=rankFor(CAREER.xp-score).name;
+  const nowRank=rankFor(CAREER.xp).name;
+  const promoted=preRank!==nowRank;
+  saveCareer();
+  $('rTitle').textContent=complete?'SHIFT COMPLETE':'SHIFT TERMINATED';
+  $('rTitle').style.color=complete?'#E2ECD8':'var(--red)';
+  $('rCap').textContent=captures; $('rFalse').textContent=falseReports;
+  $('rPur').textContent=pursuitsWon+' / '+pursuitsLost;
+  $('rCit').textContent=citations+' / '+spdTickets+' / '+releases;
+  $('rAli').textContent=alibisFound+' / '+witUsed;
+  $('rSec').textContent=SEC.fixed+' / '+SEC.auth.passed+' / '+droneUses;
+  $('rMail').textContent=reportsSent;
+  $('rAudit').textContent=`VERIFIED · ${AUD.count} ENTRIES`;
+  $('rLost').textContent=lostBolos;
+  $('rStreak').textContent='×'+bestStreak; $('rScore').textContent=score;
+  const rk=$('rRank');
+  if(!complete){ rk.textContent='RELIEVED OF DUTY — DESK REASSIGNED'; rk.className='rank bad'; }
+  else{ rk.className='rank';
+    let txt=score>=3200?'COMMENDATION — EXCEPTIONAL COMMAND':
+      score>=2000?'COMMENDED — SHARP DEDUCTIONS':
+      score>=800?'RATED SATISFACTORY':'RETRAINING ADVISED';
+    if(reportsSent===0)txt+=' · NO MAIL REPORT FILED';
+    if(perfect)txt='PERFECT SHIFT — '+txt;
+    rk.textContent=txt; }
+  const r=rankFor(CAREER.xp);
+  $('xpRankL').textContent=`${r.name} · ${CAREER.xp} XP · SHIFT ${CAREER.shifts}`;
+  $('xpNextL').textContent=r.hi?`NEXT: ${RANKS.find(x=>x[0]===r.hi)[1]} @ ${r.hi}`:'MAX RANK';
+  $('xpFill').style.width=r.hi?Math.round((CAREER.xp-r.lo)/(r.hi-r.lo)*100)+'%':'100%';
+  if(promoted){ $('rRank').textContent='PROMOTED ▸ '+nowRank+' — '+$('rRank').textContent;
+    setTimeout(()=>AU.promo(),800); }
+  $('achRow').innerHTML=ACHS.map(a=>`<span class="ach ${CAREER.ach[a.id]?'on':''}">★ ${a.label}</span>`).join('');
+  log(`SHIFT ${complete?'COMPLETE':'TERMINATED'} — SCORE ${score} · CAREER ${CAREER.xp} XP`,'alert');
+  audit(`SHIFT REPORT — ARRESTS ${captures} · CITES ${citations} · RELEASES ${releases} · MAIL ${reportsSent} · CHAIN CLOSED`);
+  $('ovReport').classList.add('show');
+}
+function begin(){
+  if(state!=='brief')return;
+  state='run';
+  try{ AU.init(); resetShift(); }
+  catch(err){
+    log('FAULT ▸ SHIFT START — '+err.message,'bad');
+    try{ audit('SHIFT START FAULT — '+err.message); }catch(_){}
+  }
+  $('ovBrief').classList.remove('show');
+  flashMsg('ON DUTY — SCANNERS LIVE','good');
+}
+function togglePause(){
+  if(state==='run'){ state='pause'; $('ovPause').classList.add('show'); }
+  else if(state==='pause'){ state='run'; $('ovPause').classList.remove('show'); }
+}
+
+/* ================= tactical map (HiDPI) ================= */
+const tacCv=$('tacCv'), tctx=tacCv.getContext('2d'), mapWrapEl=$('mapWrap');
+const MW=1180, MH=148;
+let mapCssW=1180, mapCssH=148, mapDpr=1;
+function fitMap(){
+  const r=mapWrapEl.getBoundingClientRect();
+  mapCssW=Math.max(320,r.width); mapCssH=Math.max(100,r.height);
+  mapDpr=clamp(window.devicePixelRatio||1,1,2);
+  tacCv.width=Math.round(mapCssW*mapDpr);
+  tacCv.height=Math.round(mapCssH*mapDpr);
+}
+function mapX(w){ return 54+(w+105)/(118+105)*(MW-90); }
+function roadY(rd){ return 32+ROADS.indexOf(rd)*24; }
+function unitMapPos(u){
+  if(u.state==='transit')return [mapX(112), lerp(u.transit.y0,u.transit.y1,u.transit.p)];
+  return [mapX(u.s), roadY(u.rd)];
+}
+function drawTac(){
+  tctx.setTransform(mapDpr*mapCssW/MW,0,0,mapDpr*mapCssH/MH,0,0);
+  tctx.fillStyle='#070A07'; tctx.fillRect(0,0,MW,MH);
+  tctx.font='8px "IBM Plex Mono"'; tctx.textBaseline='alphabetic';
+  tctx.fillStyle='#2A3A2E'; tctx.fillText(`RENDER ${tacCv.width}×${tacCv.height} · ${mapDpr.toFixed(1)}× DPR`,MW-140,10);
+  const sx=mapX(112);
+  tctx.strokeStyle='#1A2418'; tctx.lineWidth=2;
+  tctx.beginPath(); tctx.moveTo(sx,roadY(ROADS[0])); tctx.lineTo(sx,roadY(ROADS[ROADS.length-1])); tctx.stroke();
+  for(const st of strips){
+    const y=roadY(st.rd), x=mapX(st.s);
+    tctx.strokeStyle=st.armed?'#F25C4D':'#F0B441';
+    tctx.lineWidth=2;
+    tctx.beginPath(); tctx.moveTo(x-4,y-6); tctx.lineTo(x-4,y+6); tctx.moveTo(x+4,y-6); tctx.lineTo(x+4,y+6); tctx.stroke();
+    tctx.lineWidth=1;
+    if(!st.armed&&Math.sin(simT*12)>0){ tctx.fillStyle='#F0B441'; tctx.fillText('ARM',x-6,y-9); }
+  }
+  ROADS.forEach((rd,i)=>{
+    const y=roadY(rd), x1=mapX(0), x2=mapX(rd.len);
+    tctx.strokeStyle='#141C12';
+    tctx.beginPath(); tctx.moveTo(x2,y); tctx.lineTo(sx,y); tctx.stroke();
+    tctx.strokeStyle='#26331F'; tctx.lineWidth=3;
+    tctx.beginPath(); tctx.moveTo(x1,y); tctx.lineTo(x2,y); tctx.stroke();
+    tctx.lineWidth=1;
+    tctx.fillStyle='#6B7862'; tctx.fillText(rd.name+' '+rd.lim,10,y+3);
+  });
+  const candSet=new Set();
+  for(const b of boloList) candidatesFor(b).forEach(c=>candSet.add(c.plate));
+  for(const rd of ROADS) for(let d=0;d<2;d++) for(const v of rd.veh[d]){
+    const x=mapX(v.s), y=roadY(rd);
+    if(v.captured){ tctx.fillStyle='#F25C4D'; tctx.fillRect(x-3,y-3,6,6); continue; }
+    const isC=candSet.has(v.plate);
+    const isSel=v.plate===selPlate;
+    const isP=UNITS.some(u=>u.mission&&u.mission.v===v&&(u.state==='pursuit'||u.state==='arrest'));
+    if(isP){ const pr=6+Math.sin(simT*7)*2;
+      tctx.strokeStyle='rgba(242,92,77,.8)'; tctx.beginPath(); tctx.arc(x,y,pr,0,TAU); tctx.stroke(); }
+    else if(isC){ const pr=5+Math.sin(simT*4)*1.5;
+      tctx.strokeStyle='rgba(240,180,65,.6)'; tctx.beginPath(); tctx.arc(x,y,pr,0,TAU); tctx.stroke(); }
+    tctx.fillStyle=isP?'#F25C4D':isC?'#F0B441':isSel?'#C9F2C4':'#39442F';
+    tctx.beginPath(); tctx.arc(x,y,isSel||isP||isC?3.2:2.2,0,TAU); tctx.fill();
+    if(isSel){ tctx.strokeStyle='#EFF5E8'; tctx.strokeRect(x-5,y-5,10,10); }
+    if((v.bolo||isP)&&Math.sin(simT*10)>0){
+      const ex=v.back?mapX(0)-6:mapX(rd.len)+6;
+      tctx.fillStyle='#F25C4D'; tctx.fillText('⇥',ex,y+3);
+    }
+  }
+  for(const g of GATES){
+    const y=roadY(g.rd), x=mapX(g.s);
+    const tampered=gateTampered(g.i);
+    const age=simT-g.lastRead;
+    if(age<1.2){ const pr=5+age*10;
+      tctx.strokeStyle=tampered?`rgba(240,180,65,${1-age/1.2})`:`rgba(143,227,136,${1-age/1.2})`;
+      tctx.beginPath(); tctx.arc(x,y,pr,0,TAU); tctx.stroke(); }
+    if(tampered&&Math.sin(simT*8)>0){
+      tctx.strokeStyle='#F0B441';
+      tctx.beginPath(); tctx.arc(x,y,9,0,TAU); tctx.stroke();
+      tctx.fillStyle='#F0B441'; tctx.fillText('UV',x-5,y-20);
+    }
+    tctx.fillStyle=tampered?'#B58A2A':'#5A6B54'; tctx.fillRect(x-3.5,y-15.5,7,7);
+    tctx.fillStyle='#8FA086'; tctx.fillText(String(g.i+1),x-2,y-18);
+  }
+  if(drone.active&&drone.rd){
+    const y=roadY(drone.rd), x=mapX(drone.s);
+    const pr=12+Math.sin(simT*5)*3;
+    tctx.strokeStyle='rgba(159,199,232,.8)'; tctx.lineWidth=1.4;
+    tctx.beginPath(); tctx.arc(x,y,pr,0,TAU); tctx.stroke();
+    tctx.beginPath(); tctx.moveTo(x,y-4); tctx.lineTo(x+4,y+2); tctx.lineTo(x-4,y+2); tctx.closePath();
+    tctx.fillStyle='#9FC7E8'; tctx.fill();
+    tctx.lineWidth=1;
+    tctx.fillStyle='#9FC7E8'; tctx.fillText('DRONE',x-12,y-12);
+  }
+  for(const u of UNITS){
+    const [x,y]=unitMapPos(u);
+    let col=USTATE_COL[u.state];
+    if(u.state==='pursuit'&&Math.sin(u.flash*10)>0)col='#FFD9D4';
+    tctx.fillStyle=col;
+    tctx.beginPath();
+    if(u.state==='transit'){
+      const up=u.transit.y1<u.transit.y0?-1:1;
+      tctx.moveTo(x,y+5*up); tctx.lineTo(x-4,y-3*up); tctx.lineTo(x+4,y-3*up);
+    }else{
+      tctx.moveTo(x+6*u.dir,y); tctx.lineTo(x-4*u.dir,y-4.5); tctx.lineTo(x-4*u.dir,y+4.5);
+    }
+    tctx.closePath(); tctx.fill();
+    if(u.mission&&u.mission.primary&&u.state!=='base'){
+      tctx.fillStyle='#EFF5E8'; tctx.fillText('★',x+2,y-8);
+    }
+    if(UNITS[selUnit]===u){ tctx.strokeStyle='#EFF5E8'; tctx.beginPath(); tctx.arc(x,y,8,0,TAU); tctx.stroke(); }
+    tctx.fillStyle=u.color; tctx.fillText(u.name[0],x-2,y+13);
+  }
+}
+tacCv.addEventListener('pointerdown',e=>{
+  if(state!=='run')return;
+  const rect=tacCv.getBoundingClientRect();
+  const mx=(e.clientX-rect.left)/rect.width*MW, my=(e.clientY-rect.top)/rect.height*MH;
+  let best=-1,bd=18;
+  UNITS.forEach((u,i)=>{ const [x,y]=unitMapPos(u);
+    const d=Math.hypot(x-mx,y-my); if(d<bd){bd=d;best=i;} });
+  if(best>=0){ selUnit=best; refreshUnits(); AU.typeClick(); }
+});
+
+/* ================= HUD ================= */
+function hudFrame(){
+  const ts=fmtClock();
+  if($('clock').textContent!==ts)$('clock').textContent=ts;
+  if(loginOpen)$('lgClock').textContent=ts;
+  if(SEC.auth.active)$('auClock').textContent=ts;
+  if(mailOpen)$('mClock').textContent=ts;
+  while(readTimes.length&&clockT-readTimes[0]>60)readTimes.shift();
+  const pu=UNITS.find(u=>u.mission&&(u.state==='pursuit'||u.state==='enroute'));
+  if(pu&&pu.mission){
+    const v=pu.mission.v;
+    const crew=UNITS.filter(x=>x.mission&&x.mission.v===v&&x!==pu).length;
+    const manual=selPlate===v.plate;
+    const assist=drone.active&&drone.rd===v.rd;
+    const ow=manual||assist;
+    $('purBox').classList.add('show');
+    $('purTitle').textContent=`▸ ${pu.mission.b?'BOLO #'+pu.mission.b.id:'STOLEN'} ${v.plate} · LEAD ${pu.name}${crew?' +'+crew+' BACKUP':''} · ${USTATE_TXT[pu.state]}`;
+    $('purTrack').style.width=Math.round(pu.mission.track*100)+'%';
+    $('purPct').textContent=pu.state==='pursuit'?Math.round(pu.mission.track*100)+'%':'';
+    $('purOw').innerHTML=pu.state==='pursuit'
+      ?`SIGNAL LOCK <span class="${ow?'ow-ok':'ow-no'}">${assist?'▲ DRONE RELAY':(manual?'✓ HOLDING — KEEP TARGET SELECTED':'✗ DECAYING — SELECT '+v.plate+' OR [H] DRONE')}</span>`:'';
+    if(pu.state==='pursuit'){
+      const distExit=v.back?v.s:v.rd.len-v.s;
+      const eta=Math.round(distExit/Math.max(.5,v.v));
+      $('purGap').textContent=`GAP ${Math.max(0,Math.round(Math.abs(v.s-pu.s)))}u · ROAD ${v.rd.name} · ${v.back?'WB':'EB'} · EXIT ETA ~${eta}s`;
+    }else $('purGap').textContent='';
+  }else $('purBox').classList.remove('show');
+}
+function flashMsg(text,cls){
+  const el=$('termMsg');
+  el.textContent=text; el.className='show '+cls;
+  clearTimeout(flashMsg._t); flashMsg._t=setTimeout(()=>el.className='',1500);
+}
+function popup(text,cls){
+  const d=document.createElement('div'); d.className='pop '+cls; d.textContent=text;
+  d.style.left=(50+rand(-8,8))+'%'; d.style.top=(30+rand(-6,6))+'%';
+  $('popLayer').appendChild(d); setTimeout(()=>d.remove(),1550);
+}
+
+/* ================= delegated input — instant clicks ================= */
+function pickPlateEl(t){
+  const c=t.closest? t.closest('[data-plate]') : null;
+  return c?c.dataset.plate:null;
+}
+scanBody.addEventListener('pointerdown',e=>{
+  const p=pickPlateEl(e.target);
+  if(p){ selPlate=p; refreshSel(false); AU.typeClick(); }
+});
+boloBody.addEventListener('pointerdown',e=>{
+  const p=pickPlateEl(e.target);
+  if(p){ selPlate=p; refreshSel(false); AU.typeClick(); return; }
+  const bo=e.target.closest?e.target.closest('[data-bid]'):null;
+  if(bo){ const b=boloList.find(x=>x.id===+bo.dataset.bid); if(b){bSel=b; refreshBoloDOM(); AU.typeClick();} }
+});
+ $('notesBody').addEventListener('pointerdown',e=>{
+  const p=pickPlateEl(e.target);
+  if(p){ selPlate=p; refreshSel(false); AU.typeClick(); }
+});
+ $('unitsBody').addEventListener('pointerdown',e=>{
+  const u=e.target.closest?e.target.closest('[data-u]'):null;
+  if(u){ selUnit=+u.dataset.u; refreshUnits(); AU.typeClick(); }
+});
+
+/* ================= keyboard ================= */
+function updateQueryUI(){
+  $('fbQ').innerHTML=(query?query.toUpperCase():'')+'<span class="cur">▊</span>';
+}
+addEventListener('keydown',e=>{
+  if(loginOpen){
+    if(e.key==='Enter'&&document.activeElement!==$('lgInput')&&$('lgInput').value)loginTry();
+    return;
+  }
+  if(mailOpen){ mailKeys(e); return; }
+  if(state==='auth')return;
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  const k=e.key;
+  if([' ','Backspace','Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter','F1'].includes(k))e.preventDefault();
+  if(k==='Enter'){
+    if(state==='brief'||$('ovBrief').classList.contains('show')){ begin(); return; }
+    if(state==='over'||$('ovReport').classList.contains('show')){
+      $('ovReport').classList.remove('show'); resetShift(); state='run'; return;
+    }
+    if(state==='pause'){ togglePause(); return; }
+    if(state==='run'){
+      if(visSet.size){ selPlate=readLog.find(r=>visSet.has(r.rec.plate))?.rec.plate||null; refreshSel(true); AU.typeClick(); }
+      return;
+    }
+    return;
+  }
+  if(k==='Escape'){
+    if($('ovHelp').classList.contains('show')){toggleHelp();return;}
+    if(state!=='run')return;
+    if(query){query='';updateQueryUI();applyFilter();}
+    else if(selPlate){selPlate=null;refreshSel();}
+    return;
+  }
+  if(k==='?'||k==='F1'){ toggleHelp(); return; }
+  if(state==='brief'||state==='over')return;
+  if(k==='z'||k==='Z'){ togglePause(); return; }
+  if(state!=='run')return;
+  if(k==='Tab'){ openMail(); return; }
+  if(k==='ArrowUp'){ navSel(1); return; }
+  if(k==='ArrowDown'){ navSel(-1); return; }
+  if(k==='q'||k==='Q'){ doRegistry(); return; }
+  if(k==='c'||k==='C'){ doRelease(); return; }
+  if(k==='['){ doXref(); return; }
+  if(k===']'){ doWitness(); return; }
+  if(k==='-'){ doCite(); return; }
+  if(k==="'"){ doSpeed(); return; }
+  if(k==='='){ doStolenReport(); return; }
+  if(k==='\\'){ doSpike(); return; }
+  if(k==='h'||k==='H'){ doDrone(); return; }
+  if(k==='k'||k==='K'){ doIntegrity(); return; }
+  if(k===','){ cycleUnit(-1); return; }
+  if(k==='.'){ cycleUnit(1); return; }
+  if(k==='/'){ manualDispatch(); return; }
+  if(k===';'){ recallUnit(); return; }
+  if(k===' '){ doFlag(); return; }
+  if(k==='Backspace'){ if(query){query=query.slice(0,-1);updateQueryUI();applyFilter();AU.typeClick();} return; }
+  if(k.length===1&&/[a-z0-9?]/i.test(k)){
+    if(query.length<12){ query=(query+k).toLowerCase(); updateQueryUI(); applyFilter(); AU.typeClick(); }
+  }
+});
+addEventListener('blur',()=>{ if(state==='run'&&!mailOpen&&!loginOpen)togglePause(); });
+function navSel(step){
+  const list=readLog.filter(r=>visSet.has(r.rec.plate)).map(r=>r.rec.plate);
+  if(!list.length)return;
+  let idx=list.indexOf(selPlate);
+  idx=idx<0?0:(idx+step+list.length)%list.length;
+  selPlate=list[idx];
+  refreshSel(true); AU.typeClick();
+}
+ $('muteBtn').onclick=()=>{ AU.setOn(!AU.on); $('muteBtn').textContent=AU.on?'SND ON':'SND OFF'; };
+ $('helpBtn').onclick=toggleHelp;
+ $('beginBtn').addEventListener('pointerdown',e=>{ e.preventDefault(); begin(); });
+ $('againBtn').addEventListener('pointerdown',e=>{ e.preventDefault();
+  if(state==='over'){$('ovReport').classList.remove('show');resetShift();state='run';} });
+let helpWasRun=false;
+function toggleHelp(){
+  const h=$('ovHelp');
+  if(!h.classList.contains('show')){ helpWasRun=(state==='run'); if(helpWasRun)togglePause(); h.classList.add('show'); }
+  else{ h.classList.remove('show'); if(helpWasRun&&state==='pause')togglePause(); }
+}
+
+/* ================= main loop ================= */
+let last=0, uiAcc=0;
+function loop(t){
+  requestAnimationFrame(loop);
+  const dt=Math.min(.05,(t-last)/1000||0); last=t;
+  if(!loginOpen){
+    clockT+=dt;
+    if(state==='run'&&!mailOpen){
+      simT+=dt; lightT+=dt;
+      updateVehicles(dt);
+      updateUnits(dt);
+      droneTick(dt);
+      scanEngine();
+      pendTick(dt);
+      witTick(dt);
+      interceptTick(dt);
+      securityTick(dt);
+      boloTick(dt);
+      shiftT-=dt;
+      if(shiftT<=0){ shiftT=0; endShift(true); }
+      statusDOM();
+    }
+  }else{
+    if(SEC.lockT>0)securityTick(dt);
+  }
+  uiAcc+=dt;
+  if(uiAcc>.5){ uiAcc=0;
+    if(!loginOpen){ refreshBoloDOM(); refreshDossier(); refreshUnits(); secDOM();
+      if(query)applyFilter(); } }
+  if(!loginOpen){ drawTac(); hudFrame(); }
+}
+
+/* ---------- init ---------- */
+newToken();
+populate();
+fitMap();
+addEventListener('resize',fitMap);
+ $('rankBadge').textContent=rankFor(CAREER.xp).name;
+setTimeout(()=>$('lgInput').focus(),80);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
