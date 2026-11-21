@@ -64,3 +64,7 @@ app.use(cors({
     if (!origin) return callback(null, true); // allow non-browser (curl, Postman)
     if (ALLOWED_ORIGINS.indexOf(origin) !== -1) return callback(null, true);
     var err = new Error('CORS: Origin not allowed');
+    err.status = 403;
+    return callback(err);
+  }
+}));
