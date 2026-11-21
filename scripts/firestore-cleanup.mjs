@@ -16,7 +16,7 @@ const db = getFirestore();
 const COLLECTION_NAME = "tempItems";
 const TIMESTAMP_FIELD = "createdAt";
 const MAX_AGE_DAYS = 7;
-const DRY_RUN = true; // Set to false once verified
+const DRY_RUN = false; // Set to false once verified
 
 async function runCleanup() {
   const cutoffDate = new Date(Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
