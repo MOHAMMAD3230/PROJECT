@@ -550,7 +550,11 @@ var logEl=null,boardRows=null,rowEls=[];
 function addLog(html){
   var d=document.createElement('div');
   d.className='lg';
-  d.innerHTML='<span class="lt">'+fmtS(simT)+'</span>'+html;
+  var t=document.createElement('span');
+  t.className='lt';
+  t.textContent=fmtS(simT);
+  d.appendChild(t);
+  d.appendChild(document.createTextNode(String(html)));
   logEl.insertBefore(d,logEl.firstChild);
   while(logEl.childNodes.length>60){logEl.removeChild(logEl.lastChild);}
 }
