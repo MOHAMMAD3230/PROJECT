@@ -2,4 +2,9 @@ node_modules/
 .env
 service_account.json
 exports/
+# Firebase Admin SDK downloaded filenames
+*firebase-adminsdk*.json
+*service-account*.json
+*gcp-key*.json
+
 *.log
