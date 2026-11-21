@@ -49,9 +49,15 @@ const driveService = google.drive({ version: 'v3', auth });
 const app = express();
 app.set('trust proxy', 1);
 
-// Security headers (relaxed CSP since this is an API, not serving HTML views)
+// Security headers (API-oriented CSP: deny document/resource embedding by default)
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      baseUri: ["'none'"]
+    }
+  },
   crossOriginEmbedderPolicy: false,
   crossOriginOpenerPolicy: false,
   crossOriginResourcePolicy: { policy: 'same-site' },
