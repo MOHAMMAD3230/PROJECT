@@ -786,7 +786,11 @@ var logEl=null;
 function addLog(html){
   if(!logEl) return;
   var d=document.createElement('div');d.className='lg';
-  d.innerHTML='<span class="lt">'+fmtT(simT)+'</span>'+html;
+  var ts=document.createElement('span');
+  ts.className='lt';
+  ts.textContent=fmtT(simT);
+  d.appendChild(ts);
+  d.appendChild(document.createTextNode(String(html)));
   logEl.insertBefore(d,logEl.firstChild);
   while(logEl.childNodes.length>45)logEl.removeChild(logEl.lastChild);
 }
