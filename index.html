@@ -5,6 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="p:domain_verify" content="eb51a5f291f5ddb96150dfcdcc675003"/>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "fir-rtc-96b0b.firebaseapp.com",
+    projectId: "fir-rtc-96b0b",
+    storageBucket: "fir-rtc-96b0b.firebasestorage.app",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Example write matching a timestamp cleanup field
+  // await addDoc(collection(db, "tempItems"), {
+  //   createdAt: serverTimestamp()
+  // });
+</script>
+
+
+
+
+
+
+  
+
   <!-- ✅ Google Tag Manager -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=GT-NC6T5LRJ"></script>
   <script>
