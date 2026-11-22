@@ -4,7 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCknmnM8ognAsRt7KFIhSp3MkiyTqJIxwk",
+  apiKey: "firebaseconfig",
   authDomain: "fir-rtc-96b0b.firebaseapp.com",
   projectId: "fir-rtc-96b0b",
   storageBucket: "fir-rtc-96b0b.firebasestorage.app",
