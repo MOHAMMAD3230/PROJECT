@@ -1,0 +1,27 @@
+* { box-sizing: border-box; }
+:root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #080808; background: #f4f4f1; }
+body { margin: 0; min-height: 100vh; background-image: radial-gradient(#111 1px, transparent 1px); background-size: 22px 22px; }
+button, input { font: inherit; }
+.auth-shell { width: min(100% - 32px, 520px); margin: 0 auto; padding: 32px 0; }
+.back-link { color: #111; font-weight: 700; text-decoration-thickness: 2px; }
+.auth-card { margin-top: 24px; padding: clamp(24px, 6vw, 42px); background: #fff; border: 4px solid #080808; box-shadow: 8px 8px 0 #ffe600; }
+.eyebrow { margin: 0 0 12px; font-size: .75rem; font-weight: 800; letter-spacing: .14em; }
+h1 { margin: 0; font-size: clamp(2rem, 8vw, 3rem); line-height: 1; letter-spacing: -.06em; }
+.intro { margin: 14px 0 24px; color: #444; }
+.mode-switch { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 22px; border: 3px solid #080808; }
+.mode-button { padding: 12px; border: 0; background: #fff; font-weight: 800; cursor: pointer; }
+.mode-button[aria-selected="true"] { background: #ffe600; }
+form { display: grid; gap: 10px; }
+label { margin-top: 8px; font-weight: 750; }
+label span, .hint { color: #555; font-size: .85rem; }
+input { width: 100%; padding: 13px; border: 2px solid #111; border-radius: 0; background: #fff; }
+input:focus { outline: 3px solid #00cbd2; outline-offset: 2px; }
+.submit-button { width: 100%; margin-top: 12px; padding: 14px 18px; border: 3px solid #080808; background: #ccff00; box-shadow: 4px 4px 0 #080808; font-weight: 900; cursor: pointer; }
+.submit-button:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 #080808; }
+.submit-button:disabled { opacity: .65; cursor: wait; }
+.status { padding: 12px; border: 2px solid #111; background: #e8ffd2; line-height: 1.5; }
+.status.error { background: #ffe0e8; }
+.signed-in h2 { margin-bottom: 8px; }
+#user-label { overflow-wrap: anywhere; }
+.footnote { margin: 28px 0 0; color: #666; font-size: .8rem; }
+[hidden] { display: none !important; }

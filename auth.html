@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com; frame-src https://fir-rtc-96b0b.firebaseapp.com; img-src 'self' data:; base-uri 'self'; form-action 'self';">
+  <title>Sign in / Sign up</title>
+  <link rel="stylesheet" href="auth.css">
+  <script type="module" src="auth.js"></script>
+</head>
+<body>
+  <main class="auth-shell">
+    <a class="back-link" href="./">← Back to the site</a>
+    <section class="auth-card" aria-labelledby="page-title">
+      <p class="eyebrow">MY_STUFF // ACCOUNT</p>
+      <h1 id="page-title">Your account.</h1>
+      <p class="intro">Sign in or create an account to get started.</p>
+
+      <div id="auth-forms">
+        <div class="mode-switch" role="tablist" aria-label="Account action">
+          <button type="button" class="mode-button" role="tab" aria-selected="true" data-mode="signin">SIGN IN</button>
+          <button type="button" class="mode-button" role="tab" aria-selected="false" data-mode="signup">SIGN UP</button>
+        </div>
+
+        <p id="auth-status" class="status" role="status" aria-live="polite" hidden></p>
+
+        <form id="signin-form" autocomplete="on">
+          <label for="signin-email">Email</label>
+          <input id="signin-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+          <label for="signin-password">Password</label>
+          <input id="signin-password" name="password" type="password" autocomplete="current-password" required>
+          <button class="submit-button" type="submit">SIGN IN</button>
+        </form>
+
+        <form id="signup-form" autocomplete="on" hidden>
+          <label for="signup-name">Name <span>(optional)</span></label>
+          <input id="signup-name" name="name" type="text" autocomplete="name" maxlength="80">
+          <label for="signup-email">Email</label>
+          <input id="signup-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+          <label for="signup-password">Password</label>
+          <input id="signup-password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+          <label for="confirm-password">Confirm password</label>
+          <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" minlength="8" required>
+          <button class="submit-button" type="submit">CREATE ACCOUNT</button>
+          <p class="hint">Use at least 8 characters. Firebase also enforces your project's password policy.</p>
+        </form>
+      </div>
+
+      <section id="signed-in-panel" class="signed-in" aria-live="polite" hidden>
+        <h2>You're signed in.</h2>
+        <p id="user-label"></p>
+        <button id="signout-button" class="submit-button" type="button">SIGN OUT</button>
+      </section>
+      <p class="footnote">Authentication is provided by Firebase.</p>
+    </section>
+  </main>
+</body>
+</html>
